@@ -1,1 +1,2 @@
+PetVerse is a full-stack pet adoption platform that bridges the gap between animal shelters and people looking to adopt pets. Instead of relying on social media posts or manual paperwork, the platform digitizes the entire adoption process—from discovering pets to submitting adoption requests and managing approvals through an admin dashboard. The application provides a secure, responsive, and user-friendly experience using Spring Boot, React, PostgreSQL, and JWT Authentication.
 
