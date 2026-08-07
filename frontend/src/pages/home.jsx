@@ -1,20 +1,42 @@
+import { useState } from "react";
+
 import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
 import Hero from "../components/hero";
-import FilterBar from "../components/FilterBar";
-import FeaturedPets from "../components/FeaturedPets";
+import FilterBar from "../components/filterBar";
+import FeaturedPets from "../components/featuredPets";
 
-function home(){
-    return(
-    <div className="min-h-screen bg-slate-50">
-        <Navbar />
-        <main className="px-8 py-6 space-y-8">
-            <Hero />
+function Home() {
 
-            <FilterBar />
+    const [sidebarOpen, setSidebarOpen] = useState(true);   // true = visible for now
 
-            <FeaturedPets />
-        </main>
-    </div>
+    return (
+
+        <div className="flex min-h-screen bg-slate-100">
+
+            {/* Sidebar */}
+            <Sidebar
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+            />
+            <Navbar
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+            />
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col">
+                <main className="flex-1 p-2">
+                    <Hero />
+                    <div className="mt-8">
+                        <FilterBar />
+                    </div>
+                    <div className="mt-8">
+                        <FeaturedPets />
+                    </div>
+                </main>
+            </div>
+        </div>
     );
 }
-export default home;
+
+export default Home;

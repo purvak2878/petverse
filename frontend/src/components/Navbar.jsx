@@ -1,78 +1,87 @@
 import {
     FaSearch,
-    FaHeart,
     FaBell,
-    FaUserCircle,
+    FaHeart,
     FaMoon,
+    FaUserCircle,
+    FaBars,
 } from "react-icons/fa";
-import { PiPawPrintFill } from "react-icons/pi";
 
-function Navbar() {
+import logo from "../assets/images/petverse_logo_1.png";
+
+function Navbar({ sidebarOpen, setSidebarOpen }) {
+
     return (
-        <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
 
-            <div className="flex items-center justify-between h-20 px-8">
+        <header className="sticky top-0 z-50 bg-white shadow-md">
 
-                {/* Logo */}
+            <div className="flex items-center justify-between h-16 px-8">
 
-                <div className="flex items-center gap-3">
+                {/* Left */}
 
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 flex items-center justify-center shadow-lg">
+                <div className="flex items-center h-full">
 
-                        <PiPawPrintFill className="text-white text-3xl"/>
+                    <button
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-violet-100 transition flex items-center justify-center text-lg -translate-x-4"
+                    >
 
-                    </div>
+                        <FaBars />
 
-                    <h1 className="text-3xl font-extrabold tracking-tight">
+                    </button>
 
-                        <span className="text-violet-700">Pet</span>
-
-                        <span className="text-pink-500">Verse</span>
-
-                    </h1>
-
-                </div>
-
-                {/* Search Bar */}
-
-                <div className="hidden lg:flex items-center w-[900px] bg-slate-100 rounded-full px-5 py-3">
-
-                    <FaSearch className="text-gray-400 mr-3" />
-
-                    <input
-                        type="text"
-                        placeholder="Search pets, breeds or locations..."
-                        className="bg-transparent w-full outline-none text-gray-700 placeholder-gray-400"
+                    <img
+                        src={logo}
+                        alt="PetVerse"
+                        className="h-24 object-contain translate-y-2 -translate-x-8"
                     />
 
                 </div>
 
-                {/* Right Side */}
+                {/* Search */}
 
-                <div className="flex items-center gap-6">
+                <div className="flex-1 flex justify-center">
 
-                    {/* Notifications */}
+                    <div className="flex items-center w-[850px] bg-slate-100 rounded-full px-6 py-2.5">
 
-                    <button className="text-xl text-gray-600 hover:text-violet-600 transition">
+                        <FaSearch className="text-gray-400 mr-3"/>
+
+                        <input
+                            type="text"
+                            placeholder="Search pets, breeds or locations..."
+                            className="bg-transparent outline-none w-full"
+                        />
+
+                    </div>
+
+                </div>
+
+                {/* Icons */}
+
+                <div className="flex items-center gap-3">
+
+                    <button className="w-10 h-10 rounded-full bg-slate-100 hover:bg-purple-100 transition flex items-center justify-center">
+
                         <FaBell />
+
                     </button>
 
-                    {/* Favourite */}
+                    <button className="w-10 h-10 rounded-full bg-slate-100 hover:bg-pink-100 transition flex items-center justify-center">
 
-                    <button className="text-xl text-gray-600 hover:text-pink-500 transition">
                         <FaHeart />
+
                     </button>
 
-                    {/* Theme Toggle */}
+                    <button className="w-10 h-10 rounded-full bg-slate-100 hover:bg-yellow-100 transition flex items-center justify-center">
 
-                    <button className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center hover:bg-violet-100 transition">
-                        <FaMoon className="text-gray-700" />
+                        <FaMoon />
+
                     </button>
-
-                    {/* Profile */}
 
                     <button className="text-4xl text-gray-400 hover:text-violet-600 transition">
+
                         <FaUserCircle />
+
                     </button>
 
                 </div>
@@ -80,7 +89,9 @@ function Navbar() {
             </div>
 
         </header>
+
     );
+
 }
 
 export default Navbar;
