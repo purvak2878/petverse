@@ -29,13 +29,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     return (
         <>
             {/* Sidebar */}
-            <aside
-                className={`fixed top-[64px] left-0 h-screen w-[250px] bg-white shadow-2xl z-50 transition-transform duration-300 ease-in-out
-                ${
-                    sidebarOpen
-                        ? "translate-x-0"
-                        : "-translate-x-full"
-                }`}
+            <aside className={`fixed top-[65px] left-0 h-[calc(100vh-60px)] w-[255px]
+        bg-white shadow-lg border-r z-40 overflow-hidden transition-all duration-300
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+    `}
             >
                 {/* Menu */}
 
@@ -68,9 +65,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
                 {/* Bottom */}
 
-                <div className="absolute bottom-8 left-0 w-full px-6 -translate-y-12">
+                <div className="absolute bottom-8 left-0 w-full px-6  translate-y-2 -translate-y-2">
 
-                    <div className="rounded-2xl bg-gradient-to-br from-violet-500 to-pink-500 text-white p-4">
+                    <div className="rounded-2xl bg-gradient-to-br from-violet-600 to-pink-500 text-white p-4">
 
                         <h3 className="font-bold text-base">
 

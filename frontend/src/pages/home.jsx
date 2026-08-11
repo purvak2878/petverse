@@ -8,33 +8,46 @@ import FeaturedPets from "../components/featuredPets";
 
 function Home() {
 
-    const [sidebarOpen, setSidebarOpen] = useState(true);   // true = visible for now
+    const [sidebarOpen, setSidebarOpen] = useState(true);
 
     return (
+        <div className="min-h-screen bg-slate-100">
 
-        <div className="flex min-h-screen bg-slate-100">
+            {/* Navbar stays at the top */}
+            <Navbar
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+            />
 
             {/* Sidebar */}
             <Sidebar
                 sidebarOpen={sidebarOpen}
                 setSidebarOpen={setSidebarOpen}
             />
-            <Navbar
-                sidebarOpen={sidebarOpen}
-                setSidebarOpen={setSidebarOpen}
-            />
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col">
-                <main className="flex-1 p-2">
+
+            {/* Main content */}
+            <main
+                className={`pt-[90px] transition-all duration-300 
+                ${sidebarOpen ? "ml-[255px]" : "ml-0"}
+                `}
+            >
+
+                <div className="px-4 py-2">
+
                     <Hero />
-                    <div className="mt-8">
+
+                    <div className="mt-4">
                         <FilterBar />
                     </div>
-                    <div className="mt-8">
+
+                    <div className="mt-4">
                         <FeaturedPets />
                     </div>
-                </main>
-            </div>
+
+                </div>
+
+            </main>
+
         </div>
     );
 }
