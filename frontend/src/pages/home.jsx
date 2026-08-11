@@ -28,7 +28,7 @@ function Home() {
             {/* Main content */}
             <main
                 className={`pt-[90px] transition-all duration-300 
-                ${sidebarOpen ? "ml-[255px]" : "ml-0"}
+                ${sidebarOpen ? "ml-[295px]" : "ml-0"}
                 `}
             >
 

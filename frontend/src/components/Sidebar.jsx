@@ -29,7 +29,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     return (
         <>
             {/* Sidebar */}
-            <aside className={`fixed top-[65px] left-0 h-[calc(100vh-60px)] w-[255px]
+            <aside className={`fixed top-[65px] left-0 h-[calc(100vh-60px)] w-[285px]
         bg-white shadow-lg border-r z-40 overflow-hidden transition-all duration-300
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
     `}
