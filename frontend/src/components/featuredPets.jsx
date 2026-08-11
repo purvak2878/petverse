@@ -1,4 +1,5 @@
 import PetCard from "../components/PetCard";
+import { Link } from "react-router-dom";
 
 const pets = [
     {
@@ -73,12 +74,12 @@ function FeaturedPets() {
 
                 </div>
 
-
-                <button className="text-violet-600 font-semibold text-sm hover:text-pink-500 transition">
-
+                <Link
+                    to="/browse-pets"
+                    className="text-violet-600 font-semibold text-sm hover:text-pink-500 transition"
+                >
                     View All Pets →
-
-                </button>
+                </Link>
 
             </div>
 

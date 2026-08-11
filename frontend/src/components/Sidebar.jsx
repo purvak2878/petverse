@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
     FaBars,
     FaHome,
@@ -13,17 +14,55 @@ import {
 import logo from "../assets/images/petverse_logo_1.png";
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
-
+    const navigate = useNavigate();
     const menuItems = [
-        { icon: <FaHome />, label: "Home" },
-        { icon: <FaDog />, label: "Browse Pets" },
-        { icon: <FaHeart />, label: "Wishlist" },
-        { icon: <FaClipboardList />, label: "My Applications" },
-        { icon: <FaPlusCircle />, label: "Add a Pet" },
-        { icon: <FaBook />, label: "Pet Tips" },
-        { icon: <FaQuestionCircle />, label: "FAQs" },
-        { icon: <FaUser />, label: "Profile" },
-        { icon: <FaSignOutAlt />, label: "Logout" },
+        {
+            icon: <FaHome />,
+            label: "Home",
+            path: "/"
+        },
+
+        {
+            icon: <FaDog />,
+            label: "Browse Pets",
+            path: "/browse-pets"
+        },
+
+        {
+            icon: <FaHeart />,
+            label: "Wishlist",
+            path: "/wishlist"
+        },
+
+        {
+            icon: <FaClipboardList />,
+            label: "My Applications",
+            path: "/applications"
+        },
+
+        {
+            icon: <FaPlusCircle />,
+            label: "Add a Pet",
+            path: "/add-pet"
+        },
+
+        {
+            icon: <FaBook />,
+            label: "Pet Tips",
+            path: "/pet-tips"
+        },
+
+        {
+            icon: <FaQuestionCircle />,
+            label: "FAQs",
+            path: "/faqs"
+        },
+
+        {
+            icon: <FaUser />,
+            label: "Profile",
+            path: "/profile"
+        }
     ];
 
     return (
@@ -36,31 +75,33 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             >
                 {/* Menu */}
 
-                <nav className="mt-18 px-2">
-
+                <nav className="mt-4 px-2">
                     {menuItems.map((item, index) => (
 
                         <button
                             key={index}
-                            className="w-full flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-violet-50 hover:text-violet-700 transition text-gray-700 -translate-y-14"
+                            onClick={() => navigate(item.path)}
+                            className="w-full flex items-center gap-4 px-5 py-4 rounded-xl hover:bg-violet-50 hover:text-violet-700 transition text-gray-700"
                         >
-
-              <span className="text-lg">
-
-                {item.icon}
-
-              </span>
-
+                            <span className="text-lg">
+                                {item.icon}
+                            </span>
                             <span className="font-medium">
-
-                {item.label}
-
-              </span>
-
+                                {item.label}
+                            </span>
                         </button>
-
                     ))}
+                    {/* Logout */}
 
+                    <button
+                        onClick={() => {
+                            console.log("Logout clicked");
+                        }}
+                        className="w-full flex items-center gap-4 px-5 py-4 rounded-xl hover:bg-violet-50 hover:text-violet-700 transition text-gray-700"
+                    >
+                        <FaSignOutAlt />
+                        <span>Logout</span>
+                    </button>
                 </nav>
 
                 {/* Bottom */}

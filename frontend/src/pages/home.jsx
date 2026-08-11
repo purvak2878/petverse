@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import Hero from "../components/hero";
 import FilterBar from "../components/filterBar";
 import FeaturedPets from "../components/featuredPets";
+import Footer from "../components//Footer";
 
 function Home() {
 
@@ -43,10 +44,10 @@ function Home() {
                     <div className="mt-4">
                         <FeaturedPets />
                     </div>
-
                 </div>
             </main>
-
+            {/* Footer */}
+            <Footer sidebarOpen={sidebarOpen} />
         </div>
     );
 }
