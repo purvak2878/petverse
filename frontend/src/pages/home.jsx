@@ -32,7 +32,7 @@ function Home() {
                 `}
             >
 
-                <div className="px-4 py-2">
+                <div className="px-4 py-0">
 
                     <Hero />
 
@@ -45,7 +45,6 @@ function Home() {
                     </div>
 
                 </div>
-
             </main>
 
         </div>
