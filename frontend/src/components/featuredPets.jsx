@@ -40,7 +40,46 @@ const pets = [
         gender: "Female",
         traits: ["Fluffy", "Friendly", "Playful"],
         image: "https://images.unsplash.com/photo-1558788353-f76d92427f16"
-    }
+    },
+    {
+        id: 5,
+        name: "Milo",
+        breed: "Labrador Retriever",
+        age: "1 Year",
+        gender: "Male",
+        traits: ["Energetic", "Friendly", "Trained"],
+        image: "https://images.unsplash.com/photo-1518717758536-85ae29035b6d"
+    },
+
+    {
+        id: 6,
+        name: "Coco",
+        breed: "Indie Cat",
+        age: "8 Months",
+        gender: "Female",
+        traits: ["Gentle", "Playful", "Indoor"],
+        image: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131"
+    },
+
+    {
+        id: 7,
+        name: "Daisy",
+        breed: "Beagle",
+        age: "2 Years",
+        gender: "Female",
+        traits: ["Cheerful", "Curious", "Vaccinated"],
+        image: "https://images.unsplash.com/photo-1507146426996-ef05306b995a"
+    },
+
+    {
+        id: 8,
+        name: "Oreo",
+        breed: "Border Collie",
+        age: "6 Months",
+        gender: "Male",
+        traits: ["Smart", "Active", "Playful"],
+        image: "https://images.unsplash.com/photo-1558929996-da64ba858215"
+    },
 ];
 
 
