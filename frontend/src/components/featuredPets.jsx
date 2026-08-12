@@ -1,7 +1,7 @@
 import PetCard from "../components/PetCard";
 import { Link } from "react-router-dom";
 
-const pets = [
+export const pets = [
     {
         id: 1,
         name: "Bruno",

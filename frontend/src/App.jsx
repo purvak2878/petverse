@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import Layout from "./components/Layout";
+
 import Home from "./pages/home";
 import BrowsePets from "./pages/BrowsePets";
 import AddPet from "./pages/AddPet";
@@ -15,21 +17,46 @@ function App() {
 
             <Routes>
 
-                <Route path="/" element={<Home />} />
+                <Route element={<Layout />}>
 
-                <Route path="/browse-pets" element={<BrowsePets />} />
+                    <Route path="/" element={<Home />} />
 
-                <Route path="/Myapplications" element={<MyApplication />} />
+                    <Route
+                        path="/browse-pets"
+                        element={<BrowsePets />}
+                    />
 
-                <Route path="/add-pet" element={<AddPet />} />
+                    <Route
+                        path="/applications"
+                        element={<MyApplication />}
+                    />
 
-                <Route path="/pet-tips" element={<PetTips />} />
+                    <Route
+                        path="/add-pet"
+                        element={<AddPet />}
+                    />
 
-                <Route path="/faqs" element={<FAQs />} />
+                    <Route
+                        path="/pet-tips"
+                        element={<PetTips />}
+                    />
 
-                <Route path="/profile" element={<Profile />} />
+                    <Route
+                        path="/faqs"
+                        element={<FAQs />}
+                    />
 
-                <Route path="/wishlist" element={<Wishlist />} />
+                    <Route
+                        path="/profile"
+                        element={<Profile />}
+                    />
+
+                    <Route
+                        path="/wishlist"
+                        element={<Wishlist />}
+                    />
+
+                </Route>
 
             </Routes>
 

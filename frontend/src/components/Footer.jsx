@@ -11,7 +11,7 @@ function Footer({ sidebarOpen }) {
 
     return (
 
-        <footer className="relative mt-12 bg-gradient-to-r from-violet-100 to-pink-100 overflow-hidden">
+        <footer className="relative mt-12 bg-gradient-to-r from-pink-300 to-violet-400 overflow-hidden">
 
             {/* Layered Wave */}
 
