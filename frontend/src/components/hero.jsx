@@ -177,3 +177,5 @@ function Hero() {
 }
 
 export default Hero;
+
+// .\mvnw.cmd spring-boot:run
