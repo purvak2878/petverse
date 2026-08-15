@@ -87,7 +87,8 @@ function Hero() {
 
     return (
 
-        <section className="relative w-[650x] h-[420px] overflow-hidden rounded-3xl shadow-2xl">
+        <section className="relative w-full
+         h-[420px] overflow-hidden rounded-3xl shadow-2xl">
 
             <img
                 src={slides[currentSlide].image}

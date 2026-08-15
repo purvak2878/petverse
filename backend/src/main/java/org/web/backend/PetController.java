@@ -1,8 +1,6 @@
-package org.web.backend.controller;
+package org.web.backend;
 
 import org.springframework.web.bind.annotation.*;
-import org.web.backend.model.Pet;
-import org.web.backend.repository.PetRepository;
 
 import java.util.List;
 

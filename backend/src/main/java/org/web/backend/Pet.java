@@ -1,13 +1,14 @@
-package org.web.backend.model;
+package org.web.backend;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 
-@Document(collection = "pets")
+@Entity
+@Table(name = "pets")
 public class Pet {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
     private String type;
@@ -22,7 +23,8 @@ public class Pet {
     }
 
     public Pet(String name, String type, String breed, int age,
-               String gender, String location, String image, String description) {
+               String gender, String location, String image,
+               String description) {
 
         this.name = name;
         this.type = type;
@@ -34,11 +36,11 @@ public class Pet {
         this.description = description;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
