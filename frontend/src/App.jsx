@@ -10,6 +10,7 @@ import FAQs from "./pages/FAQs";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
 import MyApplication from "./pages/MyApplication";
+import Login from "./pages/Login";
 
 function App() {
     return (
@@ -17,6 +18,10 @@ function App() {
 
             <Routes>
 
+                {/* Login page */}
+                <Route path="/login" element={<Login />} />
+
+                {/* Main PetVerse layout */}
                 <Route element={<Layout />}>
 
                     <Route path="/" element={<Home />} />
