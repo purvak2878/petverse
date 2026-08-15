@@ -12,6 +12,7 @@ import Wishlist from "./pages/Wishlist";
 import MyApplication from "./pages/MyApplication";
 import Login from "./pages/Login";
 
+
 function App() {
     return (
         <BrowserRouter>
