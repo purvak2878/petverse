@@ -1,7 +1,6 @@
-package org.web.backend.repository;
+package org.web.backend;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.web.backend.model.Pet;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PetRepository extends MongoRepository<Pet, String> {
+public interface PetRepository extends JpaRepository<Pet, Long> {
 }
