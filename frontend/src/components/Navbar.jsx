@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
     FaSearch,
     FaBell,
@@ -11,8 +11,6 @@ import ProfileDropdown from "../components/ProfileDropdown";
 import logo from "../assets/images/petverse_logo_1.png";
 
 function Navbar({ sidebarOpen, setSidebarOpen }) {
-
-    const location = useLocation();
 
     return (
 
@@ -82,9 +80,6 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     </button>
                     <Link
                         to="/login"
-                        state={{
-                            from: location.pathname + location.search
-                        }}
                         className="px-4 py-1.5 rounded-full text-xs font-semibold text-white
                bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500
                shadow-md shadow-violet-300/40

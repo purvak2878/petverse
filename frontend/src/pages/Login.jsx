@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
     FaFacebookF,
     FaGooglePlusG,
@@ -15,8 +15,6 @@ import logo from "../assets/images/petverse_logo_1.png";
 
 function Login() {
     const navigate = useNavigate();
-    const location = useLocation();
-
     const [isSignUp, setIsSignUp] = useState(false);
 
     const [loginData, setLoginData] = useState({
@@ -58,67 +56,20 @@ function Login() {
        LOGIN SUBMIT
     ========================== */
 
-    const handleLoginSubmit = async (e) => {
+    const handleLoginSubmit = (e) => {
+
         e.preventDefault();
 
-        try {
-            const response = await fetch(
-                "http://localhost:9090/api/users/login",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        email: loginData.email.trim(),
-                        password: loginData.password,
-                    }),
-                }
-            );
+        // TODO: Connect this to Spring Boot login API
 
-            // Read response as text first
-            const text = await response.text();
+        alert("Logged in successfully!");
 
-            console.log("Backend status:", response.status);
-            console.log("Backend response:", text);
-
-            let data;
-
-            try {
-                data = JSON.parse(text);
-            } catch {
-                data = text;
-            }
-
-            // Login failed
-            if (!response.ok) {
-                alert(
-                    typeof data === "string"
-                        ? data
-                        : "Invalid email or password"
-                );
-                return;
-            }
-
-            // Login successful
-            console.log("Logged in user:", data);
-
-            // Save user
-            localStorage.setItem("user", JSON.stringify(data));
-
-            alert("Logged in successfully!");
-
-            // Get previous page
-            const from = location.state?.from || "/";
-
-            // Go back to previous page
-            navigate(from);
-
-        } catch (error) {
-            console.error("Login error:", error);
-            alert("Cannot connect to server. Please try again.");
-        }
+        setLoginData({
+            email: "",
+            password: "",
+        });
     };
+
 
     /* =========================
        REGISTER SUBMIT
@@ -1046,7 +997,7 @@ function SocialIcon({ children }) {
             border-slate-300
             flex
             items-center
-            justify-centerf
+            justify-center
             text-gray-500
             hover:border-violet-400
             hover:text-violet-600
