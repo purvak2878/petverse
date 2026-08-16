@@ -101,9 +101,12 @@ function FeaturedPets() {
                             🐾
                         </span>
 
-                        <h2 className="text-2xl font-bold text-gray-800">
-                            Featured Pets
-                        </h2>
+                        <h1 className="text-xl md:text-2xl font-bold text-slate-800">
+                            Featured{" "}
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500">
+                            Pets
+                        </span>
+                        </h1>
 
                     </div>
 

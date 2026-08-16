@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { FaPlus, FaMinus, FaSearch } from "react-icons/fa";
 import Footer from "../components/Footer";
+import PawBackground from "../components/PawBackground.jsx";
 
 function FAQs() {
+
     const [openIndex, setOpenIndex] = useState(null);
     const [question, setQuestion] = useState("");
 
@@ -59,132 +61,332 @@ function FAQs() {
         }
     ];
 
+
     const filteredFAQs = faqs.filter((faq) =>
         faq.question.toLowerCase().includes(question.toLowerCase())
     );
+
 
     const toggleFAQ = (index) => {
         setOpenIndex(openIndex === index ? null : index);
     };
 
+
     return (
-        <div className="min-h-screen bg-slate-50">
 
-            {/* FAQ Section */}
-            <section className="max-w-6xl mx-auto px-6 pt-28 pb-16">
+        <div className="
+            relative
+            min-h-screen
+            w-full
+            overflow-hidden
+            bg-slate-50
+        ">
 
-                {/* Heading */}
-                <div className="text-center mb-10">
+            {/* =====================================
+                PAW BACKGROUND
+                Always stays BEHIND the page content
+            ====================================== */}
 
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-800">
-                        Frequently Asked{" "}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500">
-                            Questions
-                        </span>
-                    </h1>
+            <div className="
+                absolute
+                inset-0
+                z-0
+                pointer-events-none
+            ">
+                <PawBackground/>
+            </div>
 
-                    <p className="mt-3 text-gray-500">
-                        Find answers to common questions about pet adoption
-                        and PetVerse.
-                    </p>
 
-                </div>
+            {/* =====================================
+                ALL ACTUAL PAGE CONTENT
+                Stays above paw background
+            ====================================== */}
 
-                {/* Ask Question */}
-                <div className="mb-10"><label className="block text-lg font-semibold text-slate-700 mb-2">
-                    Ask your Question
-                </label>
-                    <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-violet-400 overflow-hidden">
+            <div className="
+                relative
+                z-10
+            ">
 
-                        <FaSearch className="ml-5 text-gray-400" />
 
-                        <input
-                            type="text"
-                            value={question}
-                            onChange={(e) => {
-                                setQuestion(e.target.value);
-                                setOpenIndex(null);
-                            }}
-                            placeholder="Ask your questions..."
-                            className="w-full px-4 py-4 bg-transparent outline-none text-sm text-slate-700"
-                        />
+                {/* =================================
+                    FAQ SECTION
+                ================================== */}
 
-                        {question && (
-                            <button
-                                onClick={() => setQuestion("")}
-                                className="mr-4 text-sm text-violet-600 font-medium hover:text-pink-500 transition"
-                            >
-                                Clear
-                            </button>
+                <section className="
+                    max-w-6xl
+                    mx-auto
+                    px-6
+                    pt-8
+                    pb-16
+                ">
+
+
+                    {/* =================================
+                        HEADING
+                    ================================== */}
+
+                    <div className="
+                        text-center
+                        mb-10
+                    ">
+
+                        <h1 className="
+                            text-4xl
+                            md:text-5xl
+                            font-bold
+                            text-slate-800
+                        ">
+
+                            Frequently Asked{" "}
+
+                            <span className="
+                                text-transparent
+                                bg-clip-text
+                                bg-gradient-to-r
+                                from-violet-600
+                                via-fuchsia-500
+                                to-pink-500
+                            ">
+                                Questions
+                            </span>
+
+                        </h1>
+
+
+                        <p className="
+                            mt-3
+                            text-gray-500
+                        ">
+                            Find answers to common questions about pet adoption
+                            and PetVerse.
+                        </p>
+
+                    </div>
+
+
+                    {/* =================================
+                        ASK QUESTION
+                    ================================== */}
+
+                    <div className="mb-10">
+
+                        <label className="
+                            block
+                            text-lg
+                            font-semibold
+                            text-slate-700
+                            mb-2
+                        ">
+                            Ask your Question
+                        </label>
+
+
+                        <div className="
+                            flex
+                            items-center
+                            bg-white
+                            border
+                            border-slate-200
+                            rounded-2xl
+                            shadow-sm
+                            focus-within:ring-2
+                            focus-within:ring-violet-400
+                            overflow-hidden
+                        ">
+
+                            <FaSearch className="
+                                ml-5
+                                text-gray-400
+                            " />
+
+
+                            <input
+                                type="text"
+                                value={question}
+                                onChange={(e) => {
+                                    setQuestion(e.target.value);
+                                    setOpenIndex(null);
+                                }}
+                                placeholder="Ask your questions..."
+                                className="
+                                    w-full
+                                    px-4
+                                    py-4
+                                    bg-transparent
+                                    outline-none
+                                    text-sm
+                                    text-slate-700
+                                "
+                            />
+
+
+                            {question && (
+
+                                <button
+                                    onClick={() => setQuestion("")}
+                                    className="
+                                        mr-4
+                                        text-sm
+                                        text-violet-600
+                                        font-medium
+                                        hover:text-pink-500
+                                        transition
+                                    "
+                                >
+                                    Clear
+                                </button>
+
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    {/* =================================
+                        FAQ LIST
+                    ================================== */}
+
+                    <div className="
+                        bg-white
+                        rounded-3xl
+                        shadow-lg
+                        overflow-hidden
+                        border
+                        border-slate-100
+                    ">
+
+                        {filteredFAQs.length > 0 ? (
+
+                            filteredFAQs.map((faq, index) => (
+
+                                <div
+                                    key={index}
+                                    className="
+                                        border-b
+                                        border-slate-200
+                                        last:border-b-0
+                                    "
+                                >
+
+                                    <button
+                                        onClick={() => toggleFAQ(index)}
+                                        className="
+                                            w-full
+                                            flex
+                                            items-center
+                                            justify-between
+                                            gap-5
+                                            px-7
+                                            py-6
+                                            text-left
+                                            hover:bg-violet-50/50
+                                            transition
+                                        "
+                                    >
+
+                                        <span className="
+                                            text-lg
+                                            font-medium
+                                            text-slate-800
+                                        ">
+                                            {faq.question}
+                                        </span>
+
+
+                                        <span className="
+                                            flex-shrink-0
+                                            w-8
+                                            h-8
+                                            rounded-full
+                                            bg-gradient-to-r
+                                            from-violet-600
+                                            to-pink-500
+                                            text-white
+                                            flex
+                                            items-center
+                                            justify-center
+                                            text-xs
+                                        ">
+
+                                            {openIndex === index ? (
+                                                <FaMinus />
+                                            ) : (
+                                                <FaPlus />
+                                            )}
+
+                                        </span>
+
+                                    </button>
+
+
+                                    {openIndex === index && (
+
+                                        <div className="
+                                            px-6
+                                            pb-6
+                                            pr-16
+                                            text-base
+                                            leading-8
+                                            text-gray-500
+                                        ">
+                                            {faq.answer}
+                                        </div>
+
+                                    )}
+
+                                </div>
+
+                            ))
+
+                        ) : (
+
+                            <div className="
+                                text-center
+                                py-12
+                                px-6
+                            ">
+
+                                <div className="
+                                    text-4xl
+                                    mb-3
+                                ">
+                                    🐾
+                                </div>
+
+
+                                <h3 className="
+                                    font-semibold
+                                    text-slate-700
+                                ">
+                                    No matching question found
+                                </h3>
+
+
+                                <p className="
+                                    text-sm
+                                    text-gray-400
+                                    mt-1
+                                ">
+                                    Try searching with different words.
+                                </p>
+
+                            </div>
+
                         )}
 
                     </div>
 
-                </div>
+                </section>
 
-                {/* FAQ List */}
-                <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100">
 
-                    {filteredFAQs.length > 0 ? (
-                        filteredFAQs.map((faq, index) => (
+                {/* =================================
+                    FOOTER
+                ================================== */}
 
-                            <div
-                                key={index}
-                                className="border-b border-slate-200 last:border-b-0"
-                            >
+                <Footer />
 
-                                <button
-                                    onClick={() => toggleFAQ(index)}
-                                    className="w-full flex items-center justify-between gap-5 px-7 py-6 text-left hover:bg-violet-50/50 transition"
-                                >
-
-                                    <span className="text-lg font-medium text-slate-800">
-                                    {faq.question}
-                                    </span>
-
-                                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-violet-600 to-pink-500 text-white flex items-center justify-center text-xs">
-                                        {openIndex === index ? (
-                                            <FaMinus />
-                                        ) : (
-                                            <FaPlus />
-                                        )}
-                                    </span>
-
-                                </button>
-
-                                {openIndex === index && (
-                                    <div className="px-6 pb-6 pr-16 text-base leading-8 text-gray-500">
-                                        {faq.answer}
-                                    </div>
-                                )}
-
-                            </div>
-
-                        ))
-                    ) : (
-                        <div className="text-center py-12 px-6">
-
-                            <div className="text-4xl mb-3">
-                                🐾
-                            </div>
-
-                            <h3 className="font-semibold text-slate-700">
-                                No matching question found
-                            </h3>
-
-                            <p className="text-sm text-gray-400 mt-1">
-                                Try searching with different words.
-                            </p>
-
-                        </div>
-                    )}
-
-                </div>
-
-            </section>
-
-            {/* Your existing Footer */}
-            <Footer />
+            </div>
 
         </div>
     );

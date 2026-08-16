@@ -1,4 +1,5 @@
 import Footer from "../components/Footer";
+import PawBackground from "../components/PawBackground.jsx";
 
 function PetTips() {
 
@@ -131,97 +132,240 @@ function PetTips() {
         }
     ];
 
+
     return (
-        <div className="min-h-screen bg-slate-50">
 
-            {/* Header */}
-            <section className="pt-28 pb-12 px-6">
+        <div className="
+            relative
+            min-h-screen
+            w-full
+            overflow-hidden
+            bg-slate-50
+        ">
 
-                <div className="max-w-7xl mx-auto text-center">
+            {/* =====================================
+                PAW BACKGROUND
+                Stays behind everything
+            ====================================== */}
 
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-800">
-                        Pet{" "}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500">
-                            Tips
-                        </span>
-                    </h1>
-
-                    <p className="mt-3 text-base md:text-lg text-gray-500 max-w-2xl mx-auto">
-                        Helpful tips and guides to keep your pets happy,
-                        healthy, active, and well cared for.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-            {/* Tips Grid */}
-            <section className="max-w-7xl mx-auto px-6 pb-20">
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-14">
-
-                    {tips.map((tip, index) => (
-
-                        <article
-                            key={index}
-                            className="group flex flex-col"
-                        >
-
-                            {/* Image */}
-                            <div className="w-full h-56 overflow-hidden rounded-2xl bg-slate-200 shadow-sm">
-
-                                <img
-                                    src={tip.image}
-                                    alt={tip.title}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-
-                            </div>
+            <div className="
+                absolute
+                inset-0
+                z-0
+                pointer-events-none
+            ">
+                <PawBackground />
+            </div>
 
 
-                            {/* Category */}
-                            <p className="mt-4 text-sm font-medium text-violet-600">
-                                {tip.category}
-                            </p>
+            {/* =====================================
+                ALL PAGE CONTENT
+                Stays above paw background
+            ====================================== */}
+
+            <div className="
+                relative
+                z-10
+            ">
 
 
-                            {/* Title */}
-                            <h2 className="mt-2 text-xl font-bold leading-tight text-slate-800 group-hover:text-violet-600 transition">
-                                {tip.title}
-                            </h2>
+                {/* =================================
+                    HEADER
+                ================================== */}
+
+                <section className="
+                    pt-8
+                    pb-12
+                    px-6
+                ">
+
+                    <div className="
+                        max-w-7xl
+                        mx-auto
+                        text-center
+                    ">
+
+                        <h1 className="
+                            text-4xl
+                            md:text-5xl
+                            font-bold
+                            text-slate-800
+                        ">
+
+                            Pet{" "}
+
+                            <span className="
+                                text-transparent
+                                bg-clip-text
+                                bg-gradient-to-r
+                                from-violet-600
+                                via-fuchsia-500
+                                to-pink-500
+                            ">
+                                Tips
+                            </span>
+
+                        </h1>
 
 
-                            {/* Description */}
-                            <p className="mt-2 text-sm md:text-base leading-6 text-gray-500">
-                                {tip.description}
-                            </p>
+                        <p className="
+                            mt-3
+                            text-base
+                            md:text-lg
+                            text-gray-500
+                            max-w-2xl
+                            mx-auto
+                        ">
+                            Helpful tips and guides to keep your pets happy,
+                            healthy, active, and well cared for.
+                        </p>
+
+                    </div>
+
+                </section>
 
 
-                            {/* Read More */}
-                            <button
-                                className="mt-6 self-start px-5 py-2.5 rounded-full
-                                           text-sm font-semibold text-white
-                                           bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500
-                                           shadow-md shadow-violet-200
-                                           hover:-translate-y-0.5
-                                           hover:shadow-lg
-                                           transition-all duration-300"
+                {/* =================================
+                    TIPS GRID
+                ================================== */}
+
+                <section className="
+                    max-w-7xl
+                    mx-auto
+                    px-6
+                    pb-20
+                ">
+
+                    <div className="
+                        grid
+                        grid-cols-1
+                        md:grid-cols-2
+                        lg:grid-cols-3
+                        gap-x-10
+                        gap-y-14
+                    ">
+
+                        {tips.map((tip, index) => (
+
+                            <article
+                                key={index}
+                                className="
+                                    group
+                                    flex
+                                    flex-col
+                                "
                             >
-                                Read More
-                            </button>
 
-                        </article>
+                                {/* Image */}
 
-                    ))}
+                                <div className="
+                                    w-full
+                                    h-56
+                                    overflow-hidden
+                                    rounded-2xl
+                                    bg-slate-200
+                                    shadow-sm
+                                ">
 
-                </div>
+                                    <img
+                                        src={tip.image}
+                                        alt={tip.title}
+                                        className="
+                                            w-full
+                                            h-full
+                                            object-cover
+                                            group-hover:scale-105
+                                            transition-transform
+                                            duration-500
+                                        "
+                                    />
 
-            </section>
+                                </div>
 
 
-            {/* Footer */}
-            <Footer />
+                                {/* Category */}
+
+                                <p className="
+                                    mt-4
+                                    text-sm
+                                    font-medium
+                                    text-violet-600
+                                ">
+                                    {tip.category}
+                                </p>
+
+
+                                {/* Title */}
+
+                                <h2 className="
+                                    mt-2
+                                    text-xl
+                                    font-bold
+                                    leading-tight
+                                    text-slate-800
+                                    group-hover:text-violet-600
+                                    transition
+                                ">
+                                    {tip.title}
+                                </h2>
+
+
+                                {/* Description */}
+
+                                <p className="
+                                    mt-2
+                                    text-sm
+                                    md:text-base
+                                    leading-6
+                                    text-gray-500
+                                ">
+                                    {tip.description}
+                                </p>
+
+
+                                {/* Read More */}
+
+                                <button
+                                    className="
+                                        mt-6
+                                        self-start
+                                        px-5
+                                        py-2.5
+                                        rounded-full
+                                        text-sm
+                                        font-semibold
+                                        text-white
+                                        bg-gradient-to-r
+                                        from-violet-600
+                                        via-fuchsia-500
+                                        to-pink-500
+                                        shadow-md
+                                        shadow-violet-200
+                                        hover:-translate-y-0.5
+                                        hover:shadow-lg
+                                        transition-all
+                                        duration-300
+                                    "
+                                >
+                                    Read More
+                                </button>
+
+                            </article>
+
+                        ))}
+
+                    </div>
+
+                </section>
+
+
+                {/* =================================
+                    FOOTER
+                ================================== */}
+
+                <Footer />
+
+            </div>
 
         </div>
     );

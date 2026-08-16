@@ -12,6 +12,9 @@ import {
     FaSignOutAlt,
 } from "react-icons/fa";
 
+import sidebarPet from "../assets/images/sidebarpet.png";
+
+
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
     const menuItems = [
@@ -64,9 +67,14 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
         }
     ];
 
+
     return (
+
         <>
-            {/* Sidebar */}
+
+            {/* ==============================
+                SIDEBAR
+            =============================== */}
 
             <aside
                 className={`
@@ -90,7 +98,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 `}
             >
 
-                {/* Menu */}
+
+                {/* ==============================
+                    MENU
+                =============================== */}
 
                 <nav className="mt-4 px-2">
 
@@ -132,7 +143,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     ))}
 
 
-                    {/* Logout */}
+                    {/* ==============================
+                        LOGOUT
+                    =============================== */}
 
                     <button
                         onClick={() => {
@@ -165,7 +178,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </nav>
 
 
-                {/* Bottom Adoption Card */}
+                {/* ==============================
+                    BOTTOM AREA
+                =============================== */}
 
                 <div className="
                     absolute
@@ -173,8 +188,38 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     left-0
                     w-full
                     px-6
-                    translate-y-2
                 ">
+
+
+                    {/* ==========================
+                        SIDEBAR PET IMAGE
+                    =========================== */}
+
+                    <div className="
+                        flex
+                        justify-center
+                        items-end
+                        h-[105px]
+                        mb-[-2px]
+                    ">
+
+                        <img
+                            src={sidebarPet}
+                            alt="Pet"
+                            className="
+                                h-[115px]
+                                w-auto
+                                object-contain
+                                drop-shadow-md
+                            "
+                        />
+
+                    </div>
+
+
+                    {/* ==========================
+                        ADOPTION CARD
+                    =========================== */}
 
                     <div className="
                         rounded-2xl
@@ -189,7 +234,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                             🐾 Adopt. Love. Repeat.
                         </h3>
 
-                        <p className="text-xs mt-2 opacity-90">
+                        <p className="
+                            text-xs
+                            mt-2
+                            opacity-90
+                        ">
                             Give a pet a loving home and gain a friend for life.
                         </p>
 
@@ -197,9 +246,12 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
                 </div>
 
+
             </aside>
+
         </>
     );
 }
+
 
 export default Sidebar;
