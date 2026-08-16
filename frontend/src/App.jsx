@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
 import MyApplication from "./pages/MyApplication";
 import Login from "./pages/Login";
+import ApplicationForm from "./pages/ApplicationForm";
 
 
 function App() {
@@ -30,6 +31,11 @@ function App() {
                     <Route
                         path="/browse-pets"
                         element={<BrowsePets />}
+                    />
+
+                    <Route
+                        path="/apply"
+                        element={<ApplicationForm />}
                     />
 
                     <Route
