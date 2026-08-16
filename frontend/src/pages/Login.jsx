@@ -75,31 +75,65 @@ function Login() {
        REGISTER SUBMIT
     ========================== */
 
-    const handleRegisterSubmit = (e) => {
+    const handleRegisterSubmit = async (e) => {
 
         e.preventDefault();
 
+        // Check passwords
         if (registerData.password !== registerData.confirm) {
-
             alert("Passwords don't match.");
-
             return;
         }
 
-        // TODO: Connect this to Spring Boot register API
+        try {
 
-        alert("User registered successfully!");
+            const response = await fetch(
+                "http://localhost:9090/api/users/register",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name: registerData.name,
+                        email: registerData.email,
+                        password: registerData.password,
+                    }),
+                }
+            );
 
-        setRegisterData({
-            name: "",
-            email: "",
-            password: "",
-            confirm: "",
-        });
+            const data = await response.json();
 
-        setIsSignUp(false);
+            if (!response.ok) {
+                alert(
+                    typeof data === "string"
+                        ? data
+                        : "Registration failed"
+                );
+                return;
+            }
+
+            console.log("Registered user:", data);
+
+            alert("User registered successfully!");
+
+            setRegisterData({
+                name: "",
+                email: "",
+                password: "",
+                confirm: "",
+            });
+
+            setIsSignUp(false);
+
+        } catch (error) {
+
+            console.error("Registration error:", error);
+
+            alert("Cannot connect to server. Please try again.");
+
+        }
     };
-
 
     return (
 
