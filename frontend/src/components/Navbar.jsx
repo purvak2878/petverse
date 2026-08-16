@@ -56,6 +56,18 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     </div>
 
                 </div>
+                <Link
+                    to="/login"
+                    className="px-4 py-1.5 rounded-full text-xs font-semibold text-white
+               bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500
+               shadow-md shadow-violet-300/40
+               hover:-translate-y-0.5 hover:shadow-lg
+               transition-all duration-300
+               -translate-x-2 "
+                >
+                    LOGIN
+                </Link>
+
 
                 {/* Icons */}
 
@@ -78,16 +90,6 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                         <FaMoon />
 
                     </button>
-                    <Link
-                        to="/login"
-                        className="px-4 py-1.5 rounded-full text-xs font-semibold text-white
-               bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500
-               shadow-md shadow-violet-300/40
-               hover:-translate-y-0.5 hover:shadow-lg
-               transition-all duration-300"
-                    >
-                        LOGIN
-                    </Link>
 
                     <button className="text-4xl text-gray-400 hover:text-violet-600 transition">
                         <ProfileDropdown/>
