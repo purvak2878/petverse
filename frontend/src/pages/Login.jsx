@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     FaFacebookF,
     FaGooglePlusG,
@@ -15,6 +15,7 @@ import logo from "../assets/images/petverse_logo_1.png";
 
 function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isSignUp, setIsSignUp] = useState(false);
 
     const [loginData, setLoginData] = useState({
@@ -56,18 +57,63 @@ function Login() {
        LOGIN SUBMIT
     ========================== */
 
-    const handleLoginSubmit = (e) => {
+    const handleLoginSubmit = async (e) => {
 
         e.preventDefault();
 
-        // TODO: Connect this to Spring Boot login API
+        try {
 
-        alert("Logged in successfully!");
+            const response = await fetch(
+                "http://localhost:9090/api/users/login",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: loginData.email,
+                        password: loginData.password,
+                    }),
+                }
+            );
 
-        setLoginData({
-            email: "",
-            password: "",
-        });
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(
+                    typeof data === "string"
+                        ? data
+                        : "Invalid email or password"
+                );
+                return;
+            }
+
+            // Save logged-in user
+            localStorage.setItem(
+                "user",
+                JSON.stringify(data)
+            );
+
+            alert("Logged in successfully!");
+
+            // Clear login fields
+            setLoginData({
+                email: "",
+                password: "",
+            });
+
+            // Get the page user came from
+            const from = location.state?.from || "/";
+
+            // Redirect back to previous page
+            navigate(from, { replace: true });
+
+        } catch (error) {
+
+            console.error("Login error:", error);
+
+            alert("Cannot connect to server. Please try again.");
+        }
     };
 
 
