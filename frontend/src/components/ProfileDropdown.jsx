@@ -133,12 +133,13 @@ function ProfileDropdown() {
                     text-slate-700
                     hover:text-violet-600
                     transition
+
                 "
                 aria-label="Profile"
             >
 
                 <FaUserCircle className="
-                    text-2xl
+                    text-4xl
                 " />
 
             </button>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation} from "react-router-dom";
 import {
     FaFacebookF,
     FaGooglePlusG,
@@ -14,9 +14,11 @@ import logo from "../assets/images/petverse_logo_1.png";
 
 
 function Login() {
+    const location = useLocation();
     const navigate = useNavigate();
-    const [isSignUp, setIsSignUp] = useState(false);
-
+    const [isSignUp, setIsSignUp] = useState(
+        location.state?.openRegister === true
+    );
     const [loginData, setLoginData] = useState({
         email: "",
         password: "",
