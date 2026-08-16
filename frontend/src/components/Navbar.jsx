@@ -7,6 +7,7 @@ import {
     FaUserCircle,
     FaBars,
 } from "react-icons/fa";
+import ProfileDropdown from "../components/ProfileDropdown";
 
 import logo from "../assets/images/petverse_logo_1.png";
 
@@ -90,9 +91,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     </Link>
 
                     <button className="text-4xl text-gray-400 hover:text-violet-600 transition">
-
-                        <FaUserCircle />
-
+                        <ProfileDropdown/>
                     </button>
 
                 </div>
