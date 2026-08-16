@@ -13,6 +13,10 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
+    // =========================
+    // REGISTER
+    // =========================
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
 
@@ -24,5 +28,42 @@ public class UserController {
         User savedUser = userRepository.save(user);
 
         return ResponseEntity.ok(savedUser);
+    }
+
+
+    // =========================
+    // LOGIN
+    // =========================
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody User loginUser) {
+
+        System.out.println("Login request received");
+        System.out.println("Email: " + loginUser.getEmail());
+
+        User user = userRepository
+                .findByEmail(loginUser.getEmail().trim())
+                .orElse(null);
+
+        if (user == null) {
+            System.out.println("USER NOT FOUND");
+            return ResponseEntity.badRequest()
+                    .body("Invalid email or password");
+        }
+
+        System.out.println("USER FOUND");
+
+        if (!user.getPassword().equals(loginUser.getPassword())) {
+            System.out.println("PASSWORD DOES NOT MATCH");
+            return ResponseEntity.badRequest()
+                    .body("Invalid email or password");
+        }
+
+        System.out.println("LOGIN SUCCESSFUL");
+
+        // Don't send password back to frontend
+        user.setPassword(null);
+
+        return ResponseEntity.ok(user);
     }
 }

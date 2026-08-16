@@ -70,14 +70,27 @@ function Login() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        email: loginData.email,
+                        email: loginData.email.trim(),
                         password: loginData.password,
                     }),
                 }
             );
 
-            const data = await response.json();
+            // Read response as text first
+            const text = await response.text();
 
+            console.log("Backend status:", response.status);
+            console.log("Backend response:", text);
+
+            let data;
+
+            try {
+                data = JSON.parse(text);
+            } catch {
+                data = text;
+            }
+
+            // Login failed
             if (!response.ok) {
                 alert(
                     typeof data === "string"
@@ -87,15 +100,18 @@ function Login() {
                 return;
             }
 
-            // Save logged-in user
+            // Login successful
+            console.log("Logged in user:", data);
+
+            // Save user
             localStorage.setItem("user", JSON.stringify(data));
 
             alert("Logged in successfully!");
 
-            // Get the page user came from
+            // Get previous page
             const from = location.state?.from || "/";
 
-            // Go back to that page
+            // Go back to previous page
             navigate(from);
 
         } catch (error) {
@@ -103,7 +119,6 @@ function Login() {
             alert("Cannot connect to server. Please try again.");
         }
     };
-
 
     /* =========================
        REGISTER SUBMIT
@@ -1031,7 +1046,7 @@ function SocialIcon({ children }) {
             border-slate-300
             flex
             items-center
-            justify-center
+            justify-centerf
             text-gray-500
             hover:border-violet-400
             hover:text-violet-600
