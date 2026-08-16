@@ -12,7 +12,7 @@ import {
     FaSignOutAlt,
 } from "react-icons/fa";
 
-import sidebarPet from "../assets/images/sidebarpet.png";
+import sidebarPet from "../assets/images/sidebarPet.png";
 
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -197,10 +197,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
                     <div className="
                         flex
-                        justify-center
                         items-end
                         h-[105px]
-                        mb-[-2px]
+                        translate-y-8
                     ">
 
                         <img
