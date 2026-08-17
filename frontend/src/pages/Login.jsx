@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+import { loginUser } from "../utils/auth";
+
 import {
     FaFacebookF,
     FaGooglePlusG,
@@ -14,8 +17,9 @@ import logo from "../assets/images/petverse_logo_1.png";
 
 
 function Login() {
+
     const navigate = useNavigate();
-    const location = useLocation();
+
     const [isSignUp, setIsSignUp] = useState(false);
 
     const [loginData, setLoginData] = useState({
@@ -30,34 +34,77 @@ function Login() {
         confirm: "",
     });
 
+    // =========================================
+    // NOTIFICATION STATE
+    // =========================================
 
-    /* =========================
-       LOGIN INPUT
-    ========================== */
+    const [notification, setNotification] = useState({
+        show: false,
+        type: "",
+        title: "",
+        message: "",
+    });
 
-    const handleLoginChange = (e) =>
+
+    // =========================================
+    // SHOW NOTIFICATION
+    // =========================================
+
+    const showNotification = (type, title, message) => {
+
+        setNotification({
+            show: true,
+            type,
+            title,
+            message,
+        });
+
+        setTimeout(() => {
+
+            setNotification({
+                show: false,
+                type: "",
+                title: "",
+                message: "",
+            });
+
+        }, 3500);
+    };
+
+
+    // =========================================
+    // LOGIN INPUT
+    // =========================================
+
+    const handleLoginChange = (e) => {
+
         setLoginData({
             ...loginData,
             [e.target.name]: e.target.value,
         });
 
+    };
 
-    /* =========================
-       REGISTER INPUT
-    ========================== */
 
-    const handleRegisterChange = (e) =>
+    // =========================================
+    // REGISTER INPUT
+    // =========================================
+
+    const handleRegisterChange = (e) => {
+
         setRegisterData({
             ...registerData,
             [e.target.name]: e.target.value,
         });
 
+    };
 
-    /* =========================
-       LOGIN SUBMIT
-    ========================== */
 
-    const handleLoginSubmit = async (e) => {
+    // =========================================
+    // LOGIN
+    // =========================================
+
+    const handleLogin = async (e) => {
 
         e.preventDefault();
 
@@ -67,9 +114,11 @@ function Login() {
                 "http://localhost:9090/api/users/login",
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type": "application/json",
                     },
+
                     body: JSON.stringify({
                         email: loginData.email,
                         password: loginData.password,
@@ -77,69 +126,113 @@ function Login() {
                 }
             );
 
-            const data = await response.json();
+
+            const contentType =
+                response.headers.get("content-type");
+
+
+            let data;
+
+
+            if (
+                contentType &&
+                contentType.includes("application/json")
+            ) {
+
+                data = await response.json();
+
+            } else {
+
+                data = await response.text();
+
+            }
+
 
             if (!response.ok) {
-                alert(
+
+                throw new Error(
                     typeof data === "string"
                         ? data
                         : "Invalid email or password"
                 );
-                return;
+
             }
 
-            // Save logged-in user
-            localStorage.setItem(
-                "user",
-                JSON.stringify(data)
+
+            // Save JWT + user
+            loginUser(data);
+
+
+            console.log(
+                "LOGIN SUCCESSFUL:",
+                data
             );
 
-            alert("Logged in successfully!");
 
-            // Clear login fields
-            setLoginData({
-                email: "",
-                password: "",
-            });
+            // Show success notification
+            showNotification(
+                "success",
+                "Welcome back! 🐾",
+                "You have successfully logged in."
+            );
 
-            // Get the page user came from
-            const from = location.state?.from || "/";
 
-            // Redirect back to previous page
-            navigate(from, { replace: true });
+            // Small delay so user can see notification
+            setTimeout(() => {
+                navigate("/");
+            }, 1000);
+
 
         } catch (error) {
 
-            console.error("Login error:", error);
+            console.error(
+                "Login failed:",
+                error
+            );
 
-            alert("Cannot connect to server. Please try again.");
+
+            showNotification(
+                "error",
+                "Login failed",
+                error.message ||
+                "Invalid email or password."
+            );
         }
     };
 
 
-    /* =========================
-       REGISTER SUBMIT
-    ========================== */
+    // =========================================
+    // REGISTER
+    // =========================================
 
-    const handleRegisterSubmit = async (e) => {
+    const handleRegister = async (e) => {
 
         e.preventDefault();
 
-        // Check passwords
-        if (registerData.password !== registerData.confirm) {
-            alert("Passwords don't match.");
-            return;
-        }
-
         try {
+
+            // Password confirmation
+            if (
+                registerData.password !==
+                registerData.confirm
+            ) {
+
+                throw new Error(
+                    "Passwords do not match."
+                );
+
+            }
+
 
             const response = await fetch(
                 "http://localhost:9090/api/users/register",
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type": "application/json",
                     },
+
                     body: JSON.stringify({
                         name: registerData.name,
                         email: registerData.email,
@@ -148,21 +241,27 @@ function Login() {
                 }
             );
 
-            const data = await response.json();
+
+            const data =
+                await response.text();
+
 
             if (!response.ok) {
-                alert(
-                    typeof data === "string"
-                        ? data
-                        : "Registration failed"
+
+                throw new Error(
+                    data ||
+                    "Registration failed."
                 );
-                return;
+
             }
 
-            console.log("Registered user:", data);
 
-            alert("User registered successfully!");
+            console.log(
+                "REGISTER SUCCESSFUL"
+            );
 
+
+            // Clear registration form
             setRegisterData({
                 name: "",
                 email: "",
@@ -170,16 +269,36 @@ function Login() {
                 confirm: "",
             });
 
+
+            // Switch to login
             setIsSignUp(false);
+
+
+            // Show success notification
+            showNotification(
+                "success",
+                "Account created! 🐾",
+                "Your PetVerse account has been created. Please login."
+            );
+
 
         } catch (error) {
 
-            console.error("Registration error:", error);
+            console.error(
+                "Registration failed:",
+                error
+            );
 
-            alert("Cannot connect to server. Please try again.");
 
+            showNotification(
+                "error",
+                "Registration failed",
+                error.message ||
+                "Something went wrong."
+            );
         }
     };
+
 
     return (
 
@@ -193,44 +312,53 @@ function Login() {
             items-center
         ">
 
+
             {/* =====================================
                 PAW PRINT BACKGROUND
             ====================================== */}
 
             <PawBackground />
+
+
+            {/* =====================================
+                BACK TO HOME
+            ====================================== */}
+
             <button
                 onClick={() => navigate("/")}
                 className="
-        absolute
-        top-6
-        left-6
-        z-50
-        w-10
-        h-10
-        rounded-full
-        flex
-        items-center
-        justify-center
-        bg-white/90
-        text-slate-600
-        shadow-md
-        hover:bg-violet-600
-        hover:text-white
-        hover:-translate-x-1
-        transition-all
-        duration-200
-    "
+                    absolute
+                    top-6
+                    left-6
+                    z-50
+                    w-10
+                    h-10
+                    rounded-full
+                    flex
+                    items-center
+                    justify-center
+                    bg-white/90
+                    text-slate-600
+                    shadow-md
+                    hover:bg-violet-600
+                    hover:text-white
+                    hover:-translate-x-1
+                    transition-all
+                    duration-200
+                "
                 aria-label="Back to Home"
             >
                 <FaArrowLeft className="text-sm" />
             </button>
 
+
             {/* =====================================
-                CUSTOM DOG ANIMATION
+                DOG ANIMATION
             ====================================== */}
 
             <style>
                 {`
+
                     @keyframes petverseDogFloat {
 
                         0%, 100% {
@@ -240,7 +368,9 @@ function Login() {
                         50% {
                             transform: translateY(-8px);
                         }
+
                     }
+
 
                     @keyframes petverseShadow {
 
@@ -253,7 +383,9 @@ function Login() {
                             transform: scale(0.88);
                             opacity: 0.2;
                         }
+
                     }
+
                 `}
             </style>
 
@@ -287,9 +419,7 @@ function Login() {
                 ">
 
 
-                    {/* =========================
-                        PETVERSE MINI LOGO
-                    ========================== */}
+                    {/* LOGO */}
 
                     <div className="
                         flex
@@ -304,14 +434,18 @@ function Login() {
                         <img
                             src={logo}
                             alt="PetVerse"
-                            className="h-40 object-contain translate-y-2 -translate-x-2"
+                            className="
+                                h-40
+                                object-contain
+                                translate-y-2
+                                -translate-x-2
+                            "
                         />
 
                     </div>
 
-                    {/* =========================
-                        DOG AREA
-                    ========================== */}
+
+                    {/* DOG */}
 
                     <div className="
                         relative
@@ -325,19 +459,20 @@ function Login() {
 
                         {/* Ground shadow */}
 
-                        <div className="
-                            absolute
-                            bottom-4
-                            w-[210px]
-                            h-[28px]
-                            rounded-[50%]
-                            bg-slate-400/35
-                            blur-md
-                        "
-                             style={{
-                                 animation:
-                                     "petverseShadow 3.5s ease-in-out infinite",
-                             }}
+                        <div
+                            className="
+                                absolute
+                                bottom-4
+                                w-[210px]
+                                h-[28px]
+                                rounded-[50%]
+                                bg-slate-400/35
+                                blur-md
+                            "
+                            style={{
+                                animation:
+                                    "petverseShadow 3.5s ease-in-out infinite",
+                            }}
                         />
 
 
@@ -362,9 +497,8 @@ function Login() {
 
                     </div>
 
-                    {/* =========================
-                        TAGLINE
-                    ========================== */}
+
+                    {/* TAGLINE */}
 
                     <div className="text-center">
 
@@ -409,13 +543,14 @@ function Login() {
                         </p>
 
                     </div>
+
                 </div>
 
             </section>
 
 
             {/* =====================================
-                LOGIN / REGISTER CARD
+                RIGHT SIDE
             ====================================== */}
 
             <div className="
@@ -432,7 +567,7 @@ function Login() {
 
 
                 {/* =================================
-                    MAIN CARD
+                    LOGIN / REGISTER CARD
                 ================================== */}
 
                 <div className="
@@ -494,7 +629,7 @@ function Login() {
                             </h2>
 
 
-                            {/* Social icons */}
+                            {/* SOCIAL ICONS */}
 
                             <div className="
                                 flex
@@ -527,7 +662,7 @@ function Login() {
 
 
                             <form
-                                onSubmit={handleRegisterSubmit}
+                                onSubmit={handleRegister}
                                 className="
                                     w-full
                                     flex
@@ -726,7 +861,7 @@ function Login() {
                             </h2>
 
 
-                            {/* Social icons */}
+                            {/* SOCIAL ICONS */}
 
                             <div className="
                                 flex
@@ -759,7 +894,7 @@ function Login() {
 
 
                             <form
-                                onSubmit={handleLoginSubmit}
+                                onSubmit={handleLogin}
                                 className="
                                     w-full
                                     flex
@@ -1019,8 +1154,116 @@ function Login() {
 
                 </div>
 
-            </div>
 
+                {/* =====================================
+                    PETVERSE NOTIFICATION
+                    APPEARS BELOW LOGIN CARD
+                ====================================== */}
+
+                <div
+                    className={`
+                        absolute
+                        z-50
+                        right-[6%]
+                        top-[calc(50%+300px)]
+                        w-[820px]
+                        max-w-[calc(100vw-40px)]
+                        flex
+                        justify-center
+                        pointer-events-none
+                        transition-all
+                        duration-500
+                        ${
+                        notification.show
+                            ? "opacity-100 translate-y-0"
+                            : "opacity-0 -translate-y-3"
+                    }
+                    `}
+                >
+
+                    {notification.show && (
+
+                        <div
+                            className={`
+                                w-full
+                                max-w-[520px]
+                                rounded-2xl
+                                px-5
+                                py-4
+                                shadow-xl
+                                border
+                                backdrop-blur-md
+                                flex
+                                items-center
+                                gap-4
+
+                                ${
+                                notification.type === "success"
+                                    ? "bg-white/95 border-emerald-200"
+                                    : "bg-white/95 border-red-200"
+                            }
+                            `}
+                        >
+
+                            {/* Notification Icon */}
+
+                            <div
+                                className={`
+                                    flex-shrink-0
+                                    w-10
+                                    h-10
+                                    rounded-full
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-white
+                                    font-bold
+                                    text-lg
+
+                                    ${
+                                    notification.type === "success"
+                                        ? "bg-emerald-500"
+                                        : "bg-red-500"
+                                }
+                                `}
+                            >
+
+                                {notification.type === "success"
+                                    ? "✓"
+                                    : "✕"}
+
+                            </div>
+
+
+                            {/* Notification Text */}
+
+                            <div className="text-left">
+
+                                <h3 className="
+                                    font-bold
+                                    text-slate-800
+                                    text-sm
+                                ">
+                                    {notification.title}
+                                </h3>
+
+                                <p className="
+                                    text-xs
+                                    text-slate-500
+                                    mt-1
+                                ">
+                                    {notification.message}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    )}
+
+                </div>
+
+            </div>
 
         </div>
     );

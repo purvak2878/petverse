@@ -262,7 +262,7 @@ function ProfileDropdown() {
                                 <button
                                     onClick={() => {
                                         setOpen(false);
-                                        navigate("/my-profile");
+                                        navigate("/profile");
                                     }}
                                     className="
                                          w-full
