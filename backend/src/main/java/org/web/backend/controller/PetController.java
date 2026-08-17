@@ -31,9 +31,9 @@ public class PetController {
     }
 
 
-    // =========================================
+    // =====================================================
     // GET ALL PETS
-    // =========================================
+    // =====================================================
 
     @GetMapping
     public ResponseEntity<List<Pet>> getAllPets() {
@@ -44,9 +44,9 @@ public class PetController {
     }
 
 
-    // =========================================
+    // =====================================================
     // GET ONE PET BY ID
-    // =========================================
+    // =====================================================
 
     @GetMapping("/{id}")
     public ResponseEntity<Pet> getPetById(
@@ -61,9 +61,9 @@ public class PetController {
     }
 
 
-    // =========================================
+    // =====================================================
     // ADD PET WITH IMAGE
-    // =========================================
+    // =====================================================
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<?> addPet(
@@ -97,15 +97,14 @@ public class PetController {
 
         try {
 
-            // Create uploads/pets folder if needed
             Files.createDirectories(uploadDirectory);
 
             String imageFileName = null;
 
 
-            // =====================================
+            // =================================================
             // SAVE IMAGE
-            // =====================================
+            // =================================================
 
             if (image != null && !image.isEmpty()) {
 
@@ -126,7 +125,6 @@ public class PetController {
                 }
 
 
-                // Create unique filename
                 imageFileName =
                         UUID.randomUUID()
                                 .toString()
@@ -147,9 +145,9 @@ public class PetController {
             }
 
 
-            // =====================================
-            // CREATE PET OBJECT
-            // =====================================
+            // =================================================
+            // CREATE PET
+            // =================================================
 
             Pet pet = new Pet();
 
@@ -165,13 +163,8 @@ public class PetController {
             pet.setHealthStatus(healthStatus);
             pet.setStatus(status);
 
-            // Save image filename in database
             pet.setImage(imageFileName);
 
-
-            // =====================================
-            // SAVE PET
-            // =====================================
 
             Pet savedPet =
                     petRepository.save(pet);
@@ -192,9 +185,177 @@ public class PetController {
     }
 
 
-    // =========================================
+    // =====================================================
+    // UPDATE PET WITH OPTIONAL NEW IMAGE
+    // =====================================================
+
+    @PutMapping(
+            value = "/{id}",
+            consumes = "multipart/form-data"
+    )
+    public ResponseEntity<?> updatePet(
+
+            @PathVariable Long id,
+
+            @RequestParam("name") String name,
+
+            @RequestParam("type") String type,
+
+            @RequestParam("breed") String breed,
+
+            @RequestParam("age") String age,
+
+            @RequestParam("gender") String gender,
+
+            @RequestParam("city") String city,
+
+            @RequestParam("traits") String traits,
+
+            @RequestParam("description") String description,
+
+            @RequestParam("vaccinated") boolean vaccinated,
+
+            @RequestParam("healthStatus") String healthStatus,
+
+            @RequestParam("status") String status,
+
+            @RequestParam(value = "image", required = false)
+            MultipartFile image
+
+    ) {
+
+        try {
+
+            // =================================================
+            // FIND EXISTING PET
+            // =================================================
+
+            Pet pet = petRepository.findById(id)
+                    .orElse(null);
+
+            if (pet == null) {
+
+                return ResponseEntity
+                        .notFound()
+                        .build();
+            }
+
+
+            Files.createDirectories(uploadDirectory);
+
+
+            // =================================================
+            // UPDATE BASIC INFORMATION
+            // =================================================
+
+            pet.setName(name);
+            pet.setType(type);
+            pet.setBreed(breed);
+            pet.setAge(age);
+            pet.setGender(gender);
+            pet.setCity(city);
+            pet.setTraits(traits);
+            pet.setDescription(description);
+            pet.setVaccinated(vaccinated);
+            pet.setHealthStatus(healthStatus);
+            pet.setStatus(status);
+
+
+            // =================================================
+            // UPDATE IMAGE ONLY IF NEW IMAGE WAS SELECTED
+            // =================================================
+
+            if (image != null && !image.isEmpty()) {
+
+                String oldImage =
+                        pet.getImage();
+
+
+                String originalFileName =
+                        image.getOriginalFilename();
+
+                String extension = "";
+
+                if (
+                        originalFileName != null &&
+                                originalFileName.contains(".")
+                ) {
+
+                    extension =
+                            originalFileName.substring(
+                                    originalFileName.lastIndexOf(".")
+                            );
+                }
+
+
+                String newImageFileName =
+                        UUID.randomUUID()
+                                .toString()
+                                + extension;
+
+
+                Path newImagePath =
+                        uploadDirectory.resolve(
+                                newImageFileName
+                        );
+
+
+                Files.copy(
+                        image.getInputStream(),
+                        newImagePath,
+                        StandardCopyOption.REPLACE_EXISTING
+                );
+
+
+                // Save new image filename
+                pet.setImage(newImageFileName);
+
+
+                // Delete old image if it exists
+                if (
+                        oldImage != null &&
+                                !oldImage.isBlank() &&
+                                !oldImage.startsWith("http")
+                ) {
+
+                    Path oldImagePath =
+                            uploadDirectory.resolve(
+                                    oldImage
+                            );
+
+                    Files.deleteIfExists(
+                            oldImagePath
+                    );
+                }
+            }
+
+
+            // =================================================
+            // SAVE UPDATED PET
+            // =================================================
+
+            Pet updatedPet =
+                    petRepository.save(pet);
+
+
+            return ResponseEntity.ok(updatedPet);
+
+
+        } catch (IOException e) {
+
+            return ResponseEntity
+                    .internalServerError()
+                    .body(
+                            "Failed to update pet: "
+                                    + e.getMessage()
+                    );
+        }
+    }
+
+
+    // =====================================================
     // DELETE PET
-    // =========================================
+    // =====================================================
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePet(

@@ -11,6 +11,8 @@ import {
     FaFilePdf,
 } from "react-icons/fa";
 
+import PawBackground from "../components/PawBackground";
+
 
 function AddPet() {
 
@@ -343,11 +345,8 @@ function AddPet() {
                 "http://localhost:9090/api/pets",
 
                 {
-
                     method: "POST",
-
                     body: dataToSend,
-
                 }
 
             );
@@ -501,68 +500,11 @@ function AddPet() {
             overflow-hidden
         ">
 
-
             {/* =====================================
-                PAW BACKGROUND
+                EXISTING PAW BACKGROUND
             ====================================== */}
 
-            <div className="
-                absolute
-                inset-0
-                pointer-events-none
-                opacity-50
-            ">
-
-                <FaPaw className="
-                    absolute
-                    top-16
-                    left-[12%]
-                    text-4xl
-                    text-slate-300
-                    rotate-[-20deg]
-                " />
-
-
-                <FaPaw className="
-                    absolute
-                    top-32
-                    right-[10%]
-                    text-5xl
-                    text-slate-300
-                    rotate-12
-                " />
-
-
-                <FaPaw className="
-                    absolute
-                    top-[45%]
-                    left-[8%]
-                    text-3xl
-                    text-slate-300
-                    rotate-12
-                " />
-
-
-                <FaPaw className="
-                    absolute
-                    top-[65%]
-                    right-[14%]
-                    text-4xl
-                    text-slate-300
-                    rotate-[-15deg]
-                " />
-
-
-                <FaPaw className="
-                    absolute
-                    bottom-10
-                    left-[30%]
-                    text-3xl
-                    text-slate-300
-                    rotate-12
-                " />
-
-            </div>
+            <PawBackground />
 
 
             {/* =====================================
@@ -778,9 +720,6 @@ function AddPet() {
                             options={[
                                 "Dog",
                                 "Cat",
-                                "Rabbit",
-                                "Bird",
-                                "Other",
                             ]}
                             placeholder="Select pet type"
                         />

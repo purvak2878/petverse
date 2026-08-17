@@ -5,6 +5,8 @@ import Layout from "./components/Layout";
 import Home from "./pages/home";
 import BrowsePets from "./pages/BrowsePets";
 import AddPet from "./pages/AddPet";
+import PetDetails from "./pages/PetDetails";
+import EditPet from "./pages/EditPet";
 import PetTips from "./pages/PetTips";
 import FAQs from "./pages/FAQs";
 import Profile from "./pages/Profile";
@@ -15,53 +17,106 @@ import ApplicationForm from "./pages/ApplicationForm";
 
 
 function App() {
+
     return (
+
         <BrowserRouter>
 
             <Routes>
 
-                {/* Login page */}
-                <Route path="/login" element={<Login />} />
+                {/* LOGIN */}
 
-                {/* Main PetVerse layout */}
+                <Route
+                    path="/login"
+                    element={<Login />}
+                />
+
+
+                {/* MAIN PETVERSE LAYOUT */}
+
                 <Route element={<Layout />}>
 
-                    <Route path="/" element={<Home />} />
+                    {/* HOME */}
+
+                    <Route
+                        path="/"
+                        element={<Home />}
+                    />
+
+
+                    {/* BROWSE PETS */}
 
                     <Route
                         path="/browse-pets"
                         element={<BrowsePets />}
                     />
 
+
+                    {/* PET DETAILS */}
+
+                    <Route
+                        path="/pet/:id"
+                        element={<PetDetails />}
+                    />
+
+
+                    {/* EDIT PET */}
+
+                    <Route
+                        path="/pet/:id/edit"
+                        element={<EditPet />}
+                    />
+
+
+                    {/* APPLICATION */}
+
                     <Route
                         path="/apply"
                         element={<ApplicationForm />}
                     />
+
+
+                    {/* MY APPLICATIONS */}
 
                     <Route
                         path="/applications"
                         element={<MyApplication />}
                     />
 
+
+                    {/* ADD PET */}
+
                     <Route
                         path="/add-pet"
                         element={<AddPet />}
                     />
+
+
+                    {/* PET TIPS */}
 
                     <Route
                         path="/pet-tips"
                         element={<PetTips />}
                     />
 
+
+                    {/* FAQ */}
+
                     <Route
                         path="/faqs"
                         element={<FAQs />}
                     />
 
+
+                    {/* PROFILE */}
+
                     <Route
                         path="/profile"
                         element={<Profile />}
                     />
+
+
+                    {/* WISHLIST */}
 
                     <Route
                         path="/wishlist"
@@ -75,5 +130,6 @@ function App() {
         </BrowserRouter>
     );
 }
+
 
 export default App;
