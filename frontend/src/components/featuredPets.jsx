@@ -1,145 +1,292 @@
+import { useEffect, useState } from "react";
 import PetCard from "../components/PetCard";
 import { Link } from "react-router-dom";
 
-export const pets = [
-    {
-        id: 1,
-        name: "Bruno",
-        breed: "Golden Retriever",
-        age: "2 Years",
-        gender: "Male",
-        traits: ["Friendly", "Playful", "Vaccinated"],
-        image: "https://images.unsplash.com/photo-1552053831-71594a27632d"
-    },
-
-    {
-        id: 2,
-        name: "Luna",
-        breed: "Persian Cat",
-        age: "1 Year",
-        gender: "Female",
-        traits: ["Calm", "Loving", "Indoor"],
-        image: "https://images.unsplash.com/photo-1573865526739-10659fec78a5"
-    },
-
-    {
-        id: 3,
-        name: "Max",
-        breed: "Beagle",
-        age: "3 Years",
-        gender: "Male",
-        traits: ["Active", "Curious", "Vaccinated"],
-        image: "https://images.unsplash.com/photo-1505628346881-b72b27e84530"
-    },
-
-    {
-        id: 4,
-        name: "Bella",
-        breed: "Samoyed",
-        age: "4 Months",
-        gender: "Female",
-        traits: ["Fluffy", "Friendly", "Playful"],
-        image: "https://images.unsplash.com/photo-1558788353-f76d92427f16"
-    },
-    {
-        id: 5,
-        name: "Milo",
-        breed: "Labrador Retriever",
-        age: "1 Year",
-        gender: "Male",
-        traits: ["Energetic", "Friendly", "Trained"],
-        image: "https://images.unsplash.com/photo-1518717758536-85ae29035b6d"
-    },
-
-    {
-        id: 6,
-        name: "Coco",
-        breed: "Indie Cat",
-        age: "8 Months",
-        gender: "Female",
-        traits: ["Gentle", "Playful", "Indoor"],
-        image: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131"
-    },
-
-    {
-        id: 7,
-        name: "Daisy",
-        breed: "Beagle",
-        age: "2 Years",
-        gender: "Female",
-        traits: ["Cheerful", "Curious", "Vaccinated"],
-        image: "https://images.unsplash.com/photo-1507146426996-ef05306b995a"
-    },
-
-    {
-        id: 8,
-        name: "Oreo",
-        breed: "Border Collie",
-        age: "6 Months",
-        gender: "Male",
-        traits: ["Smart", "Active", "Playful"],
-        image: "https://images.unsplash.com/photo-1558929996-da64ba858215"
-    },
-];
-
-
 function FeaturedPets() {
+
+    const [pets, setPets] = useState([]);
+
+    const [loading, setLoading] = useState(true);
+
+    const [error, setError] = useState("");
+
+
+    // =========================================
+    // FETCH PETS FROM BACKEND
+    // =========================================
+
+    useEffect(() => {
+
+        const fetchPets = async () => {
+
+            try {
+
+                setLoading(true);
+                setError("");
+
+                const response = await fetch(
+                    "http://localhost:9090/api/pets"
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Failed to load pets."
+                    );
+                }
+
+                const data = await response.json();
+
+                console.log(
+                    "Featured pets received:",
+                    data
+                );
+
+                // Show first 8 pets on Home
+                setPets(data.slice(0, 8));
+
+            } catch (error) {
+
+                console.error(
+                    "Error fetching featured pets:",
+                    error
+                );
+
+                setError(
+                    "Unable to load pets right now."
+                );
+
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        };
+
+        fetchPets();
+
+    }, []);
+
 
     return (
 
         <section className="w-full">
 
-            {/* Heading */}
+            {/* =====================================
+                HEADING
+            ====================================== */}
 
-            <div className="flex items-center justify-between mb-5">
+            <div className="
+                flex
+                items-center
+                justify-between
+                mb-5
+            ">
 
                 <div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="
+                        flex
+                        items-center
+                        gap-2
+                    ">
 
                         <span className="text-2xl">
                             🐾
                         </span>
 
-                        <h1 className="text-xl md:text-2xl font-bold text-slate-800">
+                        <h1 className="
+                            text-xl
+                            md:text-2xl
+                            font-bold
+                            text-slate-800
+                        ">
+
                             Featured{" "}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500">
-                            Pets
-                        </span>
+
+                            <span className="
+                                text-transparent
+                                bg-clip-text
+                                bg-gradient-to-r
+                                from-violet-600
+                                via-fuchsia-500
+                                to-pink-500
+                            ">
+
+                                Pets
+
+                            </span>
+
                         </h1>
 
                     </div>
 
-                    <p className="text-sm text-gray-500 mt-1">
-                        Meet some lovely pets waiting for their forever home.
+                    <p className="
+                        text-sm
+                        text-gray-500
+                        mt-1
+                    ">
+
+                        Meet some lovely pets waiting
+                        for their forever home.
+
                     </p>
 
                 </div>
 
+
+                {/* VIEW ALL */}
+
                 <Link
                     to="/browse-pets"
-                    className="text-violet-600 font-semibold text-sm hover:text-pink-500 transition"
+                    className="
+                        text-violet-600
+                        font-semibold
+                        text-sm
+                        hover:text-pink-500
+                        transition
+                    "
                 >
+
                     View All Pets →
+
                 </Link>
 
             </div>
 
 
-            {/* Cards */}
+            {/* =====================================
+                LOADING
+            ====================================== */}
 
-            <div className="grid grid-cols-4 gap-5">
+            {loading && (
 
-                {pets.map((pet) => (
+                <div className="
+                    grid
+                    grid-cols-4
+                    gap-5
+                ">
 
-                    <PetCard
-                        key={pet.id}
-                        pet={pet}
-                    />
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(
+                        (item) => (
 
-                ))}
+                            <div
+                                key={item}
+                                className="
+                                    h-[340px]
+                                    bg-white
+                                    rounded-2xl
+                                    border
+                                    border-slate-100
+                                    shadow-sm
+                                    animate-pulse
+                                "
+                            />
 
-            </div>
+                        )
+                    )}
+
+                </div>
+
+            )}
+
+
+            {/* =====================================
+                ERROR
+            ====================================== */}
+
+            {!loading && error && (
+
+                <div className="
+                    bg-white
+                    rounded-2xl
+                    border
+                    border-slate-100
+                    p-10
+                    text-center
+                ">
+
+                    <div className="
+                        text-4xl
+                        mb-3
+                    ">
+                        🐾
+                    </div>
+
+                    <p className="
+                        text-gray-500
+                        text-sm
+                    ">
+                        {error}
+                    </p>
+
+                </div>
+
+            )}
+
+
+            {/* =====================================
+                PET CARDS
+            ====================================== */}
+
+            {!loading &&
+                !error &&
+                pets.length > 0 && (
+
+                    <div className="
+                        grid
+                        grid-cols-4
+                        gap-5
+                    ">
+
+                        {pets.map((pet) => (
+
+                            <PetCard
+                                key={pet.id}
+                                pet={pet}
+                            />
+
+                        ))}
+
+                    </div>
+
+                )}
+
+
+            {/* =====================================
+                NO PETS
+            ====================================== */}
+
+            {!loading &&
+                !error &&
+                pets.length === 0 && (
+
+                    <div className="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-100
+                        p-10
+                        text-center
+                    ">
+
+                        <div className="
+                            text-4xl
+                            mb-3
+                        ">
+                            🐾
+                        </div>
+
+                        <p className="
+                            text-gray-500
+                            text-sm
+                        ">
+                            No pets are currently available.
+                        </p>
+
+                    </div>
+
+                )}
 
         </section>
 
@@ -147,4 +294,3 @@ function FeaturedPets() {
 }
 
 export default FeaturedPets;
-

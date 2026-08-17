@@ -1,19 +1,112 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaSearch, FaSlidersH } from "react-icons/fa";
 
 import PetCard from "../components/PetCard";
-import { pets } from "../components/FeaturedPets";
 import PawBackground from "../components/PawBackground.jsx";
+import Footer from "../components/Footer.jsx";
 
 
 function BrowsePets() {
 
+    // =========================================
+    // PET DATA
+    // =========================================
+
+    const [pets, setPets] = useState([]);
+
+    const [loading, setLoading] = useState(true);
+
+    const [error, setError] = useState("");
+
     const [search, setSearch] = useState("");
 
-    const filteredPets = pets.filter((pet) =>
-        pet.name.toLowerCase().includes(search.toLowerCase()) ||
-        pet.breed.toLowerCase().includes(search.toLowerCase())
-    );
+
+    // =========================================
+    // FETCH PETS FROM BACKEND
+    // =========================================
+
+    useEffect(() => {
+
+        const fetchPets = async () => {
+
+            try {
+
+                setLoading(true);
+                setError("");
+
+                const response = await fetch(
+                    "http://localhost:9090/api/pets"
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Failed to load pets."
+                    );
+
+                }
+
+
+                const data = await response.json();
+
+
+                console.log(
+                    "Pets received from backend:",
+                    data
+                );
+
+
+                setPets(data);
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error fetching pets:",
+                    error
+                );
+
+                setError(
+                    "Unable to load pets right now. Please try again."
+                );
+
+
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        };
+
+
+        fetchPets();
+
+    }, []);
+
+
+    // =========================================
+    // SEARCH
+    // =========================================
+
+    const filteredPets = pets.filter((pet) => {
+
+        const searchText =
+            search.toLowerCase();
+
+
+        return (
+            pet.name
+                ?.toLowerCase()
+                .includes(searchText) ||
+
+            pet.breed
+                ?.toLowerCase()
+                .includes(searchText)
+        );
+
+    });
 
 
     return (
@@ -38,13 +131,14 @@ function BrowsePets() {
                 z-0
                 pointer-events-none
             ">
+
                 <PawBackground />
+
             </div>
 
 
             {/* =====================================
                 ALL BROWSE PETS CONTENT
-                Stays ABOVE paw background
             ====================================== */}
 
             <div className="
@@ -57,7 +151,10 @@ function BrowsePets() {
 
                 {/* ================= HEADER ================= */}
 
-                <div className="mb-10 text-center">
+                <div className="
+                    mb-10
+                    text-center
+                ">
 
                     <div className="
                         flex
@@ -88,7 +185,9 @@ function BrowsePets() {
                                 via-fuchsia-500
                                 to-pink-500
                             ">
+
                                 Pets
+
                             </span>
 
                         </h1>
@@ -100,7 +199,10 @@ function BrowsePets() {
                         mt-3
                         text-gray-500
                     ">
-                        Find a loving companion waiting for their forever home!
+
+                        Find a loving companion waiting
+                        for their forever home!
+
                     </p>
 
                 </div>
@@ -135,7 +237,9 @@ function BrowsePets() {
                             type="text"
                             placeholder="Search by pet name or breed..."
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) =>
+                                setSearch(e.target.value)
+                            }
                             className="
                                 w-full
                                 h-12
@@ -169,8 +273,6 @@ function BrowsePets() {
                     shadow-sm
                     p-4
                     mb-7
-                     from-violet-600
-                        to-pink-500
                 ">
 
 
@@ -181,7 +283,9 @@ function BrowsePets() {
                         mb-4
                     ">
 
-                        <FaSlidersH className="text-violet-500" />
+                        <FaSlidersH
+                            className="text-violet-500"
+                        />
 
                         <h2 className="
                             font-semibold
@@ -217,11 +321,25 @@ function BrowsePets() {
                             "
                         >
 
-                            <option>All Cities</option>
-                            <option>Mumbai</option>
-                            <option>Pune</option>
-                            <option>Nanded</option>
-                            <option>Nagpur</option>
+                            <option>
+                                All Cities
+                            </option>
+
+                            <option>
+                                Mumbai
+                            </option>
+
+                            <option>
+                                Pune
+                            </option>
+
+                            <option>
+                                Nanded
+                            </option>
+
+                            <option>
+                                Nagpur
+                            </option>
 
                         </select>
 
@@ -243,10 +361,21 @@ function BrowsePets() {
                             "
                         >
 
-                            <option>All Pet Types</option>
-                            <option>Dogs</option>
-                            <option>Cats</option>
-                            <option>Birds</option>
+                            <option>
+                                All Pet Types
+                            </option>
+
+                            <option>
+                                Dogs
+                            </option>
+
+                            <option>
+                                Cats
+                            </option>
+
+                            <option>
+                                Birds
+                            </option>
 
                         </select>
 
@@ -268,13 +397,33 @@ function BrowsePets() {
                             "
                         >
 
-                            <option>All Breeds</option>
-                            <option>Golden Retriever</option>
-                            <option>Labrador Retriever</option>
-                            <option>Beagle</option>
-                            <option>Persian Cat</option>
-                            <option>Samoyed</option>
-                            <option>Border Collie</option>
+                            <option>
+                                All Breeds
+                            </option>
+
+                            <option>
+                                Golden Retriever
+                            </option>
+
+                            <option>
+                                Labrador Retriever
+                            </option>
+
+                            <option>
+                                Beagle
+                            </option>
+
+                            <option>
+                                Persian Cat
+                            </option>
+
+                            <option>
+                                Samoyed
+                            </option>
+
+                            <option>
+                                Border Collie
+                            </option>
 
                         </select>
 
@@ -296,11 +445,25 @@ function BrowsePets() {
                             "
                         >
 
-                            <option>All Ages</option>
-                            <option>0 - 6 Months</option>
-                            <option>6 Months - 1 Year</option>
-                            <option>1 - 3 Years</option>
-                            <option>3+ Years</option>
+                            <option>
+                                All Ages
+                            </option>
+
+                            <option>
+                                0 - 6 Months
+                            </option>
+
+                            <option>
+                                6 Months - 1 Year
+                            </option>
+
+                            <option>
+                                1 - 3 Years
+                            </option>
+
+                            <option>
+                                3+ Years
+                            </option>
 
                         </select>
 
@@ -328,43 +491,31 @@ function BrowsePets() {
                             Available Pets
                         </h2>
 
-                        <p className="
-                            text-sm
-                            text-gray-500
-                            mt-1
-                        ">
-                            {filteredPets.length} pets found
-                        </p>
+
+                        {!loading && !error && (
+
+                            <p className="
+                                text-sm
+                                text-gray-500
+                                mt-1
+                            ">
+
+                                {filteredPets.length} pets found
+
+                            </p>
+
+                        )}
 
                     </div>
 
                 </div>
 
 
-                {/* ================= PET GRID ================= */}
+                {/* =====================================
+                    LOADING STATE
+                ====================================== */}
 
-                {filteredPets.length > 0 ? (
-
-                    <div className="
-                        grid
-                        grid-cols-4
-                        gap-5
-                    ">
-
-                        {filteredPets.map((pet) => (
-
-                            <PetCard
-                                key={pet.id}
-                                pet={pet}
-                            />
-
-                        ))}
-
-                    </div>
-
-                ) : (
-
-                    /* ================= NO RESULTS ================= */
+                {loading && (
 
                     <div className="
                         bg-white
@@ -373,38 +524,186 @@ function BrowsePets() {
                         text-center
                         border
                         border-gray-100
+                        shadow-sm
                     ">
 
                         <div className="
-                            text-5xl
+                            text-4xl
                             mb-4
+                            animate-bounce
                         ">
                             🐾
                         </div>
 
+
                         <h3 className="
-                            text-xl
-                            font-bold
+                            text-lg
+                            font-semibold
                             text-gray-700
                         ">
-                            No pets found
+                            Finding your furry friends...
                         </h3>
 
+
                         <p className="
-                            text-gray-500
+                            text-sm
+                            text-gray-400
                             mt-2
                         ">
-                            Try searching for another name or breed.
+                            Loading pets from PetVerse.
                         </p>
 
                     </div>
 
                 )}
 
-            </div>
 
+                {/* =====================================
+                    ERROR STATE
+                ====================================== */}
+
+                {!loading && error && (
+
+                    <div className="
+                        bg-white
+                        rounded-2xl
+                        p-12
+                        text-center
+                        border
+                        border-red-100
+                        shadow-sm
+                    ">
+
+                        <div className="
+                            text-4xl
+                            mb-4
+                        ">
+                            🐾
+                        </div>
+
+
+                        <h3 className="
+                            text-xl
+                            font-bold
+                            text-gray-700
+                        ">
+                            Oops!
+                        </h3>
+
+
+                        <p className="
+                            text-gray-500
+                            mt-2
+                            mb-5
+                        ">
+                            {error}
+                        </p>
+
+
+                        <button
+                            onClick={() =>
+                                window.location.reload()
+                            }
+                            className="
+                                px-6
+                                py-2.5
+                                rounded-full
+                                text-white
+                                text-sm
+                                font-semibold
+                                bg-gradient-to-r
+                                from-violet-600
+                                to-pink-500
+                                hover:-translate-y-0.5
+                                transition
+                            "
+                        >
+                            Try Again
+                        </button>
+
+                    </div>
+
+                )}
+
+
+                {/* =====================================
+                    PET GRID
+                ====================================== */}
+
+                {!loading &&
+                    !error &&
+                    filteredPets.length > 0 && (
+
+                        <div className="
+                            grid
+                            grid-cols-4
+                            gap-5
+                        ">
+
+                            {filteredPets.map((pet) => (
+
+                                <PetCard
+                                    key={pet.id}
+                                    pet={pet}
+                                />
+
+                            ))}
+
+                        </div>
+
+                    )}
+
+
+                {/* =====================================
+                    NO RESULTS
+                ====================================== */}
+
+                {!loading &&
+                    !error &&
+                    filteredPets.length === 0 && (
+
+                        <div className="
+                            bg-white
+                            rounded-2xl
+                            p-12
+                            text-center
+                            border
+                            border-gray-100
+                        ">
+
+                            <div className="
+                                text-5xl
+                                mb-4
+                            ">
+                                🐾
+                            </div>
+
+
+                            <h3 className="
+                                text-xl
+                                font-bold
+                                text-gray-700
+                            ">
+                                No pets found
+                            </h3>
+
+
+                            <p className="
+                                text-gray-500
+                                mt-2
+                            ">
+                                Try searching for another name or breed.
+                            </p>
+
+                        </div>
+
+                    )}
+
+            </div>
+        <Footer/>
         </div>
     );
 }
+
 
 export default BrowsePets;

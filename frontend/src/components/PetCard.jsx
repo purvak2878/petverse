@@ -1,37 +1,114 @@
 import { useState } from "react";
-import { FaHeart, FaPaw, FaArrowRight } from "react-icons/fa";
+import {
+    FaHeart,
+    FaPaw,
+    FaArrowRight,
+    FaEye,
+    FaClock,
+    FaVenusMars,
+    FaMapMarkerAlt,
+} from "react-icons/fa";
+
 import { useNavigate } from "react-router-dom";
+
+import { isLoggedIn } from "../utils/auth";
+
 
 function PetCard({ pet }) {
 
     const navigate = useNavigate();
 
-    const [showLoginPopup, setShowLoginPopup] = useState(false);
+    const [showLoginPopup, setShowLoginPopup] =
+        useState(false);
 
 
-    const handleAdopt = () => {
+    // =========================================
+    // GET PET TRAITS
+    // =========================================
 
-        // Check if user is logged in
-        const savedUser = localStorage.getItem("petverseUser");
+    const getTraits = () => {
 
-        if (savedUser) {
-
-            // User is logged in → open application
-            navigate("/apply", {
-                state: {
-                    pet: pet
-                }
-            });
-
-        } else {
-
-            // Guest → show login/register popup
-            setShowLoginPopup(true);
-
+        if (!pet.traits) {
+            return [];
         }
+
+        // If backend ever sends an array
+        if (Array.isArray(pet.traits)) {
+            return pet.traits;
+        }
+
+        // PostgreSQL currently stores:
+        // "Friendly, Playful, Vaccinated"
+
+        return pet.traits
+            .split(",")
+            .map((trait) => trait.trim())
+            .filter(Boolean);
 
     };
 
+
+    const traits = getTraits();
+
+
+    // =========================================
+    // LOGIN CHECK
+    // =========================================
+
+    const requireLogin = () => {
+
+        if (!isLoggedIn()) {
+
+            setShowLoginPopup(true);
+
+            return false;
+        }
+
+        return true;
+    };
+
+
+    // =========================================
+    // VIEW DETAILS
+    // =========================================
+
+    const handleViewDetails = () => {
+
+        if (!requireLogin()) {
+            return;
+        }
+
+        navigate(`/pet/${pet.id}`, {
+            state: {
+                pet: pet,
+            },
+        });
+
+    };
+
+
+    // =========================================
+    // ADOPT PET
+    // =========================================
+
+    const handleAdopt = () => {
+
+        if (!requireLogin()) {
+            return;
+        }
+
+        navigate("/apply", {
+            state: {
+                pet: pet,
+            },
+        });
+
+    };
+
+
+    // =========================================
+    // LOGIN
+    // =========================================
 
     const handleLogin = () => {
 
@@ -39,12 +116,16 @@ function PetCard({ pet }) {
 
         navigate("/login", {
             state: {
-                openRegister: false
-            }
+                openRegister: false,
+            },
         });
 
     };
 
+
+    // =========================================
+    // REGISTER
+    // =========================================
 
     const handleRegister = () => {
 
@@ -52,8 +133,8 @@ function PetCard({ pet }) {
 
         navigate("/login", {
             state: {
-                openRegister: true
-            }
+                openRegister: true,
+            },
         });
 
     };
@@ -63,103 +144,164 @@ function PetCard({ pet }) {
 
         <>
 
-            {/* =================================
+            {/* =====================================
                 PET CARD
-            ================================== */}
+            ====================================== */}
 
             <div className="
+                group
                 bg-white
-                rounded-3xl
+                rounded-2xl
                 overflow-hidden
                 border
                 border-slate-100
                 shadow-sm
-                hover:shadow-xl
+                hover:shadow-lg
                 hover:-translate-y-1
                 transition-all
                 duration-300
-                group
             ">
 
 
-                {/* Pet Image */}
+                {/* =================================
+                    PET IMAGE
+                ================================== */}
 
                 <div className="
                     relative
-                    h-56
+                    h-[145px]
                     overflow-hidden
+                    bg-slate-100
                 ">
 
-                    <img
-                        src={pet.image}
-                        alt={pet.name}
-                        className="
+                    {pet.image ? (
+
+                        <img
+                            src={pet.image}
+                            alt={pet.name}
+                            className="
+                                w-full
+                                h-full
+                                object-cover
+                                group-hover:scale-105
+                                transition-transform
+                                duration-500
+                            "
+                        />
+
+                    ) : (
+
+                        <div className="
                             w-full
                             h-full
-                            object-cover
-                            group-hover:scale-105
-                            transition-transform
-                            duration-500
-                        "
-                    />
-
-
-                    {/* Wishlist */}
-
-                    <button
-                        className="
-                            absolute
-                            top-4
-                            right-4
-                            w-10
-                            h-10
-                            rounded-full
-                            bg-white/90
-                            backdrop-blur
                             flex
                             items-center
                             justify-center
-                            text-gray-500
-                            hover:text-pink-500
+                            bg-violet-50
+                        ">
+
+                            <FaPaw className="
+                                text-5xl
+                                text-violet-300
+                            " />
+
+                        </div>
+
+                    )}
+
+
+                    {/* =================================
+                        WISHLIST HEART
+                    ================================== */}
+
+                    <button
+                        type="button"
+                        className="
+                            absolute
+                            top-3
+                            right-3
+                            w-9
+                            h-9
+                            rounded-full
+                            bg-white
+                            flex
+                            items-center
+                            justify-center
+                            text-violet-500
                             shadow-md
-                            transition
+                            hover:text-pink-500
+                            hover:scale-110
+                            transition-all
+                            duration-200
                         "
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
+                        aria-label="Add to wishlist"
                     >
-                        <FaHeart />
+
+                        <FaHeart className="text-sm" />
+
                     </button>
 
                 </div>
 
 
-                {/* Pet Details */}
+                {/* =================================
+                    PET INFORMATION
+                ================================== */}
 
                 <div className="
-                    p-5
+                    px-4
+                    pt-3
+                    pb-4
                 ">
+
+
+                    {/* NAME + TYPE */}
 
                     <div className="
                         flex
-                        items-center
+                        items-start
                         justify-between
                         gap-2
                     ">
 
-                        <h3 className="
-                            text-xl
-                            font-bold
-                            text-slate-800
-                        ">
-                            {pet.name}
-                        </h3>
+                        <div className="min-w-0">
+
+                            <h3 className="
+                                text-lg
+                                font-bold
+                                text-slate-800
+                                truncate
+                            ">
+                                {pet.name}
+                            </h3>
+
+
+                            <p className="
+                                text-xs
+                                text-slate-500
+                                mt-0.5
+                                truncate
+                            ">
+                                {pet.breed}
+                            </p>
+
+                        </div>
+
+
+                        {/* TYPE */}
 
                         <span className="
-                            text-xs
-                            px-3
+                            flex-shrink-0
+                            text-[10px]
+                            px-2.5
                             py-1
                             rounded-full
                             bg-violet-50
                             text-violet-600
-                            font-medium
+                            font-semibold
                         ">
                             {pet.type}
                         </span>
@@ -167,93 +309,208 @@ function PetCard({ pet }) {
                     </div>
 
 
-                    <p className="
-                        mt-1
-                        text-sm
-                        text-gray-500
-                    ">
-                        {pet.breed}
-                    </p>
-
-
-                    {/* Pet Info */}
+                    {/* =================================
+                        PET BASIC INFO
+                    ================================== */}
 
                     <div className="
                         flex
                         items-center
-                        gap-4
-                        mt-4
-                        text-sm
-                        text-gray-500
+                        gap-3
+                        mt-3
+                        text-[11px]
+                        text-slate-500
                     ">
 
-                        <span>
+
+                        {/* AGE */}
+
+                        <span className="
+                            flex
+                            items-center
+                            gap-1
+                            whitespace-nowrap
+                        ">
+
+                            <FaClock className="
+                                text-violet-400
+                                text-[10px]
+                            " />
+
                             {pet.age}
+
                         </span>
 
-                        <span>
-                            •
-                        </span>
 
-                        <span>
+                        {/* GENDER */}
+
+                        <span className="
+                            flex
+                            items-center
+                            gap-1
+                            whitespace-nowrap
+                        ">
+
+                            <FaVenusMars className="
+                                text-pink-400
+                                text-[11px]
+                            " />
+
                             {pet.gender}
+
                         </span>
 
-                        <span>
-                            •
-                        </span>
 
-                        <span>
+                        {/* CITY */}
+
+                        <span className="
+                            flex
+                            items-center
+                            gap-1
+                            truncate
+                        ">
+
+                            <FaMapMarkerAlt className="
+                                text-violet-400
+                                text-[10px]
+                            " />
+
                             {pet.city}
+
                         </span>
 
                     </div>
 
 
-                    {/* Adopt Button */}
+                    {/* =================================
+                        TRAITS
+                    ================================== */}
 
-                    <button
-                        onClick={handleAdopt}
-                        className="
-                            mt-5
-                            w-full
-                            flex
-                            items-center
-                            justify-center
-                            gap-2
-                            py-3
-                            rounded-full
-                            bg-gradient-to-r
-                            from-violet-600
-                            via-fuchsia-500
-                            to-pink-500
-                            text-white
-                            font-semibold
-                            text-sm
-                            shadow-md
-                            shadow-violet-200
-                            hover:-translate-y-0.5
-                            hover:shadow-lg
-                            transition-all
-                        "
-                    >
+                    <div className="
+                        flex
+                        flex-wrap
+                        gap-1.5
+                        mt-3
+                        min-h-[25px]
+                    ">
 
-                        <FaPaw />
+                        {traits
+                            .slice(0, 3)
+                            .map((trait, index) => (
 
-                        Adopt Me
+                                <span
+                                    key={index}
+                                    className={`
+                                        text-[9px]
+                                        px-2.5
+                                        py-1
+                                        rounded-full
+                                        font-medium
 
-                        <FaArrowRight className="text-xs" />
+                                        ${
+                                        index === 0
+                                            ? "bg-violet-50 text-violet-600"
+                                            : index === 1
+                                                ? "bg-orange-50 text-orange-500"
+                                                : "bg-emerald-50 text-emerald-600"
+                                    }
+                                    `}
+                                >
+                                    {trait}
+                                </span>
 
-                    </button>
+                            ))}
+
+                    </div>
+
+
+                    {/* =================================
+                        ACTION BUTTONS
+                    ================================== */}
+
+                    <div className="
+                        flex
+                        gap-2
+                        mt-4
+                    ">
+
+
+                        {/* VIEW DETAILS */}
+
+                        <button
+                            type="button"
+                            onClick={handleViewDetails}
+                            className="
+                                flex-1
+                                flex
+                                items-center
+                                justify-center
+                                gap-1.5
+                                py-2.5
+                                rounded-xl
+                                border
+                                border-violet-300
+                                bg-white
+                                text-violet-600
+                                text-[11px]
+                                font-semibold
+                                hover:bg-violet-50
+                                hover:border-violet-400
+                                transition-all
+                            "
+                        >
+
+                            <FaEye className="text-[10px]" />
+
+                            View Details
+
+                        </button>
+
+
+                        {/* ADOPT ME */}
+
+                        <button
+                            type="button"
+                            onClick={handleAdopt}
+                            className="
+                                flex-1
+                                flex
+                                items-center
+                                justify-center
+                                gap-1.5
+                                py-2.5
+                                rounded-xl
+                                bg-gradient-to-r
+                                from-violet-600
+                                via-fuchsia-500
+                                to-pink-500
+                                text-white
+                                text-[11px]
+                                font-semibold
+                                shadow-sm
+                                shadow-violet-200
+                                hover:-translate-y-0.5
+                                hover:shadow-md
+                                transition-all
+                            "
+                        >
+
+                            <FaPaw className="text-[10px]" />
+
+                            Adopt Me
+
+                        </button>
+
+                    </div>
 
                 </div>
 
             </div>
 
 
-            {/* =================================
+            {/* =====================================
                 LOGIN / REGISTER POPUP
-            ================================== */}
+            ====================================== */}
 
             {showLoginPopup && (
 
@@ -270,7 +527,7 @@ function PetCard({ pet }) {
                 ">
 
 
-                    {/* Popup */}
+                    {/* POPUP */}
 
                     <div className="
                         relative
@@ -284,10 +541,13 @@ function PetCard({ pet }) {
                     ">
 
 
-                        {/* Close */}
+                        {/* CLOSE */}
 
                         <button
-                            onClick={() => setShowLoginPopup(false)}
+                            type="button"
+                            onClick={() =>
+                                setShowLoginPopup(false)
+                            }
                             className="
                                 absolute
                                 top-4
@@ -302,7 +562,7 @@ function PetCard({ pet }) {
                         </button>
 
 
-                        {/* Paw */}
+                        {/* PAW */}
 
                         <div className="
                             w-16
@@ -339,12 +599,21 @@ function PetCard({ pet }) {
                             leading-6
                             text-gray-500
                         ">
-                            Please login or create an account before
-                            submitting an adoption application.
+
+                            Please login or create an account
+                            before continuing with{" "}
+
+                            <span className="
+                                font-semibold
+                                text-violet-600
+                            ">
+                                {pet.name}
+                            </span>.
+
                         </p>
 
 
-                        {/* Buttons */}
+                        {/* BUTTONS */}
 
                         <div className="
                             flex
@@ -353,7 +622,10 @@ function PetCard({ pet }) {
                         ">
 
 
+                            {/* LOGIN */}
+
                             <button
+                                type="button"
                                 onClick={handleLogin}
                                 className="
                                     flex-1
@@ -372,7 +644,10 @@ function PetCard({ pet }) {
                             </button>
 
 
+                            {/* REGISTER */}
+
                             <button
+                                type="button"
                                 onClick={handleRegister}
                                 className="
                                     flex-1
@@ -413,5 +688,6 @@ function PetCard({ pet }) {
 
     );
 }
+
 
 export default PetCard;
