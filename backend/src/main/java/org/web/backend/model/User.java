@@ -1,4 +1,4 @@
-package org.web.backend;
+package org.web.backend.model;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;

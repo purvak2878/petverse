@@ -1,7 +1,7 @@
-package org.web.backend;
+package org.web.backend.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.*;import org.web.backend.model.User;import org.web.backend.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/users")
