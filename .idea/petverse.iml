@@ -20,5 +20,7 @@
     <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt-api:0.13.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:10.1.46" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:6.5.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:6.2.11" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-core:6.2.11" level="project" />
   </component>
 </module>

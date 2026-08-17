@@ -87,6 +87,11 @@ public class SecurityConfig {
                                 "/api/pets/**"
                         ).permitAll()
 
+                        // Uploaded pet images/files
+                        .requestMatchers(
+                                "/uploads/**"
+                        ).permitAll()
+
                         // Everything else requires login
                         .anyRequest().authenticated()
                 )

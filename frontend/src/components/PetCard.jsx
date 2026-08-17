@@ -1,12 +1,13 @@
 import { useState } from "react";
+
 import {
     FaHeart,
     FaPaw,
-    FaArrowRight,
     FaEye,
     FaClock,
     FaVenusMars,
     FaMapMarkerAlt,
+    FaFilePdf,
 } from "react-icons/fa";
 
 import { useNavigate } from "react-router-dom";
@@ -32,12 +33,14 @@ function PetCard({ pet }) {
             return [];
         }
 
-        // If backend ever sends an array
+
+        // If backend sends an array
         if (Array.isArray(pet.traits)) {
             return pet.traits;
         }
 
-        // PostgreSQL currently stores:
+
+        // PostgreSQL stores:
         // "Friendly, Playful, Vaccinated"
 
         return pet.traits
@@ -49,6 +52,63 @@ function PetCard({ pet }) {
 
 
     const traits = getTraits();
+
+
+    // =========================================
+    // IMAGE URL
+    // =========================================
+    //
+    // Existing pets:
+    // https://images.unsplash.com/...
+    //
+    // Newly uploaded pets:
+    // b3d12716-....webp
+    //
+    // Uploaded files are stored in:
+    // backend/uploads/pets/
+    //
+    // =========================================
+
+    const getImageUrl = () => {
+
+        if (!pet.image) {
+            return "";
+        }
+
+        // Remove accidental spaces
+        const image = pet.image.trim();
+
+
+        // =====================================
+        // EXISTING EXTERNAL IMAGE
+        // =====================================
+
+        if (
+            image.startsWith("http://") ||
+            image.startsWith("https://")
+        ) {
+            return image;
+        }
+
+
+        // =====================================
+        // UPLOADED IMAGE
+        // =====================================
+
+        return `http://localhost:9090/uploads/pets/${encodeURIComponent(image)}`;
+    };
+
+
+    const imageUrl = getImageUrl();
+
+
+    // =========================================
+    // CHECK IF FILE IS PDF
+    // =========================================
+
+    const isPdf =
+        pet.image &&
+        pet.image.trim().toLowerCase().endsWith(".pdf");
 
 
     // =========================================
@@ -174,10 +234,76 @@ function PetCard({ pet }) {
                     bg-slate-100
                 ">
 
-                    {pet.image ? (
+
+                    {/* =================================
+                        PDF FILE
+                    ================================== */}
+
+                    {isPdf ? (
+
+                        <div className="
+                            w-full
+                            h-full
+                            flex
+                            flex-col
+                            items-center
+                            justify-center
+                            bg-red-50
+                            text-red-500
+                        ">
+
+                            <FaFilePdf className="
+                                text-4xl
+                                mb-2
+                            " />
+
+                            <span className="
+                                text-xs
+                                font-semibold
+                            ">
+                                PDF FILE
+                            </span>
+
+                            <button
+                                type="button"
+                                onClick={(e) => {
+
+                                    e.stopPropagation();
+
+                                    window.open(
+                                        imageUrl,
+                                        "_blank"
+                                    );
+
+                                }}
+                                className="
+                                    mt-2
+                                    px-3
+                                    py-1
+                                    rounded-full
+                                    bg-red-500
+                                    text-white
+                                    text-[9px]
+                                    font-semibold
+                                    hover:bg-red-600
+                                    transition
+                                "
+                            >
+                                View PDF
+                            </button>
+
+                        </div>
+
+
+                    ) : imageUrl ? (
+
+                        /* =================================
+                            JPG / JPEG / PNG / WEBP /
+                            EXTERNAL IMAGE
+                        ================================== */
 
                         <img
-                            src={pet.image}
+                            src={imageUrl}
                             alt={pet.name}
                             className="
                                 w-full
@@ -187,9 +313,25 @@ function PetCard({ pet }) {
                                 transition-transform
                                 duration-500
                             "
+                            onError={(e) => {
+
+                                console.error(
+                                    "Pet image failed to load:",
+                                    imageUrl
+                                );
+
+                                e.currentTarget.style.display =
+                                    "none";
+
+                            }}
                         />
 
+
                     ) : (
+
+                        /* =================================
+                            NO IMAGE
+                        ================================== */
 
                         <div className="
                             w-full
@@ -258,7 +400,9 @@ function PetCard({ pet }) {
                 ">
 
 
-                    {/* NAME + TYPE */}
+                    {/* =================================
+                        NAME + TYPE
+                    ================================== */}
 
                     <div className="
                         flex
@@ -266,6 +410,7 @@ function PetCard({ pet }) {
                         justify-between
                         gap-2
                     ">
+
 
                         <div className="min-w-0">
 
@@ -435,7 +580,9 @@ function PetCard({ pet }) {
                     ">
 
 
-                        {/* VIEW DETAILS */}
+                        {/* =================================
+                            VIEW DETAILS
+                        ================================== */}
 
                         <button
                             type="button"
@@ -467,7 +614,9 @@ function PetCard({ pet }) {
                         </button>
 
 
-                        {/* ADOPT ME */}
+                        {/* =================================
+                            ADOPT ME
+                        ================================== */}
 
                         <button
                             type="button"
@@ -527,7 +676,9 @@ function PetCard({ pet }) {
                 ">
 
 
-                    {/* POPUP */}
+                    {/* =================================
+                        POPUP
+                    ================================== */}
 
                     <div className="
                         relative
@@ -541,7 +692,9 @@ function PetCard({ pet }) {
                     ">
 
 
-                        {/* CLOSE */}
+                        {/* =================================
+                            CLOSE
+                        ================================== */}
 
                         <button
                             type="button"
@@ -562,7 +715,9 @@ function PetCard({ pet }) {
                         </button>
 
 
-                        {/* PAW */}
+                        {/* =================================
+                            PAW
+                        ================================== */}
 
                         <div className="
                             w-16
@@ -613,7 +768,9 @@ function PetCard({ pet }) {
                         </p>
 
 
-                        {/* BUTTONS */}
+                        {/* =================================
+                            BUTTONS
+                        ================================== */}
 
                         <div className="
                             flex
