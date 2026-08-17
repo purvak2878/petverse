@@ -1,7 +1,8 @@
 package org.web.backend.model;
 
 import jakarta.persistence.*;
-import java.time.OffsetDateTime;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -11,34 +12,32 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 150)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String password;
 
-    @Column(length = 20)
     private String phone;
 
-    @Column(length = 150)
     private String location;
 
-    @Column(name = "profile_image")
     private String profileImage;
 
-    @Column(name = "created_at")
-    private OffsetDateTime createdAt;
+    private LocalDateTime createdAt;
+
 
     public User() {
     }
 
+
     @PrePersist
-    public void onCreate() {
-        createdAt = OffsetDateTime.now();
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
+
 
     public Long getId() {
         return id;
@@ -48,6 +47,7 @@ public class User {
         this.id = id;
     }
 
+
     public String getName() {
         return name;
     }
@@ -55,6 +55,7 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
+
 
     public String getEmail() {
         return email;
@@ -64,6 +65,7 @@ public class User {
         this.email = email;
     }
 
+
     public String getPassword() {
         return password;
     }
@@ -71,6 +73,7 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
 
     public String getPhone() {
         return phone;
@@ -80,6 +83,7 @@ public class User {
         this.phone = phone;
     }
 
+
     public String getLocation() {
         return location;
     }
@@ -87,6 +91,7 @@ public class User {
     public void setLocation(String location) {
         this.location = location;
     }
+
 
     public String getProfileImage() {
         return profileImage;
@@ -96,11 +101,12 @@ public class User {
         this.profileImage = profileImage;
     }
 
-    public OffsetDateTime getCreatedAt() {
+
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }
