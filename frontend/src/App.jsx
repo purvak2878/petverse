@@ -14,7 +14,8 @@ import Wishlist from "./pages/Wishlist";
 import MyApplication from "./pages/MyApplication";
 import Login from "./pages/Login";
 import ApplicationForm from "./pages/ApplicationForm";
-
+import ApplicationDetails from "./pages/ApplicationDetails";
+import EditApplication from "./pages/EditApplication";
 
 function App() {
 
@@ -83,6 +84,21 @@ function App() {
                         element={<MyApplication />}
                     />
 
+
+                    {/* APPLICATION DETAILS */}
+
+                    <Route
+                        path="/applications/:id"
+                        element={<ApplicationDetails />}
+                    />
+
+
+                    {/* EDIT APPLICATION */}
+
+                    <Route
+                        path="/applications/:id/edit"
+                        element={<EditApplication />}
+                    />
 
                     {/* ADD PET */}
 

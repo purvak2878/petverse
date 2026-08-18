@@ -1,17 +1,21 @@
 import { useState } from "react";
+
 import {
     FaPaw,
     FaUser,
     FaEnvelope,
     FaPhone,
     FaMapMarkerAlt,
-    FaHome,
     FaHeart,
     FaArrowLeft,
     FaCheck,
 } from "react-icons/fa";
 
-import { useNavigate } from "react-router-dom";
+import {
+    useNavigate,
+    useLocation
+} from "react-router-dom";
+
 import PawBackground from "../components/PawBackground.jsx";
 
 
@@ -19,157 +23,414 @@ function ApplicationForm() {
 
     const navigate = useNavigate();
 
+    const location = useLocation();
+
+    // Pet selected from PetDetails.jsx
+    const pet = location.state?.pet;
+
+
+    // ==========================================
+    // FORM DATA
+    // ==========================================
+
     const [formData, setFormData] = useState({
+
+        // IMPORTANT:
+        // Pet ID is automatically taken from
+        // the pet selected on PetDetails page.
+        petId: pet?.id || "",
+
         fullName: "",
         email: "",
         phone: "",
         city: "",
         address: "",
+
         reason: "",
         previousPet: "",
         otherPets: "",
         housing: "",
         permission: "",
         contactMethod: "",
-        agreement: false,
+
+        agreement: false
     });
 
 
+    // ==========================================
+    // STATES
+    // ==========================================
+
     const [submitted, setSubmitted] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+
+    const [error, setError] = useState("");
+
+    const [applicationId, setApplicationId] = useState(null);
+
+
+    // ==========================================
+    // HANDLE INPUT CHANGE
+    // ==========================================
 
     const handleChange = (e) => {
 
-        const { name, value, type, checked } = e.target;
+        const {
+            name,
+            value,
+            type,
+            checked
+        } = e.target;
+
 
         setFormData({
-            ...formData,
-            [name]: type === "checkbox" ? checked : value,
-        });
 
+            ...formData,
+
+            [name]:
+                type === "checkbox"
+                    ? checked
+                    : value
+
+        });
     };
 
 
-    const handleSubmit = (e) => {
+    // ==========================================
+    // SUBMIT APPLICATION
+    // ==========================================
+
+    const handleSubmit = async (e) => {
 
         e.preventDefault();
 
-        // Backend connection will be added later
+        setError("");
 
-        setSubmitted(true);
+        setLoading(true);
+
+
+        try {
+
+            // ==================================
+            // GET JWT TOKEN
+            // ==================================
+
+            const token = localStorage.getItem("petverseToken");
+
+
+            if (!token) {
+
+                setError(
+                    "Please login before submitting an adoption application."
+                );
+
+                setLoading(false);
+
+                return;
+            }
+
+
+            // ==================================
+            // CHECK SELECTED PET
+            // ==================================
+
+            if (!pet || !pet.id) {
+
+                setError(
+                    "Pet information is missing. Please go back and select a pet again."
+                );
+
+                setLoading(false);
+
+                return;
+            }
+
+
+            // ==================================
+            // SEND DATA TO SPRING BOOT
+            // ==================================
+
+            const response = await fetch(
+                "http://localhost:9090/api/applications",
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
+                    },
+
+                    body: JSON.stringify({
+
+                        // IMPORTANT
+                        // Send pet ID, NOT pet name/type
+                        petId: pet.id,
+
+                        fullName:
+                        formData.fullName,
+
+                        email:
+                        formData.email,
+
+                        phone:
+                        formData.phone,
+
+                        city:
+                        formData.city,
+
+                        address:
+                        formData.address,
+
+                        reason:
+                        formData.reason,
+
+                        previousPet:
+                        formData.previousPet,
+
+                        otherPets:
+                        formData.otherPets,
+
+                        housing:
+                        formData.housing,
+
+                        permission:
+                        formData.permission,
+
+                        contactMethod:
+                        formData.contactMethod,
+
+                        agreement:
+                        formData.agreement
+                    })
+                }
+            );
+
+
+            // ==================================
+            // CHECK RESPONSE
+            // ==================================
+
+            if (!response.ok) {
+
+                const errorText =
+                    await response.text();
+
+                throw new Error(
+                    errorText ||
+                    "Failed to submit application."
+                );
+            }
+
+
+            // ==================================
+            // GET SAVED APPLICATION
+            // ==================================
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "Application saved:",
+                data
+            );
+
+
+            // ==================================
+            // SAVE APPLICATION ID
+            // ==================================
+
+            if (data.id) {
+
+                setApplicationId(
+                    data.id
+                );
+            }
+
+
+            // ==================================
+            // SHOW SUCCESS SCREEN
+            // ==================================
+
+            setSubmitted(true);
+
+
+        } catch (err) {
+
+            console.error(
+                "Application Submit Error:",
+                err
+            );
+
+
+            setError(
+                err.message ||
+                "Something went wrong while submitting the application."
+            );
+
+
+        } finally {
+
+            setLoading(false);
+
+        }
 
     };
 
 
-    /* =========================================
-       SUCCESS SCREEN
-    ========================================== */
+    // ==========================================
+    // SUCCESS SCREEN
+    // ==========================================
 
     if (submitted) {
 
         return (
 
-            <div className="
-                relative
-                min-h-screen
-                overflow-hidden
-                bg-slate-50
-                flex
-                items-center
-                justify-center
-                px-6
-            ">
+            <div
+                className="
+                    relative
+                    min-h-screen
+                    overflow-hidden
+                    bg-slate-50
+                    flex
+                    items-center
+                    justify-center
+                    px-6
+                "
+            >
 
-                <div className="
-                    absolute
-                    inset-0
-                    z-0
-                    pointer-events-none
-                ">
+                <div
+                    className="
+                        absolute
+                        inset-0
+                        z-0
+                        pointer-events-none
+                    "
+                >
+
                     <PawBackground />
+
                 </div>
 
 
-                <div className="
-                    relative
-                    z-10
-                    w-full
-                    max-w-lg
-                    bg-white
-                    rounded-3xl
-                    shadow-xl
-                    border
-                    border-slate-100
-                    p-10
-                    text-center
-                ">
+                <div
+                    className="
+                        relative
+                        z-10
+                        w-full
+                        max-w-lg
+                        bg-white
+                        rounded-3xl
+                        shadow-xl
+                        border
+                        border-slate-100
+                        p-10
+                        text-center
+                    "
+                >
 
-                    <div className="
-                        w-20
-                        h-20
-                        mx-auto
-                        rounded-full
-                        bg-green-100
-                        text-green-600
-                        flex
-                        items-center
-                        justify-center
-                        mb-6
-                    ">
+                    <div
+                        className="
+                            w-20
+                            h-20
+                            mx-auto
+                            rounded-full
+                            bg-green-100
+                            text-green-600
+                            flex
+                            items-center
+                            justify-center
+                            mb-6
+                        "
+                    >
 
-                        <FaCheck className="text-3xl" />
+                        <FaCheck
+                            className="text-3xl"
+                        />
 
                     </div>
 
 
-                    <h1 className="
-                        text-3xl
-                        font-bold
-                        text-slate-800
-                    ">
+                    <h1
+                        className="
+                            text-3xl
+                            font-bold
+                            text-slate-800
+                        "
+                    >
+
                         Application Submitted!
+
                     </h1>
 
 
-                    <p className="
-                        mt-3
-                        text-gray-500
-                        leading-7
-                    ">
-                        Your adoption application has been submitted
-                        successfully. The shelter will review your
-                        application and contact you with the next steps.
+                    <p
+                        className="
+                            mt-3
+                            text-gray-500
+                            leading-7
+                        "
+                    >
+
+                        Your adoption application has been
+                        submitted successfully. The shelter
+                        will review your application and
+                        contact you with the next steps.
+
                     </p>
 
 
-                    <div className="
-                        mt-6
-                        rounded-2xl
-                        bg-violet-50
-                        p-4
-                        text-sm
-                        text-violet-700
-                    ">
+                    <div
+                        className="
+                            mt-6
+                            rounded-2xl
+                            bg-violet-50
+                            p-4
+                            text-sm
+                            text-violet-700
+                        "
+                    >
 
                         <p className="font-semibold">
+
                             Application ID
+
                         </p>
 
-                        <p className="mt-1 font-mono">
-                            APP-2026-001
+
+                        <p
+                            className="
+                                mt-1
+                                font-mono
+                            "
+                        >
+
+                            {applicationId
+                                ? `APP-${applicationId}`
+                                : "Application submitted"}
+
                         </p>
 
                     </div>
 
 
-                    <div className="
-                        flex
-                        gap-3
-                        mt-7
-                    ">
+                    <div
+                        className="
+                            flex
+                            gap-3
+                            mt-7
+                        "
+                    >
 
                         <button
-                            onClick={() => navigate("/browse-pets")}
+                            onClick={() =>
+                                navigate("/browse-pets")
+                            }
                             className="
                                 flex-1
                                 py-3
@@ -183,12 +444,16 @@ function ApplicationForm() {
                                 transition
                             "
                         >
+
                             Browse Pets
+
                         </button>
 
 
                         <button
-                            onClick={() => navigate("/applications")}
+                            onClick={() =>
+                                navigate("/applications")
+                            }
                             className="
                                 flex-1
                                 py-3
@@ -204,7 +469,9 @@ function ApplicationForm() {
                                 transition
                             "
                         >
+
                             My Applications
+
                         </button>
 
                     </div>
@@ -214,58 +481,67 @@ function ApplicationForm() {
             </div>
 
         );
+
     }
 
 
+    // ==========================================
+    // MAIN FORM
+    // ==========================================
+
     return (
 
-        <div className="
-            relative
-            min-h-screen
-            w-full
-            overflow-hidden
-            bg-slate-50
-        ">
+        <div
+            className="
+                relative
+                min-h-screen
+                w-full
+                overflow-hidden
+                bg-slate-50
+            "
+        >
 
+            {/* PAW BACKGROUND */}
 
-            {/* =====================================
-                PAW BACKGROUND
-            ====================================== */}
+            <div
+                className="
+                    absolute
+                    inset-0
+                    z-0
+                    pointer-events-none
+                "
+            >
 
-            <div className="
-                absolute
-                inset-0
-                z-0
-                pointer-events-none
-            ">
                 <PawBackground />
+
             </div>
 
 
-            {/* =====================================
-                PAGE CONTENT
-            ====================================== */}
+            {/* PAGE CONTENT */}
 
-            <div className="
-                relative
-                z-10
-                px-6
-                pt-28
-                pb-16
-            ">
+            <div
+                className="
+                    relative
+                    z-10
+                    px-6
+                    pt-28
+                    pb-16
+                "
+            >
 
-                <div className="
-                    max-w-5xl
-                    mx-auto
-                ">
+                <div
+                    className="
+                        max-w-5xl
+                        mx-auto
+                    "
+                >
 
-
-                    {/* =================================
-                        BACK BUTTON
-                    ================================== */}
+                    {/* BACK BUTTON */}
 
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() =>
+                            navigate(-1)
+                        }
                         className="
                             flex
                             items-center
@@ -286,46 +562,56 @@ function ApplicationForm() {
                     </button>
 
 
-                    {/* =================================
-                        HEADER
-                    ================================== */}
+                    {/* HEADER */}
 
-                    <div className="
-                        text-center
-                        mb-10
-                    ">
+                    <div
+                        className="
+                            text-center
+                            mb-10
+                        "
+                    >
 
-                        <div className="
-                            flex
-                            items-center
-                            justify-center
-                            gap-3
-                        ">
+                        <div
+                            className="
+                                flex
+                                items-center
+                                justify-center
+                                gap-3
+                            "
+                        >
 
-                            <FaPaw className="
-                                text-3xl
-                                text-violet-600
-                            " />
+                            <FaPaw
+                                className="
+                                    text-3xl
+                                    text-violet-600
+                                "
+                            />
 
 
-                            <h1 className="
-                                text-4xl
-                                md:text-5xl
-                                font-bold
-                                text-slate-800
-                            ">
+                            <h1
+                                className="
+                                    text-4xl
+                                    md:text-5xl
+                                    font-bold
+                                    text-slate-800
+                                "
+                            >
 
                                 Adoption{" "}
 
-                                <span className="
-                                    text-transparent
-                                    bg-clip-text
-                                    bg-gradient-to-r
-                                    from-violet-600
-                                    via-fuchsia-500
-                                    to-pink-500
-                                ">
+                                <span
+                                    className="
+                                        text-transparent
+                                        bg-clip-text
+                                        bg-gradient-to-r
+                                        from-violet-600
+                                        via-fuchsia-500
+                                        to-pink-500
+                                    "
+                                >
+
                                     Application
+
                                 </span>
 
                             </h1>
@@ -333,20 +619,22 @@ function ApplicationForm() {
                         </div>
 
 
-                        <p className="
-                            mt-3
-                            text-gray-500
-                        ">
+                        <p
+                            className="
+                                mt-3
+                                text-gray-500
+                            "
+                        >
+
                             Tell us a little about yourself and your
                             plans for welcoming a pet.
+
                         </p>
 
                     </div>
 
 
-                    {/* =================================
-                        APPLICATION FORM
-                    ================================== */}
+                    {/* FORM */}
 
                     <form
                         onSubmit={handleSubmit}
@@ -360,56 +648,71 @@ function ApplicationForm() {
                         "
                     >
 
+                        {/* ===================================== */}
+                        {/* PET INFORMATION */}
+                        {/* ===================================== */}
 
-                        {/* =================================
-                            PET SECTION
-                        ================================== */}
+                        <div
+                            className="
+                                p-7
+                                md:p-9
+                                border-b
+                                border-slate-100
+                            "
+                        >
 
-                        <div className="
-                            p-7
-                            md:p-9
-                            border-b
-                            border-slate-100
-                        ">
-
-                            <div className="
-                                flex
-                                items-center
-                                gap-3
-                                mb-6
-                            ">
-
-                                <div className="
-                                    w-10
-                                    h-10
-                                    rounded-xl
-                                    bg-violet-100
-                                    text-violet-600
+                            <div
+                                className="
                                     flex
                                     items-center
-                                    justify-center
-                                ">
+                                    gap-3
+                                    mb-6
+                                "
+                            >
+
+                                <div
+                                    className="
+                                        w-10
+                                        h-10
+                                        rounded-xl
+                                        bg-violet-100
+                                        text-violet-600
+                                        flex
+                                        items-center
+                                        justify-center
+                                    "
+                                >
+
                                     <FaPaw />
+
                                 </div>
 
 
                                 <div>
 
-                                    <h2 className="
-                                        text-xl
-                                        font-bold
-                                        text-slate-800
-                                    ">
+                                    <h2
+                                        className="
+                                            text-xl
+                                            font-bold
+                                            text-slate-800
+                                        "
+                                    >
+
                                         Pet Information
+
                                     </h2>
 
-                                    <p className="
-                                        text-sm
-                                        text-gray-500
-                                        mt-1
-                                    ">
-                                        Select the pet you would like
-                                        to apply for.
+
+                                    <p
+                                        className="
+                                            text-sm
+                                            text-gray-500
+                                            mt-1
+                                        "
+                                    >
+
+                                        You are applying to adopt this pet.
+
                                     </p>
 
                                 </div>
@@ -417,173 +720,235 @@ function ApplicationForm() {
                             </div>
 
 
-                            {/* Temporary pet selection */}
+                            {/* SELECTED PET CARD */}
 
-                            <div className="
-                                grid
-                                grid-cols-1
-                                md:grid-cols-2
-                                gap-5
-                            ">
+                            {pet ? (
 
-                                <div>
+                                <div
+                                    className="
+                                        flex
+                                        flex-col
+                                        sm:flex-row
+                                        gap-5
+                                        items-center
+                                        rounded-2xl
+                                        bg-violet-50
+                                        border
+                                        border-violet-100
+                                        p-5
+                                    "
+                                >
 
-                                    <label className="
-                                        block
-                                        text-sm
-                                        font-semibold
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                        Pet Name
-                                    </label>
+                                    {pet.image ? (
 
-                                    <select
-                                        name="petName"
-                                        required
-                                        className="
-                                            w-full
-                                            h-12
-                                            px-4
-                                            rounded-xl
-                                            bg-slate-50
-                                            border
-                                            border-slate-200
-                                            outline-none
-                                            text-sm
-                                            text-slate-600
-                                            focus:border-violet-400
-                                            focus:ring-2
-                                            focus:ring-violet-100
-                                        "
-                                    >
+                                        <img
+                                            src={
+                                                pet.image.startsWith("http")
+                                                    ? pet.image
+                                                    : `http://localhost:9090${pet.image}`
+                                            }
+                                            alt={pet.name}
+                                            className="
+                                                w-24
+                                                h-24
+                                                rounded-2xl
+                                                object-cover
+                                                border
+                                                border-white
+                                                shadow-sm
+                                            "
+                                        />
 
-                                        <option value="">
-                                            Select a pet
-                                        </option>
+                                    ) : (
 
-                                        <option value="Bruno">
-                                            Bruno
-                                        </option>
+                                        <div
+                                            className="
+                                                w-24
+                                                h-24
+                                                rounded-2xl
+                                                bg-white
+                                                flex
+                                                items-center
+                                                justify-center
+                                                text-violet-400
+                                                text-3xl
+                                            "
+                                        >
 
-                                        <option value="Luna">
-                                            Luna
-                                        </option>
+                                            <FaPaw />
 
-                                        <option value="Max">
-                                            Max
-                                        </option>
+                                        </div>
 
-                                    </select>
+                                    )}
+
+
+                                    <div className="text-center sm:text-left">
+
+                                        <p
+                                            className="
+                                                text-xs
+                                                uppercase
+                                                tracking-wide
+                                                text-violet-500
+                                                font-semibold
+                                            "
+                                        >
+
+                                            Selected Pet
+
+                                        </p>
+
+
+                                        <h3
+                                            className="
+                                                mt-1
+                                                text-2xl
+                                                font-bold
+                                                text-slate-800
+                                            "
+                                        >
+
+                                            {pet.name}
+
+                                        </h3>
+
+
+                                        <p
+                                            className="
+                                                mt-1
+                                                text-sm
+                                                text-slate-500
+                                            "
+                                        >
+
+                                            {pet.type}
+
+                                            {pet.breed
+                                                ? ` • ${pet.breed}`
+                                                : ""}
+
+                                            {pet.age
+                                                ? ` • ${pet.age}`
+                                                : ""}
+
+                                        </p>
+
+
+                                        {pet.city && (
+
+                                            <p
+                                                className="
+                                                    mt-1
+                                                    text-sm
+                                                    text-slate-500
+                                                "
+                                            >
+
+                                                <FaMapMarkerAlt
+                                                    className="inline mr-1"
+                                                />
+
+                                                {pet.city}
+
+                                            </p>
+
+                                        )}
+
+                                    </div>
 
                                 </div>
 
+                            ) : (
 
-                                <div>
-
-                                    <label className="
-                                        block
+                                <div
+                                    className="
+                                        rounded-2xl
+                                        bg-red-50
+                                        border
+                                        border-red-200
+                                        p-5
+                                        text-red-600
                                         text-sm
-                                        font-semibold
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                        Pet Type
-                                    </label>
+                                    "
+                                >
 
-                                    <select
-                                        name="petType"
-                                        required
-                                        className="
-                                            w-full
-                                            h-12
-                                            px-4
-                                            rounded-xl
-                                            bg-slate-50
-                                            border
-                                            border-slate-200
-                                            outline-none
-                                            text-sm
-                                            text-slate-600
-                                            focus:border-violet-400
-                                            focus:ring-2
-                                            focus:ring-violet-100
-                                        "
-                                    >
+                                    No pet was selected.
 
-                                        <option value="">
-                                            Select type
-                                        </option>
-
-                                        <option value="Dog">
-                                            Dog
-                                        </option>
-
-                                        <option value="Cat">
-                                            Cat
-                                        </option>
-
-                                        <option value="Other">
-                                            Other
-                                        </option>
-
-                                    </select>
+                                    Please go back to Browse Pets
+                                    and click Adopt Me again.
 
                                 </div>
 
-                            </div>
+                            )}
 
                         </div>
 
 
-                        {/* =================================
-                            APPLICANT DETAILS
-                        ================================== */}
+                        {/* ===================================== */}
+                        {/* APPLICANT DETAILS */}
+                        {/* ===================================== */}
 
-                        <div className="
-                            p-7
-                            md:p-9
-                            border-b
-                            border-slate-100
-                        ">
+                        <div
+                            className="
+                                p-7
+                                md:p-9
+                                border-b
+                                border-slate-100
+                            "
+                        >
 
-                            <div className="
-                                flex
-                                items-center
-                                gap-3
-                                mb-6
-                            ">
-
-                                <div className="
-                                    w-10
-                                    h-10
-                                    rounded-xl
-                                    bg-pink-100
-                                    text-pink-500
+                            <div
+                                className="
                                     flex
                                     items-center
-                                    justify-center
-                                ">
+                                    gap-3
+                                    mb-6
+                                "
+                            >
+
+                                <div
+                                    className="
+                                        w-10
+                                        h-10
+                                        rounded-xl
+                                        bg-pink-100
+                                        text-pink-500
+                                        flex
+                                        items-center
+                                        justify-center
+                                    "
+                                >
+
                                     <FaUser />
+
                                 </div>
 
 
                                 <div>
 
-                                    <h2 className="
-                                        text-xl
-                                        font-bold
-                                        text-slate-800
-                                    ">
+                                    <h2
+                                        className="
+                                            text-xl
+                                            font-bold
+                                            text-slate-800
+                                        "
+                                    >
+
                                         Your Details
+
                                     </h2>
 
-                                    <p className="
-                                        text-sm
-                                        text-gray-500
-                                        mt-1
-                                    ">
+
+                                    <p
+                                        className="
+                                            text-sm
+                                            text-gray-500
+                                            mt-1
+                                        "
+                                    >
+
                                         Tell us how we can contact you.
+
                                     </p>
 
                                 </div>
@@ -591,61 +956,70 @@ function ApplicationForm() {
                             </div>
 
 
-                            <div className="
-                                grid
-                                grid-cols-1
-                                md:grid-cols-2
-                                gap-5
-                            ">
-
-
-                                {/* Full Name */}
+                            <div
+                                className="
+                                    grid
+                                    grid-cols-1
+                                    md:grid-cols-2
+                                    gap-5
+                                "
+                            >
 
                                 <FormInput
                                     label="Full Name"
                                     name="fullName"
-                                    value={formData.fullName}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.fullName
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     placeholder="Enter your full name"
                                     icon={<FaUser />}
                                     required
                                 />
 
 
-                                {/* Email */}
-
                                 <FormInput
                                     label="Email Address"
                                     name="email"
                                     type="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.email
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     placeholder="Enter your email"
                                     icon={<FaEnvelope />}
                                     required
                                 />
 
 
-                                {/* Phone */}
-
                                 <FormInput
                                     label="Phone Number"
                                     name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.phone
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     placeholder="Enter your phone number"
                                     icon={<FaPhone />}
                                     required
                                 />
 
 
-                                {/* City */}
-
                                 <FormInput
                                     label="City"
                                     name="city"
-                                    value={formData.city}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.city
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     placeholder="Enter your city"
                                     icon={<FaMapMarkerAlt />}
                                     required
@@ -654,24 +1028,31 @@ function ApplicationForm() {
                             </div>
 
 
-                            {/* Address */}
-
                             <div className="mt-5">
 
-                                <label className="
-                                    block
-                                    text-sm
-                                    font-semibold
-                                    text-slate-700
-                                    mb-2
-                                ">
+                                <label
+                                    className="
+                                        block
+                                        text-sm
+                                        font-semibold
+                                        text-slate-700
+                                        mb-2
+                                    "
+                                >
+
                                     Address
+
                                 </label>
+
 
                                 <textarea
                                     name="address"
-                                    value={formData.address}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.address
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     required
                                     rows="3"
                                     placeholder="Enter your complete address"
@@ -697,55 +1078,72 @@ function ApplicationForm() {
                         </div>
 
 
-                        {/* =================================
-                            ABOUT YOU
-                        ================================== */}
+                        {/* ===================================== */}
+                        {/* ABOUT YOU */}
+                        {/* ===================================== */}
 
-                        <div className="
-                            p-7
-                            md:p-9
-                            border-b
-                            border-slate-100
-                        ">
+                        <div
+                            className="
+                                p-7
+                                md:p-9
+                                border-b
+                                border-slate-100
+                            "
+                        >
 
-                            <div className="
-                                flex
-                                items-center
-                                gap-3
-                                mb-6
-                            ">
-
-                                <div className="
-                                    w-10
-                                    h-10
-                                    rounded-xl
-                                    bg-violet-100
-                                    text-violet-600
+                            <div
+                                className="
                                     flex
                                     items-center
-                                    justify-center
-                                ">
+                                    gap-3
+                                    mb-6
+                                "
+                            >
+
+                                <div
+                                    className="
+                                        w-10
+                                        h-10
+                                        rounded-xl
+                                        bg-violet-100
+                                        text-violet-600
+                                        flex
+                                        items-center
+                                        justify-center
+                                    "
+                                >
+
                                     <FaHeart />
+
                                 </div>
 
 
                                 <div>
 
-                                    <h2 className="
-                                        text-xl
-                                        font-bold
-                                        text-slate-800
-                                    ">
+                                    <h2
+                                        className="
+                                            text-xl
+                                            font-bold
+                                            text-slate-800
+                                        "
+                                    >
+
                                         About You
+
                                     </h2>
 
-                                    <p className="
-                                        text-sm
-                                        text-gray-500
-                                        mt-1
-                                    ">
+
+                                    <p
+                                        className="
+                                            text-sm
+                                            text-gray-500
+                                            mt-1
+                                        "
+                                    >
+
                                         Help us understand your
                                         adoption plans.
+
                                     </p>
 
                                 </div>
@@ -753,24 +1151,33 @@ function ApplicationForm() {
                             </div>
 
 
-                            {/* Reason */}
+                            {/* REASON */}
 
                             <div>
 
-                                <label className="
-                                    block
-                                    text-sm
-                                    font-semibold
-                                    text-slate-700
-                                    mb-2
-                                ">
+                                <label
+                                    className="
+                                        block
+                                        text-sm
+                                        font-semibold
+                                        text-slate-700
+                                        mb-2
+                                    "
+                                >
+
                                     Why do you want to adopt this pet?
+
                                 </label>
+
 
                                 <textarea
                                     name="reason"
-                                    value={formData.reason}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.reason
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     required
                                     rows="4"
                                     placeholder="Tell us why you would like to adopt..."
@@ -794,84 +1201,93 @@ function ApplicationForm() {
                             </div>
 
 
-                            {/* Select Questions */}
-
-                            <div className="
-                                grid
-                                grid-cols-1
-                                md:grid-cols-2
-                                gap-5
-                                mt-5
-                            ">
-
-
-                                {/* Previous Pet */}
+                            <div
+                                className="
+                                    grid
+                                    grid-cols-1
+                                    md:grid-cols-2
+                                    gap-5
+                                    mt-5
+                                "
+                            >
 
                                 <SelectField
                                     label="Have you owned a pet before?"
                                     name="previousPet"
-                                    value={formData.previousPet}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.previousPet
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     options={[
                                         "Yes",
-                                        "No",
+                                        "No"
                                     ]}
                                 />
 
-
-                                {/* Other Pets */}
 
                                 <SelectField
                                     label="Do you currently have other pets?"
                                     name="otherPets"
-                                    value={formData.otherPets}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.otherPets
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     options={[
                                         "Yes",
-                                        "No",
+                                        "No"
                                     ]}
                                 />
 
-
-                                {/* Housing */}
 
                                 <SelectField
                                     label="What type of home do you live in?"
                                     name="housing"
-                                    value={formData.housing}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.housing
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     options={[
                                         "Apartment",
                                         "House",
-                                        "Other",
+                                        "Other"
                                     ]}
                                 />
 
-
-                                {/* Permission */}
 
                                 <SelectField
                                     label="Do you have permission to keep a pet?"
                                     name="permission"
-                                    value={formData.permission}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.permission
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     options={[
                                         "Yes",
-                                        "No",
+                                        "No"
                                     ]}
                                 />
 
 
-                                {/* Contact */}
-
                                 <SelectField
                                     label="Preferred contact method"
                                     name="contactMethod"
-                                    value={formData.contactMethod}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.contactMethod
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     options={[
                                         "Phone",
-                                        "Email",
+                                        "Email"
                                     ]}
                                 />
 
@@ -880,29 +1296,36 @@ function ApplicationForm() {
                         </div>
 
 
-                        {/* =================================
-                            AGREEMENT + SUBMIT
-                        ================================== */}
+                        {/* ===================================== */}
+                        {/* AGREEMENT */}
+                        {/* ===================================== */}
 
-                        <div className="
-                            p-7
-                            md:p-9
-                            bg-slate-50/70
-                        ">
+                        <div
+                            className="
+                                p-7
+                                md:p-9
+                                bg-slate-50/70
+                            "
+                        >
 
-
-                            <label className="
-                                flex
-                                items-start
-                                gap-3
-                                cursor-pointer
-                            ">
+                            <label
+                                className="
+                                    flex
+                                    items-start
+                                    gap-3
+                                    cursor-pointer
+                                "
+                            >
 
                                 <input
                                     type="checkbox"
                                     name="agreement"
-                                    checked={formData.agreement}
-                                    onChange={handleChange}
+                                    checked={
+                                        formData.agreement
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     required
                                     className="
                                         mt-1
@@ -913,28 +1336,61 @@ function ApplicationForm() {
                                 />
 
 
-                                <span className="
-                                    text-sm
-                                    leading-6
-                                    text-gray-500
-                                ">
-                                    I understand that adopting a pet is a
-                                    long-term responsibility and I am prepared
-                                    to provide proper care, love, and a safe
-                                    home.
+                                <span
+                                    className="
+                                        text-sm
+                                        leading-6
+                                        text-gray-500
+                                    "
+                                >
+
+                                    I understand that adopting a pet
+                                    is a long-term responsibility and
+                                    I am prepared to provide proper
+                                    care, love, and a safe home.
+
                                 </span>
 
                             </label>
 
 
-                            <div className="
-                                flex
-                                justify-end
-                                mt-7
-                            ">
+                            {/* ERROR */}
+
+                            {error && (
+
+                                <div
+                                    className="
+                                        mt-5
+                                        p-4
+                                        rounded-xl
+                                        bg-red-50
+                                        border
+                                        border-red-200
+                                        text-red-600
+                                        text-sm
+                                    "
+                                >
+
+                                    {error}
+
+                                </div>
+
+                            )}
+
+
+                            {/* SUBMIT */}
+
+                            <div
+                                className="
+                                    flex
+                                    justify-end
+                                    mt-7
+                                "
+                            >
 
                                 <button
                                     type="submit"
+                                    disabled={loading}
                                     className="
                                         px-10
                                         py-3.5
@@ -952,9 +1408,15 @@ function ApplicationForm() {
                                         hover:shadow-xl
                                         transition-all
                                         duration-300
+                                        disabled:opacity-60
+                                        disabled:cursor-not-allowed
                                     "
                                 >
-                                    Submit Application
+
+                                    {loading
+                                        ? "Submitting..."
+                                        : "Submit Application"}
+
                                 </button>
 
                             </div>
@@ -991,28 +1453,36 @@ function FormInput({
 
         <div>
 
-            <label className="
-                block
-                text-sm
-                font-semibold
-                text-slate-700
-                mb-2
-            ">
+            <label
+                className="
+                    block
+                    text-sm
+                    font-semibold
+                    text-slate-700
+                    mb-2
+                "
+            >
+
                 {label}
+
             </label>
 
 
             <div className="relative">
 
-                <span className="
-                    absolute
-                    left-4
-                    top-1/2
-                    -translate-y-1/2
-                    text-violet-400
-                    text-sm
-                ">
+                <span
+                    className="
+                        absolute
+                        left-4
+                        top-1/2
+                        -translate-y-1/2
+                        text-violet-400
+                        text-sm
+                    "
+                >
+
                     {icon}
+
                 </span>
 
 
@@ -1046,7 +1516,6 @@ function FormInput({
             </div>
 
         </div>
-
     );
 }
 
@@ -1067,14 +1536,18 @@ function SelectField({
 
         <div>
 
-            <label className="
-                block
-                text-sm
-                font-semibold
-                text-slate-700
-                mb-2
-            ">
+            <label
+                className="
+                    block
+                    text-sm
+                    font-semibold
+                    text-slate-700
+                    mb-2
+                "
+            >
+
                 {label}
+
             </label>
 
 
@@ -1105,13 +1578,16 @@ function SelectField({
                     Select an option
                 </option>
 
+
                 {options.map((option) => (
 
                     <option
                         key={option}
                         value={option}
                     >
+
                         {option}
+
                     </option>
 
                 ))}
@@ -1119,7 +1595,6 @@ function SelectField({
             </select>
 
         </div>
-
     );
 }
 

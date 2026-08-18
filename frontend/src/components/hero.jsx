@@ -69,7 +69,7 @@ function Hero() {
 
         return () => clearInterval(timer);
 
-    }, []);
+    }, [slides.length]);
 
     const nextSlide = () => {
 
