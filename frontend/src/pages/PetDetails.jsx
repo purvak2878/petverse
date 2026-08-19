@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import PawBackground from "../components/PawBackground";
+import { isLoggedIn } from "../utils/auth";
 
 
 function PetDetails() {
@@ -10,17 +11,16 @@ function PetDetails() {
 
     const navigate = useNavigate();
 
-
     const [pet, setPet] = useState(null);
 
     const [loading, setLoading] = useState(true);
 
-
-    // =====================================================
-    // LOAD PET
-    // =====================================================
-
     useEffect(() => {
+
+        if (!isLoggedIn()) {
+            navigate("/login");
+            return;
+        }
 
         const loadPet = async () => {
 
@@ -30,21 +30,13 @@ function PetDetails() {
                     `http://localhost:9090/api/pets/${id}`
                 );
 
-
                 if (!response.ok) {
-
-                    throw new Error(
-                        "Failed to load pet"
-                    );
+                    throw new Error("Failed to load pet");
                 }
 
-
-                const data =
-                    await response.json();
-
+                const data = await response.json();
 
                 setPet(data);
-
 
             } catch (error) {
 
@@ -59,10 +51,9 @@ function PetDetails() {
             }
         };
 
-
         loadPet();
 
-    }, [id]);
+    }, [id, navigate]);
 
 
     // =====================================================

@@ -16,6 +16,7 @@ import Login from "./pages/Login";
 import ApplicationForm from "./pages/ApplicationForm";
 import ApplicationDetails from "./pages/ApplicationDetails";
 import EditApplication from "./pages/EditApplication";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
 
@@ -57,7 +58,11 @@ function App() {
 
                     <Route
                         path="/pet/:id"
-                        element={<PetDetails />}
+                        element={
+                            <ProtectedRoute>
+                                <PetDetails />
+                            </ProtectedRoute>
+                        }
                     />
 
 
@@ -73,7 +78,11 @@ function App() {
 
                     <Route
                         path="/apply"
-                        element={<ApplicationForm />}
+                        element={
+                            <ProtectedRoute>
+                                <ApplicationForm />
+                            </ProtectedRoute>
+                        }
                     />
 
 

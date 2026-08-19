@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
     FaPaw,
@@ -18,6 +18,8 @@ import {
 
 import PawBackground from "../components/PawBackground.jsx";
 
+import { isLoggedIn } from "../utils/auth";
+
 
 function ApplicationForm() {
 
@@ -25,8 +27,15 @@ function ApplicationForm() {
 
     const location = useLocation();
 
-    // Pet selected from PetDetails.jsx
     const pet = location.state?.pet;
+
+    useEffect(() => {
+
+        if (!isLoggedIn()) {
+            navigate("/login");
+        }
+
+    }, [navigate]);
 
 
     // ==========================================

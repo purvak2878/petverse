@@ -34,20 +34,15 @@ function PetCard({ pet }) {
         }
 
 
-        // If backend sends an array
         if (Array.isArray(pet.traits)) {
             return pet.traits;
         }
 
 
-        // PostgreSQL stores:
-        // "Friendly, Playful, Vaccinated"
-
         return pet.traits
             .split(",")
             .map((trait) => trait.trim())
             .filter(Boolean);
-
     };
 
 
@@ -57,17 +52,6 @@ function PetCard({ pet }) {
     // =========================================
     // IMAGE URL
     // =========================================
-    //
-    // Existing pets:
-    // https://images.unsplash.com/...
-    //
-    // Newly uploaded pets:
-    // b3d12716-....webp
-    //
-    // Uploaded files are stored in:
-    // backend/uploads/pets/
-    //
-    // =========================================
 
     const getImageUrl = () => {
 
@@ -75,13 +59,9 @@ function PetCard({ pet }) {
             return "";
         }
 
-        // Remove accidental spaces
+
         const image = pet.image.trim();
 
-
-        // =====================================
-        // EXISTING EXTERNAL IMAGE
-        // =====================================
 
         if (
             image.startsWith("http://") ||
@@ -91,10 +71,6 @@ function PetCard({ pet }) {
         }
 
 
-        // =====================================
-        // UPLOADED IMAGE
-        // =====================================
-
         return `http://localhost:9090/uploads/pets/${encodeURIComponent(image)}`;
     };
 
@@ -103,7 +79,7 @@ function PetCard({ pet }) {
 
 
     // =========================================
-    // CHECK IF FILE IS PDF
+    // CHECK PDF
     // =========================================
 
     const isPdf =
@@ -124,6 +100,7 @@ function PetCard({ pet }) {
             return false;
         }
 
+
         return true;
     };
 
@@ -138,12 +115,12 @@ function PetCard({ pet }) {
             return;
         }
 
+
         navigate(`/pet/${pet.id}`, {
             state: {
                 pet: pet,
             },
         });
-
     };
 
 
@@ -157,12 +134,12 @@ function PetCard({ pet }) {
             return;
         }
 
+
         navigate("/apply", {
             state: {
                 pet: pet,
             },
         });
-
     };
 
 
@@ -179,7 +156,6 @@ function PetCard({ pet }) {
                 openRegister: false,
             },
         });
-
     };
 
 
@@ -196,7 +172,6 @@ function PetCard({ pet }) {
                 openRegister: true,
             },
         });
-
     };
 
 
@@ -229,14 +204,15 @@ function PetCard({ pet }) {
 
                 <div className="
                     relative
-                    h-[145px]
+                    w-full
+                    h-[150px]
                     overflow-hidden
                     bg-slate-100
                 ">
 
 
                     {/* =================================
-                        PDF FILE
+                        PDF
                     ================================== */}
 
                     {isPdf ? (
@@ -257,12 +233,14 @@ function PetCard({ pet }) {
                                 mb-2
                             " />
 
+
                             <span className="
                                 text-xs
                                 font-semibold
                             ">
                                 PDF FILE
                             </span>
+
 
                             <button
                                 type="button"
@@ -298,8 +276,7 @@ function PetCard({ pet }) {
                     ) : imageUrl ? (
 
                         /* =================================
-                            JPG / JPEG / PNG / WEBP /
-                            EXTERNAL IMAGE
+                            PET IMAGE
                         ================================== */
 
                         <img
@@ -309,6 +286,8 @@ function PetCard({ pet }) {
                                 w-full
                                 h-full
                                 object-cover
+                                object-center
+                                block
                                 group-hover:scale-105
                                 transition-transform
                                 duration-500
@@ -394,9 +373,9 @@ function PetCard({ pet }) {
                 ================================== */}
 
                 <div className="
-                    px-4
-                    pt-3
-                    pb-4
+                    px-5
+                    pt-4
+                    pb-5
                 ">
 
 
@@ -551,7 +530,6 @@ function PetCard({ pet }) {
                                         py-1
                                         rounded-full
                                         font-medium
-
                                         ${
                                         index === 0
                                             ? "bg-violet-50 text-violet-600"
@@ -580,9 +558,7 @@ function PetCard({ pet }) {
                     ">
 
 
-                        {/* =================================
-                            VIEW DETAILS
-                        ================================== */}
+                        {/* VIEW DETAILS */}
 
                         <button
                             type="button"
@@ -593,7 +569,7 @@ function PetCard({ pet }) {
                                 items-center
                                 justify-center
                                 gap-1.5
-                                py-2.5
+                                py-3
                                 rounded-xl
                                 border
                                 border-violet-300
@@ -614,9 +590,7 @@ function PetCard({ pet }) {
                         </button>
 
 
-                        {/* =================================
-                            ADOPT ME
-                        ================================== */}
+                        {/* ADOPT ME */}
 
                         <button
                             type="button"
@@ -627,7 +601,7 @@ function PetCard({ pet }) {
                                 items-center
                                 justify-center
                                 gap-1.5
-                                py-2.5
+                                py-3
                                 rounded-xl
                                 bg-gradient-to-r
                                 from-violet-600
@@ -692,9 +666,7 @@ function PetCard({ pet }) {
                     ">
 
 
-                        {/* =================================
-                            CLOSE
-                        ================================== */}
+                        {/* CLOSE */}
 
                         <button
                             type="button"
@@ -715,9 +687,7 @@ function PetCard({ pet }) {
                         </button>
 
 
-                        {/* =================================
-                            PAW
-                        ================================== */}
+                        {/* PAW */}
 
                         <div className="
                             w-16
@@ -768,9 +738,7 @@ function PetCard({ pet }) {
                         </p>
 
 
-                        {/* =================================
-                            BUTTONS
-                        ================================== */}
+                        {/* POPUP BUTTONS */}
 
                         <div className="
                             flex
@@ -788,12 +756,16 @@ function PetCard({ pet }) {
                                     flex-1
                                     py-3
                                     rounded-full
-                                    border
-                                    border-violet-500
-                                    text-violet-600
+                                    bg-gradient-to-r
+                                    from-violet-600
+                                    via-fuchsia-500
+                                    to-pink-500
+                                    text-white
                                     font-semibold
                                     text-sm
-                                    hover:bg-violet-50
+                                    shadow-md
+                                    hover:-translate-y-0.5
+                                    hover:shadow-lg
                                     transition
                                 "
                             >
@@ -810,14 +782,12 @@ function PetCard({ pet }) {
                                     flex-1
                                     py-3
                                     rounded-full
-                                    bg-gradient-to-r
-                                    from-violet-600
-                                    to-pink-500
-                                    text-white
+                                    border
+                                    border-violet-500
+                                    text-violet-600
                                     font-semibold
                                     text-sm
-                                    shadow-md
-                                    hover:-translate-y-0.5
+                                    hover:bg-violet-50
                                     transition
                                 "
                             >
