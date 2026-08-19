@@ -7,17 +7,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.security.core.userdetails.UserDetails;
-
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import org.springframework.stereotype.Component;
-
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -43,17 +39,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
 
+        // =========================================
+        // DEBUG
+        // =========================================
+
+        System.out.println(
+                "=== JWT REQUEST === " +
+                        request.getMethod() +
+                        " " +
+                        request.getRequestURI()
+        );
+
+
         final String authHeader =
                 request.getHeader("Authorization");
+
+
+        System.out.println(
+                "AUTH HEADER EXISTS: " +
+                        (authHeader != null)
+        );
 
 
         String jwt = null;
         String email = null;
 
 
-        // ==============================
+        // =========================================
         // CHECK JWT HEADER
-        // ==============================
+        // =========================================
 
         if (authHeader != null &&
                 authHeader.startsWith("Bearer ")) {
@@ -62,19 +76,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             try {
 
-                email = jwtService.extractUsername(jwt);
+                email =
+                        jwtService.extractUsername(jwt);
+
+
+                System.out.println(
+                        "JWT EMAIL: " +
+                                email
+                );
+
 
             } catch (Exception e) {
 
-                System.out.println("Invalid JWT token");
+                System.out.println(
+                        "Invalid JWT token"
+                );
 
             }
         }
 
 
-        // ==============================
+        // =========================================
         // AUTHENTICATE USER
-        // ==============================
+        // =========================================
 
         if (email != null &&
                 SecurityContextHolder
@@ -110,10 +134,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder
                         .getContext()
                         .setAuthentication(authentication);
+
+
+                // =========================================
+                // DEBUG - AUTHENTICATION SUCCESS
+                // =========================================
+
+                System.out.println(
+                        "AUTHENTICATED AS: " +
+                                authentication.getName()
+                );
+
+            } else {
+
+                System.out.println(
+                        "JWT TOKEN IS NOT VALID"
+                );
+
             }
         }
 
 
-        filterChain.doFilter(request, response);
+        // =========================================
+        // CONTINUE REQUEST
+        // =========================================
+
+        filterChain.doFilter(
+                request,
+                response
+        );
     }
 }

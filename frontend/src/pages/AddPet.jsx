@@ -569,17 +569,24 @@ function AddPet() {
 
 
                     <h1 className="
-                        text-3xl
-                        md:text-4xl
-                        font-extrabold
-                        bg-gradient-to-r
-                        from-violet-600
-                        to-pink-500
-                        bg-clip-text
-                        text-transparent
-                    ">
+                            text-4xl
+                            md:text-5xl
+                            font-bold
+                            text-slate-800
+                        ">
 
-                        Add a Pet
+                        Add A{" "}
+
+                        <span className="
+                                text-transparent
+                                bg-clip-text
+                                bg-gradient-to-r
+                                from-violet-600
+                                via-fuchsia-500
+                                to-pink-500
+                            ">
+                                Pet
+                            </span>
 
                     </h1>
 

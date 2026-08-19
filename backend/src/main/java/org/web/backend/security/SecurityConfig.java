@@ -91,7 +91,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/uploads/**"
                         ).permitAll()
-
+                        // Wishlist
+                        .requestMatchers(
+                                "/api/wishlist/**"
+                        ).authenticated()
                         // Everything else requires login
                         .anyRequest().authenticated()
                 )

@@ -22,5 +22,6 @@
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:6.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:6.2.11" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:6.2.11" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.19.2" level="project" />
   </component>
 </module>

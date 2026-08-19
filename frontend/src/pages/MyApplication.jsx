@@ -284,8 +284,26 @@ function MyApplication() {
                             className="text-violet-600"
                         />
 
-                        <h1 className="text-4xl font-bold text-violet-600">
-                            My Applications
+                        <h1 className="
+                            text-4xl
+                            md:text-5xl
+                            font-bold
+                            text-slate-800
+                        ">
+
+                            My{" "}
+
+                            <span className="
+                                text-transparent
+                                bg-clip-text
+                                bg-gradient-to-r
+                                from-violet-600
+                                via-fuchsia-500
+                                to-pink-500
+                            ">
+                                Applications
+                            </span>
+
                         </h1>
 
                         <FaPaw

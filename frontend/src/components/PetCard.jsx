@@ -20,8 +20,8 @@ function PetCard({ pet }) {
     const navigate = useNavigate();
 
     const [showLoginPopup, setShowLoginPopup] =
-        useState(false);
-
+        useState(false);const [isWishlisted, setIsWishlisted] = useState(false);
+    const [wishlistLoading, setWishlistLoading] = useState(false);
 
     // =========================================
     // GET PET TRAITS
@@ -198,7 +198,88 @@ function PetCard({ pet }) {
         });
 
     };
+    const handleWishlist = async () => {
 
+        // Check login
+        const token = localStorage.getItem("petverseToken");
+        const savedUser = localStorage.getItem("petverseUser");
+
+        // Guest → login/register popup
+        if (!token || !savedUser) {
+            setShowLoginPopup(true);
+            return;
+        }
+
+        try {
+
+            setWishlistLoading(true);
+
+            // If already saved → remove it
+            if (isWishlisted) {
+
+                const response = await fetch(
+                    `http://localhost:9090/api/wishlist/${pet.id}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Failed to remove pet from wishlist."
+                    );
+                }
+
+                setIsWishlisted(false);
+
+            }
+
+            // If not saved → add it
+            else {
+
+                const response = await fetch(
+                    `http://localhost:9090/api/wishlist/${pet.id}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                if (!response.ok) {
+
+                    const message =
+                        await response.text();
+
+                    throw new Error(
+                        message ||
+                        "Failed to add pet to wishlist."
+                    );
+                }
+
+                setIsWishlisted(true);
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Wishlist error:",
+                error
+            );
+
+            alert(error.message);
+
+        } finally {
+
+            setWishlistLoading(false);
+
+        }
+    };
 
     return (
 
@@ -354,37 +435,37 @@ function PetCard({ pet }) {
 
                     {/* =================================
                         WISHLIST HEART
-                    ================================== */}
+                    ================================== */}<button
+                    type="button"
+                    onClick={handleWishlist}
+                    disabled={wishlistLoading}
+                    className="
+                          absolute
+                          top-3
+                          right-3
+                          w-9
+                          h-9
+                          rounded-full
+                          bg-white
+                          flex
+                          items-center
+                          justify-center
+                          shadow-md
+                          transition-all
+                          duration-200
+                          hover:scale-110
+                     "
+                    aria-label="Add to wishlist"
+                >
+                    <FaHeart
+                        className={
+                            isWishlisted
+                                ? "text-pink-500"
+                                : "text-violet-500"
+                        }
+                    />
+                </button>
 
-                    <button
-                        type="button"
-                        className="
-                            absolute
-                            top-3
-                            right-3
-                            w-9
-                            h-9
-                            rounded-full
-                            bg-white
-                            flex
-                            items-center
-                            justify-center
-                            text-violet-500
-                            shadow-md
-                            hover:text-pink-500
-                            hover:scale-110
-                            transition-all
-                            duration-200
-                        "
-                        onClick={(e) => {
-                            e.stopPropagation();
-                        }}
-                        aria-label="Add to wishlist"
-                    >
-
-                        <FaHeart className="text-sm" />
-
-                    </button>
 
                 </div>
 
