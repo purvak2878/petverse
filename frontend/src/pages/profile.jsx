@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+
 import {
     FaUser,
     FaEnvelope,
@@ -14,16 +15,22 @@ import {
     FaPaw,
     FaArrowLeft,
 } from "react-icons/fa";
+
 import { useNavigate } from "react-router-dom";
 
 import PawBackground from "../components/PawBackground.jsx";
 import Footer from "../components/Footer.jsx";
 
 
-function MyProfile() {
+function Profile() {
 
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
+
+
+    // =========================================
+    // PROFILE STATE
+    // =========================================
 
     const [user, setUser] = useState(null);
 
@@ -32,6 +39,7 @@ function MyProfile() {
 
     const [editing, setEditing] = useState(false);
 
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -39,14 +47,47 @@ function MyProfile() {
         location: "",
     });
 
+
+    // =========================================
+    // GENERAL MESSAGES
+    // =========================================
+
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+
+
+    // =========================================
+    // DELETE ACCOUNT
+    // =========================================
 
     const [deleteConfirm, setDeleteConfirm] =
         useState(false);
 
     const [deleting, setDeleting] =
         useState(false);
+
+
+    // =========================================
+    // CHANGE PASSWORD
+    // =========================================
+
+    const [showPasswordModal, setShowPasswordModal] =
+        useState(false);
+
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+
+    const [passwordLoading, setPasswordLoading] =
+        useState(false);
+
+    const [passwordMessage, setPasswordMessage] =
+        useState("");
+
+    const [passwordError, setPasswordError] =
+        useState("");
 
 
     // =========================================
@@ -65,6 +106,7 @@ function MyProfile() {
         const token =
             localStorage.getItem("petverseToken");
 
+
         if (!token) {
 
             navigate("/login");
@@ -79,6 +121,7 @@ function MyProfile() {
                 "http://localhost:9090/api/profile",
                 {
                     method: "GET",
+
                     headers: {
                         Authorization:
                             `Bearer ${token}`,
@@ -87,8 +130,10 @@ function MyProfile() {
             );
 
 
-            if (response.status === 401 ||
-                response.status === 403) {
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
 
                 localStorage.removeItem(
                     "petverseToken"
@@ -186,6 +231,17 @@ function MyProfile() {
         }
 
 
+        if (!formData.name.trim()) {
+
+            setError(
+                "Name cannot be empty."
+            );
+
+            return;
+
+        }
+
+
         setSaving(true);
         setError("");
         setMessage("");
@@ -207,25 +263,41 @@ function MyProfile() {
                     },
 
                     body: JSON.stringify({
-                        name: formData.name,
-                        phone: formData.phone,
+                        name:
+                            formData.name.trim(),
+
+                        phone:
+                            formData.phone.trim(),
+
                         location:
-                        formData.location,
+                            formData.location.trim(),
                     }),
                 }
             );
 
 
+            const contentType =
+                response.headers.get(
+                    "content-type"
+                );
+
+
             const data =
-                await response.json();
+                contentType &&
+                contentType.includes(
+                    "application/json"
+                )
+                    ? await response.json()
+                    : await response.text();
 
 
             if (!response.ok) {
 
                 throw new Error(
-                    data.message ||
-                    data ||
-                    "Failed to update profile."
+                    typeof data === "string"
+                        ? data
+                        : data.message ||
+                        "Failed to update profile."
                 );
 
             }
@@ -234,7 +306,7 @@ function MyProfile() {
             setUser(data);
 
 
-            // Update stored user information
+            // Update local user cache
             const savedUser =
                 localStorage.getItem(
                     "petverseUser"
@@ -243,19 +315,38 @@ function MyProfile() {
 
             if (savedUser) {
 
-                const oldUser =
-                    JSON.parse(savedUser);
+                try {
+
+                    const oldUser =
+                        JSON.parse(savedUser);
 
 
-                localStorage.setItem(
-                    "petverseUser",
-                    JSON.stringify({
-                        ...oldUser,
-                        ...data,
-                    })
-                );
+                    localStorage.setItem(
+                        "petverseUser",
+                        JSON.stringify({
+                            ...oldUser,
+                            ...data,
+                        })
+                    );
+
+                } catch (e) {
+
+                    console.warn(
+                        "Could not update cached user.",
+                        e
+                    );
+
+                }
 
             }
+
+
+            setFormData({
+                name: data.name || "",
+                email: data.email || "",
+                phone: data.phone || "",
+                location: data.location || "",
+            });
 
 
             setEditing(false);
@@ -266,7 +357,9 @@ function MyProfile() {
 
 
             setTimeout(() => {
+
                 setMessage("");
+
             }, 3000);
 
 
@@ -332,24 +425,37 @@ function MyProfile() {
         }
 
 
-        // Only images
-        if (!file.type.startsWith("image/")) {
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        ];
+
+
+        if (!allowedTypes.includes(file.type)) {
 
             setError(
-                "Please select an image file."
+                "Please select a JPG, JPEG, PNG or WebP image."
             );
+
+            e.target.value = "";
 
             return;
 
         }
 
 
-        // 2 MB limit
-        if (file.size > 2 * 1024 * 1024) {
+        // 2 MB maximum
+        if (
+            file.size >
+            2 * 1024 * 1024
+        ) {
 
             setError(
                 "Profile picture must be smaller than 2 MB."
             );
+
+            e.target.value = "";
 
             return;
 
@@ -371,7 +477,9 @@ function MyProfile() {
 
 
         setError("");
-        setMessage("Uploading profile picture...");
+        setMessage(
+            "Uploading profile picture..."
+        );
 
 
         try {
@@ -400,16 +508,28 @@ function MyProfile() {
             );
 
 
+            const contentType =
+                response.headers.get(
+                    "content-type"
+                );
+
+
             const data =
-                await response.json();
+                contentType &&
+                contentType.includes(
+                    "application/json"
+                )
+                    ? await response.json()
+                    : await response.text();
 
 
             if (!response.ok) {
 
                 throw new Error(
-                    data.message ||
-                    data ||
-                    "Failed to upload image."
+                    typeof data === "string"
+                        ? data
+                        : data.message ||
+                        "Failed to upload image."
                 );
 
             }
@@ -418,7 +538,7 @@ function MyProfile() {
             setUser(data);
 
 
-            // Update local user
+            // Update cached user
             const savedUser =
                 localStorage.getItem(
                     "petverseUser"
@@ -427,17 +547,28 @@ function MyProfile() {
 
             if (savedUser) {
 
-                const oldUser =
-                    JSON.parse(savedUser);
+                try {
+
+                    const oldUser =
+                        JSON.parse(savedUser);
 
 
-                localStorage.setItem(
-                    "petverseUser",
-                    JSON.stringify({
-                        ...oldUser,
-                        ...data,
-                    })
-                );
+                    localStorage.setItem(
+                        "petverseUser",
+                        JSON.stringify({
+                            ...oldUser,
+                            ...data,
+                        })
+                    );
+
+                } catch (e) {
+
+                    console.warn(
+                        "Could not update cached user.",
+                        e
+                    );
+
+                }
 
             }
 
@@ -448,7 +579,9 @@ function MyProfile() {
 
 
             setTimeout(() => {
+
                 setMessage("");
+
             }, 3000);
 
 
@@ -467,7 +600,6 @@ function MyProfile() {
         }
 
 
-        // Reset file input
         e.target.value = "";
 
     };
@@ -498,6 +630,152 @@ function MyProfile() {
 
             }
         );
+
+    };
+
+
+    // =========================================
+    // CHANGE PASSWORD
+    // =========================================
+
+    const handlePasswordChange = async () => {
+
+        const token =
+            localStorage.getItem(
+                "petverseToken"
+            );
+
+
+        if (!token) {
+
+            navigate("/login");
+            return;
+
+        }
+
+
+        if (
+            !passwordData.currentPassword ||
+            !passwordData.newPassword ||
+            !passwordData.confirmPassword
+        ) {
+
+            setPasswordError(
+                "Please fill in all password fields."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            passwordData.newPassword.length < 6
+        ) {
+
+            setPasswordError(
+                "New password must contain at least 6 characters."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            passwordData.newPassword !==
+            passwordData.confirmPassword
+        ) {
+
+            setPasswordError(
+                "New passwords do not match."
+            );
+
+            return;
+
+        }
+
+
+        setPasswordLoading(true);
+        setPasswordMessage("");
+        setPasswordError("");
+
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:9090/api/profile/password",
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        Authorization:
+                            `Bearer ${token}`,
+                    },
+
+                    body: JSON.stringify(
+                        passwordData
+                    ),
+                }
+            );
+
+
+            const data =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data ||
+                    "Unable to change password."
+                );
+
+            }
+
+
+            setPasswordMessage(
+                data ||
+                "Password changed successfully!"
+            );
+
+
+            setPasswordData({
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: "",
+            });
+
+
+            setTimeout(() => {
+
+                setShowPasswordModal(false);
+                setPasswordMessage("");
+                setPasswordError("");
+
+            }, 1500);
+
+
+        } catch (err) {
+
+            console.error(
+                "Password change error:",
+                err
+            );
+
+            setPasswordError(
+                err.message ||
+                "Unable to change password."
+            );
+
+        } finally {
+
+            setPasswordLoading(false);
+
+        }
 
     };
 
@@ -541,11 +819,11 @@ function MyProfile() {
             );
 
 
+            const data =
+                await response.text();
+
+
             if (!response.ok) {
-
-                const data =
-                    await response.text();
-
 
                 throw new Error(
                     data ||
@@ -555,7 +833,6 @@ function MyProfile() {
             }
 
 
-            // Clear login information
             localStorage.removeItem(
                 "petverseToken"
             );
@@ -565,7 +842,6 @@ function MyProfile() {
             );
 
 
-            // Go home
             navigate("/");
 
 
@@ -581,6 +857,10 @@ function MyProfile() {
                 "Unable to delete account."
             );
 
+            setDeleteConfirm(false);
+
+        } finally {
+
             setDeleting(false);
 
         }
@@ -589,7 +869,7 @@ function MyProfile() {
 
 
     // =========================================
-    // LOADING
+    // LOADING SCREEN
     // =========================================
 
     if (loading) {
@@ -646,7 +926,7 @@ function MyProfile() {
                 max-w-5xl
                 mx-auto
                 px-5
-                pt-28
+                pt-20
                 pb-20
             ">
 
@@ -681,9 +961,7 @@ function MyProfile() {
                     HEADER
                 ================================= */}
 
-                <div className="
-                    mb-8
-                ">
+                <div className="mb-8">
 
                     <p className="
                         text-sm
@@ -692,12 +970,14 @@ function MyProfile() {
                         uppercase
                         tracking-wider
                     ">
+
                         Account
+
                     </p>
 
 
                     <h1 className="
-                        mt-1
+                        mt-0
                         text-4xl
                         md:text-5xl
                         font-bold
@@ -797,8 +1077,6 @@ function MyProfile() {
                     mb-7
                 ">
 
-                    {/* Gradient top */}
-
                     <div className="
                         h-32
                         bg-gradient-to-r
@@ -814,7 +1092,8 @@ function MyProfile() {
                         pb-8
                     ">
 
-                        {/* Profile image */}
+
+                        {/* PROFILE IMAGE */}
 
                         <div className="
                             relative
@@ -844,7 +1123,8 @@ function MyProfile() {
                                             user.profileImage
                                         }
                                         alt={
-                                            user.name
+                                            user.name ||
+                                            "Profile"
                                         }
                                         className="
                                             w-full
@@ -873,9 +1153,8 @@ function MyProfile() {
                                 )}
 
 
-                                {/* Camera */}
-
                                 <button
+                                    type="button"
                                     onClick={
                                         handleImageClick
                                     }
@@ -916,11 +1195,10 @@ function MyProfile() {
                             </div>
 
 
-                            {/* Edit button */}
-
                             {!editing && (
 
                                 <button
+                                    type="button"
                                     onClick={() =>
                                         setEditing(true)
                                     }
@@ -958,7 +1236,8 @@ function MyProfile() {
                             text-slate-800
                         ">
 
-                            {user?.name || "PetVerse User"}
+                            {user?.name ||
+                                "PetVerse User"}
 
                         </h2>
 
@@ -1073,6 +1352,7 @@ function MyProfile() {
 
                             </h2>
 
+
                             <p className="
                                 text-sm
                                 text-gray-500
@@ -1101,9 +1381,6 @@ function MyProfile() {
                         gap-6
                     ">
 
-
-                        {/* NAME */}
-
                         <ProfileField
                             icon={<FaUser />}
                             label="Full Name"
@@ -1113,8 +1390,6 @@ function MyProfile() {
                             onChange={handleChange}
                         />
 
-
-                        {/* EMAIL */}
 
                         <ProfileField
                             icon={<FaEnvelope />}
@@ -1126,8 +1401,6 @@ function MyProfile() {
                         />
 
 
-                        {/* PHONE */}
-
                         <ProfileField
                             icon={<FaPhone />}
                             label="Phone Number"
@@ -1138,8 +1411,6 @@ function MyProfile() {
                             placeholder="Add your phone number"
                         />
 
-
-                        {/* LOCATION */}
 
                         <ProfileField
                             icon={<FaMapMarkerAlt />}
@@ -1154,8 +1425,6 @@ function MyProfile() {
                     </div>
 
 
-                    {/* EDIT BUTTONS */}
-
                     {editing && (
 
                         <div className="
@@ -1169,6 +1438,7 @@ function MyProfile() {
                         ">
 
                             <button
+                                type="button"
                                 onClick={handleCancel}
                                 className="
                                     flex
@@ -1195,6 +1465,7 @@ function MyProfile() {
 
 
                             <button
+                                type="button"
                                 onClick={handleSave}
                                 disabled={saving}
                                 className="
@@ -1233,7 +1504,7 @@ function MyProfile() {
 
 
                 {/* =================================
-                    ACCOUNT ACTIONS
+                    ACCOUNT & SECURITY
                 ================================= */}
 
                 <section className="
@@ -1279,11 +1550,17 @@ function MyProfile() {
                         {/* CHANGE PASSWORD */}
 
                         <button
-                            onClick={() =>
-                                alert(
-                                    "Password change will be added next."
-                                )
-                            }
+                            type="button"
+                            onClick={() => {
+
+                                setShowPasswordModal(
+                                    true
+                                );
+
+                                setPasswordError("");
+                                setPasswordMessage("");
+
+                            }}
                             className="
                                 w-full
                                 flex
@@ -1332,6 +1609,7 @@ function MyProfile() {
 
                                     </p>
 
+
                                     <p className="
                                         text-xs
                                         text-gray-400
@@ -1349,9 +1627,10 @@ function MyProfile() {
                         </button>
 
 
-                        {/* DELETE */}
+                        {/* DELETE ACCOUNT */}
 
                         <button
+                            type="button"
                             onClick={() =>
                                 setDeleteConfirm(true)
                             }
@@ -1397,6 +1676,7 @@ function MyProfile() {
 
                                 </p>
 
+
                                 <p className="
                                     text-xs
                                     text-red-400
@@ -1420,6 +1700,276 @@ function MyProfile() {
 
 
             <Footer />
+
+
+            {/* =====================================
+                CHANGE PASSWORD MODAL
+            ====================================== */}
+
+            {showPasswordModal && (
+
+                <div className="
+                    fixed
+                    inset-0
+                    z-[200]
+                    flex
+                    items-center
+                    justify-center
+                    bg-slate-900/50
+                    backdrop-blur-sm
+                    px-5
+                ">
+
+                    <div className="
+                        bg-white
+                        rounded-3xl
+                        shadow-2xl
+                        p-8
+                        max-w-md
+                        w-full
+                    ">
+
+                        <div className="
+                            w-14
+                            h-14
+                            rounded-full
+                            bg-violet-100
+                            text-violet-600
+                            flex
+                            items-center
+                            justify-center
+                            mx-auto
+                            mb-5
+                        ">
+
+                            <FaLock />
+
+                        </div>
+
+
+                        <h2 className="
+                            text-2xl
+                            font-bold
+                            text-slate-800
+                            text-center
+                        ">
+
+                            Change Password
+
+                        </h2>
+
+
+                        <p className="
+                            text-sm
+                            text-gray-500
+                            text-center
+                            mt-2
+                            mb-6
+                        ">
+
+                            Keep your PetVerse account secure.
+
+                        </p>
+
+
+                        {passwordError && (
+
+                            <div className="
+                                mb-4
+                                rounded-xl
+                                bg-red-50
+                                border
+                                border-red-200
+                                text-red-600
+                                px-4
+                                py-3
+                                text-sm
+                            ">
+
+                                {passwordError}
+
+                            </div>
+
+                        )}
+
+
+                        {passwordMessage && (
+
+                            <div className="
+                                mb-4
+                                rounded-xl
+                                bg-green-50
+                                border
+                                border-green-200
+                                text-green-600
+                                px-4
+                                py-3
+                                text-sm
+                            ">
+
+                                {passwordMessage}
+
+                            </div>
+
+                        )}
+
+
+                        <div className="space-y-4">
+
+                            <input
+                                type="password"
+                                placeholder="Current password"
+                                value={
+                                    passwordData.currentPassword
+                                }
+                                onChange={(e) =>
+                                    setPasswordData({
+                                        ...passwordData,
+                                        currentPassword:
+                                        e.target.value,
+                                    })
+                                }
+                                className="
+                                    w-full
+                                    px-4
+                                    py-3.5
+                                    rounded-xl
+                                    border
+                                    border-slate-200
+                                    bg-slate-50
+                                    outline-none
+                                    focus:ring-2
+                                    focus:ring-violet-300
+                                "
+                            />
+
+
+                            <input
+                                type="password"
+                                placeholder="New password"
+                                value={
+                                    passwordData.newPassword
+                                }
+                                onChange={(e) =>
+                                    setPasswordData({
+                                        ...passwordData,
+                                        newPassword:
+                                        e.target.value,
+                                    })
+                                }
+                                className="
+                                    w-full
+                                    px-4
+                                    py-3.5
+                                    rounded-xl
+                                    border
+                                    border-slate-200
+                                    bg-slate-50
+                                    outline-none
+                                    focus:ring-2
+                                    focus:ring-violet-300
+                                "
+                            />
+
+
+                            <input
+                                type="password"
+                                placeholder="Confirm new password"
+                                value={
+                                    passwordData.confirmPassword
+                                }
+                                onChange={(e) =>
+                                    setPasswordData({
+                                        ...passwordData,
+                                        confirmPassword:
+                                        e.target.value,
+                                    })
+                                }
+                                className="
+                                    w-full
+                                    px-4
+                                    py-3.5
+                                    rounded-xl
+                                    border
+                                    border-slate-200
+                                    bg-slate-50
+                                    outline-none
+                                    focus:ring-2
+                                    focus:ring-violet-300
+                                "
+                            />
+
+                        </div>
+
+
+                        <div className="
+                            flex
+                            gap-3
+                            mt-7
+                        ">
+
+                            <button
+                                type="button"
+                                onClick={() => {
+
+                                    setShowPasswordModal(
+                                        false
+                                    );
+
+                                    setPasswordError("");
+                                    setPasswordMessage("");
+
+                                }}
+                                disabled={passwordLoading}
+                                className="
+                                    flex-1
+                                    py-3
+                                    rounded-full
+                                    border
+                                    border-slate-200
+                                    text-slate-600
+                                    font-semibold
+                                    hover:bg-slate-50
+                                "
+                            >
+
+                                Cancel
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                onClick={
+                                    handlePasswordChange
+                                }
+                                disabled={passwordLoading}
+                                className="
+                                    flex-1
+                                    py-3
+                                    rounded-full
+                                    bg-gradient-to-r
+                                    from-violet-600
+                                    to-pink-500
+                                    text-white
+                                    font-semibold
+                                    disabled:opacity-60
+                                "
+                            >
+
+                                {passwordLoading
+                                    ? "Updating..."
+                                    : "Update Password"}
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
 
 
             {/* =====================================
@@ -1501,6 +2051,7 @@ function MyProfile() {
                         ">
 
                             <button
+                                type="button"
                                 onClick={() =>
                                     setDeleteConfirm(false)
                                 }
@@ -1524,6 +2075,7 @@ function MyProfile() {
 
 
                             <button
+                                type="button"
                                 onClick={
                                     handleDeleteAccount
                                 }
@@ -1621,7 +2173,11 @@ function ProfileField({
                 {editing ? (
 
                     <input
-                        type="text"
+                        type={
+                            name === "phone"
+                                ? "tel"
+                                : "text"
+                        }
                         name={name}
                         value={value}
                         onChange={onChange}

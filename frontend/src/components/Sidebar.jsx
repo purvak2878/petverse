@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     FaHome,
     FaDog,
@@ -16,7 +17,20 @@ import sidebarPet from "../assets/images/sidebarPet.png";
 
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
+    const navigate = useNavigate();
 
+    const [showLogoutDialog, setShowLogoutDialog] =
+        useState(false);
+    const handleLogout = () => {
+
+        localStorage.removeItem("petverseToken");
+        localStorage.removeItem("petverseUser");
+
+        setShowLogoutDialog(false);
+
+        navigate("/");
+
+    };
     const menuItems = [
         {
             icon: <FaHome />,
@@ -148,23 +162,19 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     =============================== */}
 
                     <button
-                        onClick={() => {
-                            console.log("Logout clicked");
-                        }}
-
+                        onClick={() => setShowLogoutDialog(true)}
                         className="
-                            w-full
                             flex
                             items-center
-                            gap-4
+                            gap-3
+                            w-full
                             px-5
-                            py-4
+                            py-3
                             rounded-xl
-                            hover:bg-violet-50
-                            hover:text-violet-700
+                            text-red-500
+                            hover:bg-red-50
                             transition
-                            text-gray-700
-                        "
+                          "
                     >
 
                         <FaSignOutAlt />
@@ -247,7 +257,137 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
 
             </aside>
+            {showLogoutDialog && (
 
+                <div className="
+        fixed
+        inset-0
+        z-[999]
+        flex
+        items-center
+        justify-center
+        bg-black/40
+        backdrop-blur-sm
+        px-5
+    ">
+
+                    <div className="
+            w-full
+            max-w-sm
+            bg-white
+            rounded-3xl
+            shadow-2xl
+            p-7
+        ">
+
+                        {/* ICON */}
+
+                        <div className="
+                w-14
+                h-14
+                mx-auto
+                rounded-full
+                bg-violet-100
+                flex
+                items-center
+                justify-center
+                mb-5
+            ">
+
+                            <FaSignOutAlt className="
+                    text-violet-600
+                    text-xl
+                " />
+
+                        </div>
+
+
+                        {/* TITLE */}
+
+                        <h2 className="
+                text-xl
+                font-bold
+                text-slate-800
+                text-center
+            ">
+
+                            Are you sure?
+
+                        </h2>
+
+
+                        {/* MESSAGE */}
+
+                        <p className="
+                text-sm
+                text-gray-500
+                text-center
+                mt-2
+            ">
+
+                            Are you sure you want to log out
+                            of PetVerse?
+
+                        </p>
+
+
+                        {/* BUTTONS */}
+
+                        <div className="
+                flex
+                gap-3
+                mt-7
+            ">
+
+                            <button
+                                onClick={() =>
+                                    setShowLogoutDialog(false)
+                                }
+                                className="
+                        flex-1
+                        py-3
+                        rounded-full
+                        border
+                        border-slate-200
+                        text-slate-600
+                        font-semibold
+                        hover:bg-slate-50
+                        transition
+                    "
+                            >
+
+                                Cancel
+
+                            </button>
+
+
+                            <button
+                                onClick={handleLogout}
+                                className="
+                        flex-1
+                        py-3
+                        rounded-full
+                        bg-gradient-to-r
+                        from-violet-600
+                        to-pink-500
+                        text-white
+                        font-semibold
+                        hover:opacity-90
+                        transition
+                    "
+                            >
+
+                                Log Out
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
         </>
     );
 }

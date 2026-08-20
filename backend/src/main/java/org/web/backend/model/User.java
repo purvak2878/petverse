@@ -24,6 +24,7 @@ public class User {
 
     private String location;
 
+    @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
 
     private LocalDateTime createdAt;
