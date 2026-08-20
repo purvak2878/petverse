@@ -375,21 +375,6 @@ function PetDetails() {
 
                         <div className="flex flex-col sm:flex-row gap-3 mt-7">
 
-
-                            {/* EDIT */}
-
-                            <button
-                                onClick={() =>
-                                    navigate(
-                                        `/pet/${pet.id}/edit`
-                                    )
-                                }
-                                className="flex-1 py-3 rounded-xl border-2 border-violet-300 text-violet-600 font-semibold text-sm hover:bg-violet-50"
-                            >
-                                ✎ Edit Pet
-                            </button>
-
-
                             {/* ADOPT */}
 
                             <button

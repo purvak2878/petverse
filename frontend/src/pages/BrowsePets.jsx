@@ -1,38 +1,99 @@
-import { useEffect, useState } from "react";
-import { FaSearch, FaSlidersH } from "react-icons/fa";
+import {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
+import {
+    FaSearch,
+    FaSlidersH,
+    FaTimes,
+} from "react-icons/fa";
+
+import {
+    useSearchParams,
+} from "react-router-dom";
 
 import PetCard from "../components/PetCard";
+
 import PawBackground from "../components/PawBackground.jsx";
-import Footer from "../components/Footer.jsx";
 
 
 function BrowsePets() {
 
-    // =========================================
-    // PET DATA
-    // =========================================
-
-    const [pets, setPets] = useState([]);
-
-    const [loading, setLoading] = useState(true);
-
-    const [error, setError] = useState("");
-
-    const [search, setSearch] = useState("");
+    const [searchParams, setSearchParams] =
+        useSearchParams();
 
 
     // =========================================
-    // FETCH PETS FROM BACKEND
+    // PETS
+    // =========================================
+
+    const [pets, setPets] =
+        useState([]);
+
+
+    const [loading, setLoading] =
+        useState(true);
+
+
+    const [error, setError] =
+        useState("");
+
+
+    // =========================================
+    // FILTERS
+    // =========================================
+
+    const [search, setSearch] =
+        useState(
+            searchParams.get("search") || ""
+        );
+
+
+    const [city, setCity] =
+        useState(
+            searchParams.get("city") || ""
+        );
+
+
+    const [type, setType] =
+        useState(
+            searchParams.get("type") || ""
+        );
+
+
+    const [breed, setBreed] =
+        useState(
+            searchParams.get("breed") || ""
+        );
+
+
+    const [age, setAge] =
+        useState(
+            searchParams.get("age") || ""
+        );
+
+
+    const [gender, setGender] =
+        useState(
+            searchParams.get("gender") || ""
+        );
+
+
+    // =========================================
+    // LOAD PETS
     // =========================================
 
     useEffect(() => {
 
-        const fetchPets = async () => {
+        const loadPets = async () => {
+
+            setLoading(true);
+            setError("");
+
 
             try {
-
-                setLoading(true);
-                setError("");
 
                 const response = await fetch(
                     "http://localhost:9090/api/pets"
@@ -42,35 +103,41 @@ function BrowsePets() {
                 if (!response.ok) {
 
                     throw new Error(
-                        "Failed to load pets."
+                        `Failed to load pets (${response.status})`
                     );
 
                 }
 
 
-                const data = await response.json();
+                const data =
+                    await response.json();
+
+
+                const petList =
+                    Array.isArray(data)
+                        ? data
+                        : data.pets || [];
 
 
                 console.log(
                     "Pets received from backend:",
-                    data
+                    petList
                 );
 
 
-                setPets(data);
+                setPets(petList);
 
-
-            } catch (error) {
+            } catch (err) {
 
                 console.error(
-                    "Error fetching pets:",
-                    error
+                    "Browse pets error:",
+                    err
                 );
+
 
                 setError(
-                    "Unable to load pets right now. Please try again."
+                    "Unable to load pets from the server."
                 );
-
 
             } finally {
 
@@ -81,32 +148,371 @@ function BrowsePets() {
         };
 
 
-        fetchPets();
+        loadPets();
 
     }, []);
 
 
     // =========================================
-    // SEARCH
+    // SYNC URL → STATE
     // =========================================
 
-    const filteredPets = pets.filter((pet) => {
+    useEffect(() => {
 
-        const searchText =
-            search.toLowerCase();
-
-
-        return (
-            pet.name
-                ?.toLowerCase()
-                .includes(searchText) ||
-
-            pet.breed
-                ?.toLowerCase()
-                .includes(searchText)
+        setSearch(
+            searchParams.get("search") || ""
         );
 
-    });
+        setCity(
+            searchParams.get("city") || ""
+        );
+
+        setType(
+            searchParams.get("type") || ""
+        );
+
+        setBreed(
+            searchParams.get("breed") || ""
+        );
+
+        setAge(
+            searchParams.get("age") || ""
+        );
+
+        setGender(
+            searchParams.get("gender") || ""
+        );
+
+    }, [searchParams]);
+
+
+    // =========================================
+    // UNIQUE FILTER OPTIONS
+    // =========================================
+
+    const cities = useMemo(() => {
+
+        return getUniqueValues(
+            pets,
+            "city"
+        );
+
+    }, [pets]);
+
+
+    const types = useMemo(() => {
+
+        return getUniqueValues(
+            pets,
+            "type"
+        );
+
+    }, [pets]);
+
+
+    const breeds = useMemo(() => {
+
+        return getUniqueValues(
+            pets,
+            "breed"
+        );
+
+    }, [pets]);
+
+
+    const genders = useMemo(() => {
+
+        return getUniqueValues(
+            pets,
+            "gender"
+        );
+
+    }, [pets]);
+
+
+    // =========================================
+    // AGE MATCHER
+    // =========================================
+
+    const matchesAge = (
+        petAge,
+        selectedAge
+    ) => {
+
+        if (!selectedAge) {
+
+            return true;
+
+        }
+
+
+        const months =
+            parseAgeInMonths(
+                petAge
+            );
+
+
+        if (months === null) {
+
+            return false;
+
+        }
+
+
+        switch (selectedAge) {
+
+            case "0-6":
+
+                return months >= 0 &&
+                    months <= 6;
+
+
+            case "6-12":
+
+                return months > 6 &&
+                    months <= 12;
+
+
+            case "1-3":
+
+                return months > 12 &&
+                    months <= 36;
+
+
+            case "3+":
+
+                return months > 36;
+
+
+            default:
+
+                return true;
+
+        }
+
+    };
+
+
+    // =========================================
+    // FILTER PETS
+    // =========================================
+
+    const filteredPets = useMemo(() => {
+
+        const query =
+            search.trim().toLowerCase();
+
+
+        return pets.filter((pet) => {
+
+            // SEARCH
+
+            const matchesSearch =
+                !query ||
+
+                String(
+                    pet.name || ""
+                )
+                    .toLowerCase()
+                    .includes(query) ||
+
+                String(
+                    pet.breed || ""
+                )
+                    .toLowerCase()
+                    .includes(query) ||
+
+                String(
+                    pet.city || ""
+                )
+                    .toLowerCase()
+                    .includes(query) ||
+
+                String(
+                    pet.type || ""
+                )
+                    .toLowerCase()
+                    .includes(query);
+
+
+            // CITY
+
+            const matchesCity =
+                !city ||
+
+                String(
+                    pet.city || ""
+                )
+                    .toLowerCase() ===
+                city.toLowerCase();
+
+
+            // TYPE
+
+            const matchesType =
+                !type ||
+
+                String(
+                    pet.type || ""
+                )
+                    .toLowerCase() ===
+                type.toLowerCase();
+
+
+            // BREED
+
+            const matchesBreed =
+                !breed ||
+
+                String(
+                    pet.breed || ""
+                )
+                    .toLowerCase() ===
+                breed.toLowerCase();
+
+
+            // GENDER
+
+            const matchesGender =
+                !gender ||
+
+                String(
+                    pet.gender || ""
+                )
+                    .toLowerCase() ===
+                gender.toLowerCase();
+
+
+            // AGE
+
+            const matchesSelectedAge =
+                matchesAge(
+                    pet.age,
+                    age
+                );
+
+
+            return (
+                matchesSearch &&
+                matchesCity &&
+                matchesType &&
+                matchesBreed &&
+                matchesGender &&
+                matchesSelectedAge
+            );
+
+        });
+
+    }, [
+        pets,
+        search,
+        city,
+        type,
+        breed,
+        gender,
+        age,
+    ]);
+
+
+    // =========================================
+    // UPDATE URL
+    // =========================================
+
+    const updateSearchParams = (
+        overrides = {}
+    ) => {
+
+        const values = {
+
+            search,
+            city,
+            type,
+            breed,
+            age,
+            gender,
+
+            ...overrides,
+
+        };
+
+
+        const params =
+            new URLSearchParams();
+
+
+        Object.entries(values)
+            .forEach(
+                ([key, value]) => {
+
+                    if (value) {
+
+                        params.set(
+                            key,
+                            value
+                        );
+
+                    }
+
+                }
+            );
+
+
+        setSearchParams(params);
+
+    };
+
+
+    // =========================================
+    // SEARCH INPUT
+    // =========================================
+
+    const handleSearchChange = (e) => {
+
+        setSearch(
+            e.target.value
+        );
+
+    };
+
+
+    const handleSearchKeyDown = (e) => {
+
+        if (
+            e.key === "Enter"
+        ) {
+
+            updateSearchParams();
+
+        }
+
+    };
+
+
+    // =========================================
+    // CLEAR FILTERS
+    // =========================================
+
+    const clearFilters = () => {
+
+        setSearch("");
+        setCity("");
+        setType("");
+        setBreed("");
+        setAge("");
+        setGender("");
+
+        setSearchParams({});
+
+    };
+
+
+    const hasFilters =
+        search ||
+        city ||
+        type ||
+        breed ||
+        age ||
+        gender;
 
 
     return (
@@ -120,10 +526,9 @@ function BrowsePets() {
         ">
 
 
-            {/* =====================================
+            {/* =================================
                 PAW BACKGROUND
-                Stays BEHIND all page content
-            ====================================== */}
+            ================================== */}
 
             <div className="
                 absolute
@@ -137,9 +542,9 @@ function BrowsePets() {
             </div>
 
 
-            {/* =====================================
-                ALL BROWSE PETS CONTENT
-            ====================================== */}
+            {/* =================================
+                CONTENT
+            ================================== */}
 
             <div className="
                 relative
@@ -149,10 +554,12 @@ function BrowsePets() {
             ">
 
 
-                {/* ================= HEADER ================= */}
+                {/* =================================
+                    HEADER
+                ================================== */}
 
                 <div className="
-                    mb-10
+                    mb-8
                     text-center
                 ">
 
@@ -163,8 +570,12 @@ function BrowsePets() {
                         gap-3
                     ">
 
-                        <span className="text-3xl">
+                        <span className="
+                            text-3xl
+                        ">
+
                             🐾
+
                         </span>
 
 
@@ -208,7 +619,9 @@ function BrowsePets() {
                 </div>
 
 
-                {/* ================= SEARCH ================= */}
+                {/* =================================
+                    SEARCH
+                ================================== */}
 
                 <div className="
                     bg-white
@@ -220,50 +633,92 @@ function BrowsePets() {
                     mb-5
                 ">
 
-                    <div className="relative">
+                    <div className="
+                        flex
+                        gap-3
+                    ">
 
-                        <FaSearch
-                            className="
+
+                        <div className="
+                            relative
+                            flex-1
+                        ">
+
+                            <FaSearch className="
                                 absolute
                                 left-4
                                 top-1/2
                                 -translate-y-1/2
                                 text-violet-400
-                            "
-                        />
+                            " />
 
 
-                        <input
-                            type="text"
-                            placeholder="Search by pet name or breed..."
-                            value={search}
-                            onChange={(e) =>
-                                setSearch(e.target.value)
+                            <input
+                                type="text"
+                                placeholder="
+                                    Search by pet name,
+                                    breed or location...
+                                "
+                                value={search}
+                                onChange={
+                                    handleSearchChange
+                                }
+                                onKeyDown={
+                                    handleSearchKeyDown
+                                }
+                                className="
+                                    w-full
+                                    h-12
+                                    pl-11
+                                    pr-4
+                                    rounded-xl
+                                    bg-gray-50
+                                    border
+                                    border-gray-200
+                                    outline-none
+                                    text-sm
+                                    text-slate-700
+                                    focus:border-violet-400
+                                    focus:ring-2
+                                    focus:ring-violet-100
+                                    transition
+                                "
+                            />
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                updateSearchParams()
                             }
                             className="
-                                w-full
-                                h-12
-                                pl-11
-                                pr-4
+                                px-6
                                 rounded-xl
-                                bg-gray-50
-                                border
-                                border-gray-200
-                                outline-none
+                                bg-gradient-to-r
+                                from-violet-600
+                                to-pink-500
+                                text-white
                                 text-sm
-                                focus:border-violet-400
-                                focus:ring-2
-                                focus:ring-violet-100
+                                font-semibold
+                                hover:shadow-md
                                 transition
                             "
-                        />
+                        >
+
+                            Search
+
+                        </button>
 
                     </div>
 
                 </div>
 
 
-                {/* ================= FILTERS ================= */}
+                {/* =================================
+                    FILTERS
+                ================================== */}
 
                 <div className="
                     bg-white
@@ -279,36 +734,86 @@ function BrowsePets() {
                     <div className="
                         flex
                         items-center
-                        gap-2
+                        justify-between
                         mb-4
                     ">
 
-                        <FaSlidersH
-                            className="text-violet-500"
-                        />
-
-                        <h2 className="
-                            font-semibold
-                            text-gray-800
+                        <div className="
+                            flex
+                            items-center
+                            gap-2
                         ">
-                            Filter Pets
-                        </h2>
+
+                            <FaSlidersH className="
+                                text-violet-500
+                            " />
+
+
+                            <h2 className="
+                                font-semibold
+                                text-gray-800
+                            ">
+
+                                Filter Pets
+
+                            </h2>
+
+                        </div>
+
+
+                        {hasFilters && (
+
+                            <button
+                                type="button"
+                                onClick={clearFilters}
+                                className="
+                                    flex
+                                    items-center
+                                    gap-1.5
+                                    text-xs
+                                    font-semibold
+                                    text-slate-400
+                                    hover:text-red-500
+                                    transition
+                                "
+                            >
+
+                                <FaTimes />
+
+                                Clear Filters
+
+                            </button>
+
+                        )}
 
                     </div>
 
 
                     <div className="
-                       grid
-                       grid-cols-1
-                       sm:grid-cols-2
-                       lg:grid-cols-3
-                       gap-6
-                        ">
+                        grid
+                        grid-cols-2
+                        md:grid-cols-3
+                        lg:grid-cols-5
+                        gap-4
+                    ">
 
 
-                        {/* City */}
+                        {/* CITY */}
 
                         <select
+                            value={city}
+                            onChange={(e) => {
+
+                                setCity(
+                                    e.target.value
+                                );
+
+                                updateSearchParams({
+                                    city:
+                                    e.target.value
+                                });
+
+                            }}
                             className="
                                 h-11
                                 px-3
@@ -323,32 +828,42 @@ function BrowsePets() {
                             "
                         >
 
-                            <option>
+                            <option value="">
                                 All Cities
                             </option>
 
-                            <option>
-                                Mumbai
-                            </option>
+                            {cities.map((item) => (
 
-                            <option>
-                                Pune
-                            </option>
+                                <option
+                                    key={item}
+                                    value={item}
+                                >
 
-                            <option>
-                                Nanded
-                            </option>
+                                    {item}
 
-                            <option>
-                                Nagpur
-                            </option>
+                                </option>
+
+                            ))}
 
                         </select>
 
 
-                        {/* Pet Type */}
+                        {/* TYPE */}
 
                         <select
+                            value={type}
+                            onChange={(e) => {
+
+                                setType(
+                                    e.target.value
+                                );
+
+                                updateSearchParams({
+                                    type:
+                                    e.target.value
+                                });
+
+                            }}
                             className="
                                 h-11
                                 px-3
@@ -363,28 +878,42 @@ function BrowsePets() {
                             "
                         >
 
-                            <option>
+                            <option value="">
                                 All Pet Types
                             </option>
 
-                            <option>
-                                Dogs
-                            </option>
+                            {types.map((item) => (
 
-                            <option>
-                                Cats
-                            </option>
+                                <option
+                                    key={item}
+                                    value={item}
+                                >
 
-                            <option>
-                                Birds
-                            </option>
+                                    {item}
+
+                                </option>
+
+                            ))}
 
                         </select>
 
 
-                        {/* Breed */}
+                        {/* BREED */}
 
                         <select
+                            value={breed}
+                            onChange={(e) => {
+
+                                setBreed(
+                                    e.target.value
+                                );
+
+                                updateSearchParams({
+                                    breed:
+                                    e.target.value
+                                });
+
+                            }}
                             className="
                                 h-11
                                 px-3
@@ -399,40 +928,42 @@ function BrowsePets() {
                             "
                         >
 
-                            <option>
+                            <option value="">
                                 All Breeds
                             </option>
 
-                            <option>
-                                Golden Retriever
-                            </option>
+                            {breeds.map((item) => (
 
-                            <option>
-                                Labrador Retriever
-                            </option>
+                                <option
+                                    key={item}
+                                    value={item}
+                                >
 
-                            <option>
-                                Beagle
-                            </option>
+                                    {item}
 
-                            <option>
-                                Persian Cat
-                            </option>
+                                </option>
 
-                            <option>
-                                Samoyed
-                            </option>
-
-                            <option>
-                                Border Collie
-                            </option>
+                            ))}
 
                         </select>
 
 
-                        {/* Age */}
+                        {/* AGE */}
 
                         <select
+                            value={age}
+                            onChange={(e) => {
+
+                                setAge(
+                                    e.target.value
+                                );
+
+                                updateSearchParams({
+                                    age:
+                                    e.target.value
+                                });
+
+                            }}
                             className="
                                 h-11
                                 px-3
@@ -447,25 +978,75 @@ function BrowsePets() {
                             "
                         >
 
-                            <option>
+                            <option value="">
                                 All Ages
                             </option>
 
-                            <option>
+                            <option value="0-6">
                                 0 - 6 Months
                             </option>
 
-                            <option>
+                            <option value="6-12">
                                 6 Months - 1 Year
                             </option>
 
-                            <option>
+                            <option value="1-3">
                                 1 - 3 Years
                             </option>
 
-                            <option>
+                            <option value="3+">
                                 3+ Years
                             </option>
+
+                        </select>
+
+
+                        {/* GENDER */}
+
+                        <select
+                            value={gender}
+                            onChange={(e) => {
+
+                                setGender(
+                                    e.target.value
+                                );
+
+                                updateSearchParams({
+                                    gender:
+                                    e.target.value
+                                });
+
+                            }}
+                            className="
+                                h-11
+                                px-3
+                                rounded-xl
+                                bg-gray-50
+                                border
+                                border-gray-200
+                                text-sm
+                                text-gray-600
+                                outline-none
+                                focus:border-violet-400
+                            "
+                        >
+
+                            <option value="">
+                                All Genders
+                            </option>
+
+                            {genders.map((item) => (
+
+                                <option
+                                    key={item}
+                                    value={item}
+                                >
+
+                                    {item}
+
+                                </option>
+
+                            ))}
 
                         </select>
 
@@ -474,7 +1055,9 @@ function BrowsePets() {
                 </div>
 
 
-                {/* ================= PET COUNT ================= */}
+                {/* =================================
+                    PET COUNT
+                ================================== */}
 
                 <div className="
                     flex
@@ -490,34 +1073,59 @@ function BrowsePets() {
                             font-bold
                             text-gray-800
                         ">
+
                             Available Pets
+
                         </h2>
 
 
-                        {!loading && !error && (
+                        <p className="
+                            text-sm
+                            text-gray-500
+                            mt-1
+                        ">
 
-                            <p className="
-                                text-sm
-                                text-gray-500
-                                mt-1
-                            ">
+                            {loading
+                                ? "Loading pets..."
+                                : `${filteredPets.length} pets found`
+                            }
 
-                                {filteredPets.length} pets found
-
-                            </p>
-
-                        )}
+                        </p>
 
                     </div>
 
                 </div>
 
 
-                {/* =====================================
-                    LOADING STATE
-                ====================================== */}
+                {/* =================================
+                    ERROR
+                ================================== */}
 
-                {loading && (
+                {error && (
+
+                    <div className="
+                        bg-red-50
+                        border
+                        border-red-200
+                        text-red-600
+                        rounded-2xl
+                        p-5
+                        mb-5
+                        text-sm
+                    ">
+
+                        {error}
+
+                    </div>
+
+                )}
+
+
+                {/* =================================
+                    LOADING
+                ================================== */}
+
+                {loading ? (
 
                     <div className="
                         bg-white
@@ -526,7 +1134,6 @@ function BrowsePets() {
                         text-center
                         border
                         border-gray-100
-                        shadow-sm
                     ">
 
                         <div className="
@@ -534,37 +1141,56 @@ function BrowsePets() {
                             mb-4
                             animate-bounce
                         ">
+
                             🐾
+
                         </div>
-
-
-                        <h3 className="
-                            text-lg
-                            font-semibold
-                            text-gray-700
-                        ">
-                            Finding your furry friends...
-                        </h3>
 
 
                         <p className="
                             text-sm
-                            text-gray-400
-                            mt-2
+                            text-gray-500
                         ">
-                            Loading pets from PetVerse.
+
+                            Finding pets for you...
+
                         </p>
 
                     </div>
 
-                )}
+                ) : filteredPets.length > 0 ? (
 
+                    /* =================================
+                        PET GRID
+                    ================================== */
 
-                {/* =====================================
-                    ERROR STATE
-                ====================================== */}
+                    <div className="
+                        grid
+                        grid-cols-1
+                        sm:grid-cols-2
+                        lg:grid-cols-3
+                        xl:grid-cols-4
+                        gap-5
+                    ">
 
-                {!loading && error && (
+                        {filteredPets.map(
+                            (pet) => (
+
+                                <PetCard
+                                    key={pet.id}
+                                    pet={pet}
+                                />
+
+                            )
+                        )}
+
+                    </div>
+
+                ) : (
+
+                    /* =================================
+                        NO RESULTS
+                    ================================== */
 
                     <div className="
                         bg-white
@@ -572,15 +1198,16 @@ function BrowsePets() {
                         p-12
                         text-center
                         border
-                        border-red-100
-                        shadow-sm
+                        border-gray-100
                     ">
 
                         <div className="
-                            text-4xl
+                            text-5xl
                             mb-4
                         ">
+
                             🐾
+
                         </div>
 
 
@@ -589,122 +1216,161 @@ function BrowsePets() {
                             font-bold
                             text-gray-700
                         ">
-                            Oops!
+
+                            No pets found
+
                         </h3>
 
 
                         <p className="
                             text-gray-500
                             mt-2
-                            mb-5
                         ">
-                            {error}
+
+                            Try changing your search
+                            or filters.
+
                         </p>
 
 
-                        <button
-                            onClick={() =>
-                                window.location.reload()
-                            }
-                            className="
-                                px-6
-                                py-2.5
-                                rounded-full
-                                text-white
-                                text-sm
-                                font-semibold
-                                bg-gradient-to-r
-                                from-violet-600
-                                to-pink-500
-                                hover:-translate-y-0.5
-                                transition
-                            "
-                        >
-                            Try Again
-                        </button>
+                        {hasFilters && (
+
+                            <button
+                                type="button"
+                                onClick={clearFilters}
+                                className="
+                                    mt-5
+                                    px-5
+                                    py-2.5
+                                    rounded-full
+                                    bg-violet-50
+                                    text-violet-600
+                                    text-sm
+                                    font-semibold
+                                    hover:bg-violet-100
+                                    transition
+                                "
+                            >
+
+                                Clear Filters
+
+                            </button>
+
+                        )}
 
                     </div>
 
                 )}
 
-
-                {/* =====================================
-                    PET GRID
-                ====================================== */}
-
-                {!loading &&
-                    !error &&
-                    filteredPets.length > 0 && (
-
-                        <div className="
-                            grid
-                            grid-cols-4
-                            gap-5
-                        ">
-
-                            {filteredPets.map((pet) => (
-
-                                <PetCard
-                                    key={pet.id}
-                                    pet={pet}
-                                />
-
-                            ))}
-
-                        </div>
-
-                    )}
-
-
-                {/* =====================================
-                    NO RESULTS
-                ====================================== */}
-
-                {!loading &&
-                    !error &&
-                    filteredPets.length === 0 && (
-
-                        <div className="
-                            bg-white
-                            rounded-2xl
-                            p-12
-                            text-center
-                            border
-                            border-gray-100
-                        ">
-
-                            <div className="
-                                text-5xl
-                                mb-4
-                            ">
-                                🐾
-                            </div>
-
-
-                            <h3 className="
-                                text-xl
-                                font-bold
-                                text-gray-700
-                            ">
-                                No pets found
-                            </h3>
-
-
-                            <p className="
-                                text-gray-500
-                                mt-2
-                            ">
-                                Try searching for another name or breed.
-                            </p>
-
-                        </div>
-
-                    )}
-
             </div>
-        <Footer/>
+
         </div>
+
     );
+
+}
+
+
+/* =============================================
+   UNIQUE VALUES
+============================================= */
+
+function getUniqueValues(
+    pets,
+    key
+) {
+
+    return [
+
+        ...new Set(
+
+            pets
+                .map((pet) => pet[key])
+                .filter(Boolean)
+                .map((value) =>
+                    String(value).trim()
+                )
+
+        ),
+
+    ].sort();
+
+}
+
+
+/* =============================================
+   AGE PARSER
+============================================= */
+
+function parseAgeInMonths(ageValue) {
+
+    if (
+        ageValue === null ||
+        ageValue === undefined
+    ) {
+
+        return null;
+
+    }
+
+
+    const value =
+        String(ageValue)
+            .trim()
+            .toLowerCase();
+
+
+    const numberMatch =
+        value.match(
+            /(\d+(?:\.\d+)?)/
+        );
+
+
+    if (!numberMatch) {
+
+        return null;
+
+    }
+
+
+    const number =
+        parseFloat(
+            numberMatch[1]
+        );
+
+
+    if (value.includes("month")) {
+
+        return number;
+
+    }
+
+
+    if (
+        value.includes("year") ||
+        value.includes("yr")
+    ) {
+
+        return number * 12;
+
+    }
+
+
+    // If backend stores only a number,
+    // treat it as years.
+
+    if (
+        !value.includes("month") &&
+        !value.includes("year")
+    ) {
+
+        return number * 12;
+
+    }
+
+
+    return null;
+
 }
 
 

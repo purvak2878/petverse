@@ -27,24 +27,84 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
 
 
     // =========================================
+    // AUTHENTICATION
+    // =========================================
+
+    const [isLoggedIn, setIsLoggedIn] = useState(() => {
+
+        return !!localStorage.getItem(
+            "petverseToken"
+        );
+
+    });
+
+
+    useEffect(() => {
+
+        const checkLoginStatus = () => {
+
+            setIsLoggedIn(
+                !!localStorage.getItem(
+                    "petverseToken"
+                )
+            );
+
+        };
+
+
+        checkLoginStatus();
+
+
+        window.addEventListener(
+            "storage",
+            checkLoginStatus
+        );
+
+
+        window.addEventListener(
+            "petverseAuthChange",
+            checkLoginStatus
+        );
+
+
+        return () => {
+
+            window.removeEventListener(
+                "storage",
+                checkLoginStatus
+            );
+
+
+            window.removeEventListener(
+                "petverseAuthChange",
+                checkLoginStatus
+            );
+
+        };
+
+    }, [location]);
+
+
+    // =========================================
     // THEME
     // =========================================
 
     const [darkMode, setDarkMode] = useState(() => {
 
-        return localStorage.getItem("petverseTheme") === "dark";
+        return (
+            localStorage.getItem(
+                "petverseTheme"
+            ) === "dark"
+        );
 
     });
 
-
-    // =========================================
-    // APPLY THEME
-    // =========================================
 
     useEffect(() => {
 
         const root =
             document.documentElement;
+
 
         if (darkMode) {
 
@@ -75,13 +135,68 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
     }, [darkMode]);
 
 
-    // =========================================
-    // TOGGLE THEME
-    // =========================================
-
     const toggleTheme = () => {
 
-        setDarkMode((previous) => !previous);
+        setDarkMode(
+            (previous) => !previous
+        );
+
+    };
+
+
+    // =========================================
+    // SEARCH
+    // =========================================
+
+    const [searchText, setSearchText] =
+        useState("");
+
+
+    // Keep search box synced with URL
+
+    useEffect(() => {
+
+        const params =
+            new URLSearchParams(
+                location.search
+            );
+
+        setSearchText(
+            params.get("search") || ""
+        );
+
+    }, [location.search]);
+
+
+    const performSearch = () => {
+
+        const query =
+            searchText.trim();
+
+
+        if (!query) {
+
+            navigate("/browse-pets");
+
+            return;
+
+        }
+
+
+        navigate(
+            `/browse-pets?search=${encodeURIComponent(query)}`
+        );
+
+    };
+
+
+    const handleSearchKeyDown = (event) => {
+
+        if (event.key === "Enter") {
+
+            performSearch();
+
+        }
 
     };
 
@@ -155,7 +270,9 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
 
                     <button
                         onClick={() =>
-                            setSidebarOpen(!sidebarOpen)
+                            setSidebarOpen(
+                                !sidebarOpen
+                            )
                         }
                         className={`
                             w-10
@@ -227,13 +344,16 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     >
 
                         <FaSearch
+                            onClick={performSearch}
                             className={`
                                 mr-3
+                                cursor-pointer
+                                transition
 
                                 ${
                                 darkMode
-                                    ? "text-slate-400"
-                                    : "text-gray-400"
+                                    ? "text-slate-400 hover:text-violet-400"
+                                    : "text-gray-400 hover:text-violet-500"
                             }
                             `}
                         />
@@ -241,7 +361,18 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
 
                         <input
                             type="text"
-                            placeholder="Search pets, breeds or locations..."
+                            value={searchText}
+                            onChange={(e) =>
+                                setSearchText(
+                                    e.target.value
+                                )
+                            }
+                            onKeyDown={
+                                handleSearchKeyDown
+                            }
+                            placeholder="
+                                Search pets, breeds or locations...
+                            "
                             className={`
                                 bg-transparent
                                 outline-none
@@ -271,13 +402,13 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                 ">
 
 
-                    {/* =================================
-                        NOTIFICATIONS
-                    ================================== */}
+                    {/* NOTIFICATIONS */}
 
                     <button
                         type="button"
-                        onClick={openNotifications}
+                        onClick={
+                            openNotifications
+                        }
                         aria-label="Notifications"
                         className={`
                             relative
@@ -302,9 +433,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     </button>
 
 
-                    {/* =================================
-                        WISHLIST
-                    ================================== */}
+                    {/* WISHLIST */}
 
                     <button
                         type="button"
@@ -332,9 +461,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     </button>
 
 
-                    {/* =================================
-                        THEME TOGGLE
-                    ================================== */}
+                    {/* THEME */}
 
                     <button
                         type="button"
@@ -363,9 +490,6 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
 
                         {darkMode ? (
 
-                            // LIGHT MODE ICON
-                            // White sun
-
                             <FaSun
                                 className="
                                     text-white
@@ -374,9 +498,6 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                             />
 
                         ) : (
-
-                            // DARK MODE ICON
-                            // Black moon
 
                             <FaMoon
                                 className="
@@ -390,45 +511,45 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     </button>
 
 
-                    {/* =================================
-                        LOGIN
-                    ================================== */}
+                    {/* LOGIN — GUEST ONLY */}
 
-                    <Link
-                        to="/login"
-                        state={{
-                            from:
-                                location.pathname +
-                                location.search
-                        }}
-                        className="
-                            px-4
-                            py-1.5
-                            rounded-full
-                            text-xs
-                            font-semibold
-                            text-white
-                            bg-gradient-to-r
-                            from-violet-600
-                            via-fuchsia-500
-                            to-pink-500
-                            shadow-md
-                            shadow-violet-300/40
-                            hover:-translate-y-0.5
-                            hover:shadow-lg
-                            transition-all
-                            duration-300
-                        "
-                    >
+                    {!isLoggedIn && (
 
-                        LOGIN
+                        <Link
+                            to="/login"
+                            state={{
+                                from:
+                                    location.pathname +
+                                    location.search
+                            }}
+                            className="
+                                px-4
+                                py-1.5
+                                rounded-full
+                                text-xs
+                                font-semibold
+                                text-white
+                                bg-gradient-to-r
+                                from-violet-600
+                                via-fuchsia-500
+                                to-pink-500
+                                shadow-md
+                                shadow-violet-300/40
+                                hover:-translate-y-0.5
+                                hover:shadow-lg
+                                transition-all
+                                duration-300
+                            "
+                        >
 
-                    </Link>
+                            LOGIN
+
+                        </Link>
+
+                    )}
 
 
-                    {/* =================================
-                        PROFILE
-                    ================================== */}
+                    {/* PROFILE */}
 
                     <div className="
                         text-4xl
@@ -448,6 +569,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         </header>
 
     );
+
 }
 
 

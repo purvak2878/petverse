@@ -1,6 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { FaUserCircle, FaSignOutAlt, FaPaw, FaUser} from "react-icons/fa";
+
+import {
+    FaUserCircle,
+    FaSignOutAlt,
+    FaPaw,
+    FaUser,
+    FaHeart,
+    FaClipboardList,
+    FaChevronRight,
+} from "react-icons/fa";
+
 import { useNavigate } from "react-router-dom";
+
 
 function ProfileDropdown() {
 
@@ -11,26 +22,25 @@ function ProfileDropdown() {
     const dropdownRef = useRef(null);
 
 
-    /*
-     * For now we check localStorage.
-     *
-     * Later Spring Boot login will set this
-     * automatically after successful authentication.
-     */
+    // =========================================
+    // USER
+    // =========================================
 
     const [user, setUser] = useState(() => {
 
-        const savedUser = localStorage.getItem("petverseUser");
+        const savedUser =
+            localStorage.getItem("petverseUser");
 
         return savedUser
             ? JSON.parse(savedUser)
             : null;
+
     });
 
 
-    /* =========================================
-       CLOSE WHEN CLICKING OUTSIDE
-    ========================================== */
+    // =========================================
+    // CLOSE WHEN CLICKING OUTSIDE
+    // =========================================
 
     useEffect(() => {
 
@@ -51,18 +61,79 @@ function ProfileDropdown() {
         );
 
         return () => {
+
             document.removeEventListener(
                 "mousedown",
                 handleClickOutside
             );
+
         };
 
     }, []);
 
 
-    /* =========================================
-       LOGIN
-    ========================================== */
+    // =========================================
+    // UPDATE USER
+    // =========================================
+
+    useEffect(() => {
+
+        const updateUser = () => {
+
+            const savedUser =
+                localStorage.getItem("petverseUser");
+
+            setUser(
+                savedUser
+                    ? JSON.parse(savedUser)
+                    : null
+            );
+
+        };
+
+        window.addEventListener(
+            "petverseAuthChange",
+            updateUser
+        );
+
+        window.addEventListener(
+            "storage",
+            updateUser
+        );
+
+        return () => {
+
+            window.removeEventListener(
+                "petverseAuthChange",
+                updateUser
+            );
+
+            window.removeEventListener(
+                "storage",
+                updateUser
+            );
+
+        };
+
+    }, []);
+
+
+    // =========================================
+    // NAVIGATION
+    // =========================================
+
+    const goTo = (path) => {
+
+        setOpen(false);
+
+        navigate(path);
+
+    };
+
+
+    // =========================================
+    // LOGIN
+    // =========================================
 
     const handleLogin = () => {
 
@@ -77,9 +148,9 @@ function ProfileDropdown() {
     };
 
 
-    /* =========================================
-       REGISTER
-    ========================================== */
+    // =========================================
+    // REGISTER
+    // =========================================
 
     const handleRegister = () => {
 
@@ -94,22 +165,52 @@ function ProfileDropdown() {
     };
 
 
-    /* =========================================
-       LOGOUT
-    ========================================== */
+    // =========================================
+    // LOGOUT
+    // =========================================
 
     const handleLogout = () => {
 
-        localStorage.removeItem("petverseUser");
+        localStorage.removeItem(
+            "petverseUser"
+        );
+
+        localStorage.removeItem(
+            "petverseToken"
+        );
 
         setUser(null);
 
         setOpen(false);
 
-        // Optional: redirect to home
+        window.dispatchEvent(
+            new Event("petverseAuthChange")
+        );
+
         navigate("/");
 
     };
+
+
+    // =========================================
+    // USER INFORMATION
+    // =========================================
+
+    const displayName =
+        user?.username ||
+        user?.name ||
+        "PetVerse User";
+
+
+    const displayEmail =
+        user?.email ||
+        "PetVerse member";
+
+
+    const profileImage =
+        user?.profileImage ||
+        user?.profile_image ||
+        null;
 
 
     return (
@@ -120,45 +221,91 @@ function ProfileDropdown() {
         >
 
 
-            {/* =================================
-                PROFILE ICON
-            ================================== */}
+            {/* =====================================
+                PROFILE BUTTON
+            ====================================== */}
 
             <button
+                type="button"
                 onClick={() => setOpen(!open)}
-                className="
+                aria-label="Profile"
+                aria-expanded={open}
+                className={`
+                    relative
                     flex
                     items-center
                     justify-center
-                    text-slate-700
-                    hover:text-violet-600
-                    transition
+                    w-10
+                    h-10
+                    rounded-full
+                    transition-all
+                    duration-200
 
-                "
-                aria-label="Profile"
+                    ${
+                    open
+                        ? "bg-violet-100 text-violet-600"
+                        : "text-slate-600 hover:bg-violet-50 hover:text-violet-600"
+                }
+                `}
             >
 
-                <FaUserCircle className="
-                    text-4xl
-                " />
+                {profileImage ? (
+
+                    <img
+                        src={profileImage}
+                        alt={displayName}
+                        className="
+                            w-9
+                            h-9
+                            rounded-full
+                            object-cover
+                            border-2
+                            border-violet-200
+                        "
+                    />
+
+                ) : (
+
+                    <FaUserCircle
+                        className="text-[2.35rem]"
+                    />
+
+                )}
+
+
+                {user && (
+
+                    <span className="
+                        absolute
+                        bottom-0
+                        right-0
+                        w-3
+                        h-3
+                        rounded-full
+                        bg-emerald-400
+                        border-2
+                        border-white
+                    " />
+
+                )}
 
             </button>
 
 
-            {/* =================================
+            {/* =====================================
                 DROPDOWN
-            ================================== */}
+            ====================================== */}
 
             {open && (
 
                 <div className="
                     absolute
                     right-0
-                    top-12
-                    w-[280px]
+                    top-[52px]
+                    w-[300px]
                     bg-white
                     rounded-2xl
-                    shadow-2xl
+                    shadow-xl
                     border
                     border-slate-100
                     overflow-hidden
@@ -167,161 +314,450 @@ function ProfileDropdown() {
 
 
                     {/* =================================
-                        LOGGED IN USER
+                        LOGGED IN
                     ================================== */}
 
                     {user ? (
 
-                        <div className="p-5">
+                        <>
 
-                            {/* Profile */}
+
+                            {/* =================================
+                                PROFILE HEADER
+                            ================================== */}
 
                             <div className="
-                                flex
-                                items-center
-                                gap-4
-                                mb-5
+                                relative
+                                px-5
+                                py-5
+                                bg-gradient-to-r
+                                from-violet-600
+                                to-fuchsia-500
                             ">
 
-
-                                {/* Profile image */}
-
                                 <div className="
-                                    w-14
-                                    h-14
-                                    rounded-full
-                                    overflow-hidden
-                                    bg-violet-100
                                     flex
                                     items-center
-                                    justify-center
-                                    flex-shrink-0
+                                    gap-3
                                 ">
 
-                                    {user.profileImage ? (
 
-                                        <img
-                                            src={user.profileImage}
-                                            alt={user.username}
-                                            className="
+                                    {/* PROFILE IMAGE */}
+
+                                    <div className="
+                                        relative
+                                        flex-shrink-0
+                                    ">
+
+                                        <div className="
+                                            w-14
+                                            h-14
+                                            rounded-full
+                                            bg-white
+                                            p-1
+                                        ">
+
+                                            <div className="
                                                 w-full
                                                 h-full
-                                                object-cover
-                                            "
-                                        />
+                                                rounded-full
+                                                overflow-hidden
+                                                bg-violet-100
+                                                flex
+                                                items-center
+                                                justify-center
+                                            ">
 
-                                    ) : (
+                                                {profileImage ? (
 
-                                        <FaUserCircle className="
-                                            text-4xl
-                                            text-violet-500
+                                                    <img
+                                                        src={profileImage}
+                                                        alt={displayName}
+                                                        className="
+                                                            w-full
+                                                            h-full
+                                                            object-cover
+                                                        "
+                                                    />
+
+                                                ) : (
+
+                                                    <FaUserCircle
+                                                        className="
+                                                            text-4xl
+                                                            text-violet-400
+                                                        "
+                                                    />
+
+                                                )}
+
+                                            </div>
+
+                                        </div>
+
+
+                                        {/* ONLINE DOT */}
+
+                                        <span className="
+                                            absolute
+                                            bottom-0
+                                            right-0
+                                            w-3.5
+                                            h-3.5
+                                            rounded-full
+                                            bg-emerald-400
+                                            border-2
+                                            border-white
                                         " />
 
-                                    )}
-
-                                </div>
+                                    </div>
 
 
-                                {/* User information */}
+                                    {/* USER DETAILS */}
 
-                                <div className="
-                                    min-w-0
-                                ">
-
-                                    <h3 className="
-                                        font-bold
-                                        text-slate-800
-                                        truncate
+                                    <div className="
+                                        min-w-0
+                                        text-white
                                     ">
-                                        {user.username}
-                                    </h3>
 
-                                    <p className="
-                                        text-xs
-                                        text-slate-500
-                                        truncate
-                                        mt-1
-                                    ">
-                                        {user.email}
-                                    </p>
+                                        <p className="
+                                            text-[9px]
+                                            uppercase
+                                            tracking-widest
+                                            font-semibold
+                                            text-white/70
+                                        ">
+
+                                            PetVerse Member
+
+                                        </p>
+
+
+                                        <h3 className="
+                                            mt-0.5
+                                            text-base
+                                            font-bold
+                                            truncate
+                                        ">
+
+                                            {displayName}
+
+                                        </h3>
+
+
+                                        <p className="
+                                            text-[11px]
+                                            text-white/80
+                                            truncate
+                                        ">
+
+                                            {displayEmail}
+
+                                        </p>
+
+                                    </div>
 
                                 </div>
 
                             </div>
 
 
-                            {/* Divider */}
+                            {/* =================================
+                                MENU
+                            ================================== */}
 
                             <div className="
-                              border-t
-                              border-slate-100
-                              pt-4
+                                py-2
                             ">
-                                {/* View Profile */}
+
+
+                                {/* PROFILE */}
 
                                 <button
-                                    onClick={() => {
-                                        setOpen(false);
-                                        navigate("/profile");
-                                    }}
+                                    type="button"
+                                    onClick={() =>
+                                        goTo("/profile")
+                                    }
                                     className="
-                                         w-full
-                                         flex
-                                         items-center
-                                         gap-3
-                                         px-4
-                                         py-3
-                                         rounded-xl
-                                         text-sm
-                                         font-medium
-                                         text-slate-700
-                                         hover:bg-violet-50
-                                         hover:text-violet-600
-                                         transition
-                                       "
+                                        group
+                                        w-full
+                                        flex
+                                        items-center
+                                        gap-3
+                                        px-5
+                                        py-3
+                                        text-left
+                                        hover:bg-slate-50
+                                        transition
+                                    "
                                 >
-                                    <FaUser />
 
-                                    <span>
-                                        View Details
+                                    <FaUser className="
+                                        w-4
+                                        text-slate-400
+                                        group-hover:text-violet-500
+                                        transition
+                                    " />
+
+                                    <span className="
+                                        flex-1
+                                        text-sm
+                                        font-medium
+                                        text-slate-700
+                                        group-hover:text-violet-600
+                                    ">
+
+                                        My Profile
+
                                     </span>
+
+
+                                    <FaChevronRight className="
+                                        text-[10px]
+                                        text-slate-300
+                                        group-hover:text-violet-400
+                                        transition
+                                    " />
+
                                 </button>
-                                {/* Logout */}
+
+
+                                {/* WISHLIST */}
 
                                 <button
+                                    type="button"
+                                    onClick={() =>
+                                        goTo("/wishlist")
+                                    }
+                                    className="
+                                        group
+                                        w-full
+                                        flex
+                                        items-center
+                                        gap-3
+                                        px-5
+                                        py-3
+                                        text-left
+                                        hover:bg-slate-50
+                                        transition
+                                    "
+                                >
+
+                                    <FaHeart className="
+                                        w-4
+                                        text-slate-400
+                                        group-hover:text-pink-500
+                                        transition
+                                    " />
+
+                                    <span className="
+                                        flex-1
+                                        text-sm
+                                        font-medium
+                                        text-slate-700
+                                        group-hover:text-pink-500
+                                    ">
+
+                                        My Wishlist
+
+                                    </span>
+
+
+                                    <FaChevronRight className="
+                                        text-[10px]
+                                        text-slate-300
+                                        group-hover:text-pink-400
+                                        transition
+                                    " />
+
+                                </button>
+
+
+                                {/* APPLICATIONS */}
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        goTo("/applications")
+                                    }
+                                    className="
+                                        group
+                                        w-full
+                                        flex
+                                        items-center
+                                        gap-3
+                                        px-5
+                                        py-3
+                                        text-left
+                                        hover:bg-slate-50
+                                        transition
+                                    "
+                                >
+
+                                    <FaClipboardList className="
+                                        w-4
+                                        text-slate-400
+                                        group-hover:text-orange-500
+                                        transition
+                                    " />
+
+                                    <span className="
+                                        flex-1
+                                        text-sm
+                                        font-medium
+                                        text-slate-700
+                                        group-hover:text-orange-500
+                                    ">
+
+                                        My Applications
+
+                                    </span>
+
+
+                                    <FaChevronRight className="
+                                        text-[10px]
+                                        text-slate-300
+                                        group-hover:text-orange-400
+                                        transition
+                                    " />
+
+                                </button>
+
+                            </div>
+
+
+                            {/* =================================
+                                FIND COMPANION
+                            ================================== */}
+
+                            <div className="
+                                mx-4
+                                border-t
+                                border-slate-100
+                                pt-3
+                                pb-3
+                            ">
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        goTo("/browse-pets")
+                                    }
+                                    className="
+                                        group
+                                        w-full
+                                        flex
+                                        items-center
+                                        gap-3
+                                        px-3
+                                        py-3
+                                        rounded-xl
+                                        bg-slate-50
+                                        hover:bg-violet-50
+                                        transition
+                                        text-left
+                                    "
+                                >
+
+                                    <FaPaw className="
+                                        text-violet-500
+                                        text-sm
+                                    " />
+
+
+                                    <div className="
+                                        flex-1
+                                    ">
+
+                                        <p className="
+                                            text-xs
+                                            font-semibold
+                                            text-slate-700
+                                            group-hover:text-violet-600
+                                        ">
+
+                                            Find a Companion
+
+                                        </p>
+
+
+                                        <p className="
+                                            text-[10px]
+                                            text-slate-400
+                                            mt-0.5
+                                        ">
+
+                                            Browse pets waiting
+                                            for a home.
+
+                                        </p>
+
+                                    </div>
+
+
+                                    <FaChevronRight className="
+                                        text-[10px]
+                                        text-slate-300
+                                    " />
+
+                                </button>
+
+                            </div>
+
+
+                            {/* =================================
+                                LOGOUT
+                            ================================== */}
+
+                            <div className="
+                                border-t
+                                border-slate-100
+                                px-4
+                                py-2
+                            ">
+
+                                <button
+                                    type="button"
                                     onClick={handleLogout}
                                     className="
-                                     w-full
-                                     flex
-                                     items-center
-                                     gap-3
-                                     px-4
-                                     py-3
-                                     rounded-xl
-                                     text-sm
-                                     font-medium
-                                     text-slate-700
-                                     hover:bg-red-50
-                                     hover:text-red-600
-                                     transition
-                                   "
+                                        w-full
+                                        flex
+                                        items-center
+                                        gap-3
+                                        px-3
+                                        py-2.5
+                                        rounded-xl
+                                        text-left
+                                        text-red-500
+                                        hover:bg-red-50
+                                        transition
+                                    "
                                 >
-                                    <FaSignOutAlt />
 
-                                    <span>
+                                    <FaSignOutAlt className="
+                                        text-sm
+                                    " />
+
+                                    <span className="
+                                        text-sm
+                                        font-medium
+                                    ">
+
                                         Logout
+
                                     </span>
 
                                 </button>
 
                             </div>
-                            </div>
+
+                        </>
 
                     ) : (
 
 
                         /* =================================
-                           GUEST USER
+                           GUEST
                         ================================== */
 
                         <div className="
@@ -329,8 +765,6 @@ function ProfileDropdown() {
                             text-center
                         ">
 
-
-                            {/* Paw */}
 
                             <div className="
                                 w-14
@@ -341,23 +775,25 @@ function ProfileDropdown() {
                                 flex
                                 items-center
                                 justify-center
-                                mb-4
+                                mb-3
                             ">
 
                                 <FaPaw className="
-                                    text-2xl
-                                    text-violet-600
+                                    text-xl
+                                    text-violet-500
                                 " />
 
                             </div>
 
 
                             <h3 className="
-                                text-lg
+                                text-base
                                 font-bold
                                 text-slate-800
                             ">
-                                Connect to PetVerse
+
+                                Welcome to PetVerse
+
                             </h3>
 
 
@@ -368,20 +804,21 @@ function ProfileDropdown() {
                                 mt-2
                                 mb-5
                             ">
-                                Login or create an account to
-                                explore all PetVerse features.
+
+                                Login to save favourites,
+                                manage applications and
+                                find your perfect companion.
+
                             </p>
 
-
-                            {/* Buttons */}
 
                             <div className="
                                 flex
                                 gap-3
                             ">
 
-
                                 <button
+                                    type="button"
                                     onClick={handleLogin}
                                     className="
                                         flex-1
@@ -391,16 +828,20 @@ function ProfileDropdown() {
                                         font-semibold
                                         text-violet-600
                                         border
-                                        border-violet-500
+                                        border-violet-200
+                                        bg-white
                                         hover:bg-violet-50
                                         transition
                                     "
                                 >
+
                                     Login
+
                                 </button>
 
 
                                 <button
+                                    type="button"
                                     onClick={handleRegister}
                                     className="
                                         flex-1
@@ -412,13 +853,13 @@ function ProfileDropdown() {
                                         bg-gradient-to-r
                                         from-violet-600
                                         to-pink-500
-                                        hover:-translate-y-0.5
-                                        shadow-md
-                                        shadow-violet-200
+                                        hover:opacity-90
                                         transition
                                     "
                                 >
+
                                     Register
+
                                 </button>
 
                             </div>
@@ -432,7 +873,10 @@ function ProfileDropdown() {
             )}
 
         </div>
+
     );
+
 }
+
 
 export default ProfileDropdown;

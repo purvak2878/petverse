@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
     FaHome,
     FaDog,
@@ -11,27 +12,48 @@ import {
     FaQuestionCircle,
     FaUser,
     FaSignOutAlt,
+    FaPaw,
 } from "react-icons/fa";
 
 import sidebarPet from "../assets/images/sidebarPet.png";
 
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
+
     const navigate = useNavigate();
+
+
+    // =========================================
+    // LOGOUT DIALOG
+    // =========================================
 
     const [showLogoutDialog, setShowLogoutDialog] =
         useState(false);
+
+
     const handleLogout = () => {
 
         localStorage.removeItem("petverseToken");
         localStorage.removeItem("petverseUser");
+
+        // Tell Navbar that authentication changed
+        window.dispatchEvent(
+            new Event("petverseAuthChange")
+        );
 
         setShowLogoutDialog(false);
 
         navigate("/");
 
     };
+
+
+    // =========================================
+    // SIDEBAR MENU
+    // =========================================
+
     const menuItems = [
+
         {
             icon: <FaHome />,
             label: "Home",
@@ -69,6 +91,12 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
         },
 
         {
+            icon: <FaPaw />,
+            label: "Adoption Process",
+            path: "/adoption-process"
+        },
+
+        {
             icon: <FaQuestionCircle />,
             label: "FAQs",
             path: "/faqs"
@@ -78,7 +106,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             icon: <FaUser />,
             label: "Profile",
             path: "/profile"
-        }
+        },
+
     ];
 
 
@@ -86,9 +115,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
         <>
 
-            {/* ==============================
+            {/* =====================================
                 SIDEBAR
-            =============================== */}
+            ====================================== */}
 
             <aside
                 className={`
@@ -105,25 +134,35 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     transition-all
                     duration-300
 
-                    ${sidebarOpen
-                    ? "translate-x-0"
-                    : "-translate-x-full"
+                    ${
+                    sidebarOpen
+                        ? "translate-x-0"
+                        : "-translate-x-full"
                 }
                 `}
             >
 
-
-                {/* ==============================
+                {/* =================================
                     MENU
-                =============================== */}
+                ================================== */}
 
-                <nav className="mt-4 px-2">
+                <nav className="
+                    mt-4
+                    px-2
+                ">
 
                     {menuItems.map((item) => (
 
                         <NavLink
                             key={item.path}
                             to={item.path}
+
+                            /*
+                             * IMPORTANT:
+                             * Do NOT close the sidebar here.
+                             * Sidebar stays open while navigating.
+                             * It is closed only through the hamburger menu.
+                             */
 
                             className={({ isActive }) => `
                                 w-full
@@ -144,12 +183,21 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                             `}
                         >
 
-                            <span className="text-lg">
+                            <span className="
+                                text-lg
+                            ">
+
                                 {item.icon}
+
                             </span>
 
-                            <span className="font-medium">
+
+                            <span className="
+                                font-medium
+                            ">
+
                                 {item.label}
+
                             </span>
 
                         </NavLink>
@@ -157,12 +205,14 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     ))}
 
 
-                    {/* ==============================
+                    {/* =================================
                         LOGOUT
-                    =============================== */}
+                    ================================== */}
 
                     <button
-                        onClick={() => setShowLogoutDialog(true)}
+                        onClick={() =>
+                            setShowLogoutDialog(true)
+                        }
                         className="
                             flex
                             items-center
@@ -174,13 +224,17 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                             text-red-500
                             hover:bg-red-50
                             transition
-                          "
+                        "
                     >
 
                         <FaSignOutAlt />
 
-                        <span className="font-medium">
+                        <span className="
+                            font-medium
+                        ">
+
                             Logout
+
                         </span>
 
                     </button>
@@ -188,9 +242,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </nav>
 
 
-                {/* ==============================
+                {/* =================================
                     BOTTOM AREA
-                =============================== */}
+                ================================== */}
 
                 <div className="
                     absolute
@@ -200,10 +254,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     px-6
                 ">
 
-
-                    {/* ==========================
-                        SIDEBAR PET IMAGE
-                    =========================== */}
+                    {/* SIDEBAR PET IMAGE */}
 
                     <div className="
                         flex
@@ -226,9 +277,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     </div>
 
 
-                    {/* ==========================
-                        ADOPTION CARD
-                    =========================== */}
+                    {/* ADOPTION CARD */}
 
                     <div className="
                         rounded-2xl
@@ -239,65 +288,79 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         p-4
                     ">
 
-                        <h3 className="font-bold text-base">
+                        <h3 className="
+                            font-bold
+                            text-base
+                        ">
+
                             🐾 Adopt. Love. Repeat.
+
                         </h3>
+
 
                         <p className="
                             text-xs
                             mt-2
                             opacity-90
                         ">
-                            Give a pet a loving home and gain a friend for life.
+
+                            Give a pet a loving home and
+                            gain a friend for life.
+
                         </p>
 
                     </div>
 
                 </div>
 
-
             </aside>
+
+
+            {/* =====================================
+                LOGOUT DIALOG
+            ====================================== */}
+
             {showLogoutDialog && (
 
                 <div className="
-        fixed
-        inset-0
-        z-[999]
-        flex
-        items-center
-        justify-center
-        bg-black/40
-        backdrop-blur-sm
-        px-5
-    ">
+                    fixed
+                    inset-0
+                    z-[999]
+                    flex
+                    items-center
+                    justify-center
+                    bg-black/40
+                    backdrop-blur-sm
+                    px-5
+                ">
 
                     <div className="
-            w-full
-            max-w-sm
-            bg-white
-            rounded-3xl
-            shadow-2xl
-            p-7
-        ">
+                        w-full
+                        max-w-sm
+                        bg-white
+                        rounded-3xl
+                        shadow-2xl
+                        p-7
+                    ">
 
                         {/* ICON */}
 
                         <div className="
-                w-14
-                h-14
-                mx-auto
-                rounded-full
-                bg-violet-100
-                flex
-                items-center
-                justify-center
-                mb-5
-            ">
+                            w-14
+                            h-14
+                            mx-auto
+                            rounded-full
+                            bg-violet-100
+                            flex
+                            items-center
+                            justify-center
+                            mb-5
+                        ">
 
                             <FaSignOutAlt className="
-                    text-violet-600
-                    text-xl
-                " />
+                                text-violet-600
+                                text-xl
+                            " />
 
                         </div>
 
@@ -305,11 +368,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         {/* TITLE */}
 
                         <h2 className="
-                text-xl
-                font-bold
-                text-slate-800
-                text-center
-            ">
+                            text-xl
+                            font-bold
+                            text-slate-800
+                            text-center
+                        ">
 
                             Are you sure?
 
@@ -319,11 +382,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         {/* MESSAGE */}
 
                         <p className="
-                text-sm
-                text-gray-500
-                text-center
-                mt-2
-            ">
+                            text-sm
+                            text-gray-500
+                            text-center
+                            mt-2
+                        ">
 
                             Are you sure you want to log out
                             of PetVerse?
@@ -334,26 +397,26 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         {/* BUTTONS */}
 
                         <div className="
-                flex
-                gap-3
-                mt-7
-            ">
+                            flex
+                            gap-3
+                            mt-7
+                        ">
 
                             <button
                                 onClick={() =>
                                     setShowLogoutDialog(false)
                                 }
                                 className="
-                        flex-1
-                        py-3
-                        rounded-full
-                        border
-                        border-slate-200
-                        text-slate-600
-                        font-semibold
-                        hover:bg-slate-50
-                        transition
-                    "
+                                    flex-1
+                                    py-3
+                                    rounded-full
+                                    border
+                                    border-slate-200
+                                    text-slate-600
+                                    font-semibold
+                                    hover:bg-slate-50
+                                    transition
+                                "
                             >
 
                                 Cancel
@@ -364,17 +427,17 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                             <button
                                 onClick={handleLogout}
                                 className="
-                        flex-1
-                        py-3
-                        rounded-full
-                        bg-gradient-to-r
-                        from-violet-600
-                        to-pink-500
-                        text-white
-                        font-semibold
-                        hover:opacity-90
-                        transition
-                    "
+                                    flex-1
+                                    py-3
+                                    rounded-full
+                                    bg-gradient-to-r
+                                    from-violet-600
+                                    to-pink-500
+                                    text-white
+                                    font-semibold
+                                    hover:opacity-90
+                                    transition
+                                "
                             >
 
                                 Log Out
@@ -388,8 +451,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </div>
 
             )}
+
         </>
+
     );
+
 }
 
 

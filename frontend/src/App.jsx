@@ -17,6 +17,9 @@ import ApplicationForm from "./pages/ApplicationForm";
 import ApplicationDetails from "./pages/ApplicationDetails";
 import EditApplication from "./pages/EditApplication";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PetTipDetails from "./pages/PetTipDetails";
+import Notifications from "./pages/Notifications.jsx";
+import AdoptionProcess from "./pages/AdoptionProcess";
 
 function App() {
 
@@ -73,6 +76,12 @@ function App() {
                         element={<EditPet />}
                     />
 
+                    {/* ADOPTION PROCESS */}
+
+                    <Route
+                        path="/adoption-process"
+                        element={<AdoptionProcess />}
+                    />
 
                     {/* APPLICATION */}
 
@@ -91,6 +100,13 @@ function App() {
                     <Route
                         path="/applications"
                         element={<MyApplication />}
+                    />
+
+                    {/* Notifications */}
+
+                    <Route
+                        path="/notifications"
+                        element={<Notifications />}
                     />
 
 
@@ -124,6 +140,10 @@ function App() {
                         element={<PetTips />}
                     />
 
+                    <Route
+                        path="/pet-tips/:id"
+                        element={<PetTipDetails />}
+                    />
 
                     {/* FAQ */}
 

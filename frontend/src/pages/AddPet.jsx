@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -9,6 +9,7 @@ import {
     FaHeart,
     FaShieldAlt,
     FaFilePdf,
+    FaTrash,
 } from "react-icons/fa";
 
 import PawBackground from "../components/PawBackground";
@@ -17,6 +18,8 @@ import PawBackground from "../components/PawBackground";
 function AddPet() {
 
     const navigate = useNavigate();
+
+    const fileInputRef = useRef(null);
 
 
     // =========================================
@@ -135,6 +138,8 @@ function AddPet() {
 
             });
 
+            e.target.value = "";
+
             return;
         }
 
@@ -154,6 +159,8 @@ function AddPet() {
 
             });
 
+            e.target.value = "";
+
             return;
         }
 
@@ -171,14 +178,14 @@ function AddPet() {
 
         if (file.type.startsWith("image/")) {
 
-            setImagePreview(
-                URL.createObjectURL(file)
-            );
+            const previewUrl =
+                URL.createObjectURL(file);
+
+            setImagePreview(previewUrl);
 
         } else {
 
             // PDF does not need image preview
-
             setImagePreview("");
 
         }
@@ -188,6 +195,36 @@ function AddPet() {
         // CLEAR ERROR
         // =====================================
 
+        setMessage({
+
+            type: "",
+            text: "",
+
+        });
+
+    };
+
+
+    // =========================================
+    // REMOVE SELECTED FILE
+    // =========================================
+
+    const handleRemoveImage = () => {
+
+        // Clear selected file
+        setImageFile(null);
+
+        // Clear preview
+        setImagePreview("");
+
+        // Clear actual file input
+        if (fileInputRef.current) {
+
+            fileInputRef.current.value = "";
+
+        }
+
+        // Clear any previous message
         setMessage({
 
             type: "",
@@ -452,6 +489,13 @@ function AddPet() {
             setImagePreview("");
 
 
+            if (fileInputRef.current) {
+
+                fileInputRef.current.value = "";
+
+            }
+
+
             // =====================================
             // GO TO BROWSE PETS
             // =====================================
@@ -501,7 +545,7 @@ function AddPet() {
         ">
 
             {/* =====================================
-                EXISTING PAW BACKGROUND
+                PAW BACKGROUND
             ====================================== */}
 
             <PawBackground />
@@ -569,24 +613,26 @@ function AddPet() {
 
 
                     <h1 className="
-                            text-4xl
-                            md:text-5xl
-                            font-bold
-                            text-slate-800
-                        ">
+                        text-4xl
+                        md:text-5xl
+                        font-bold
+                        text-slate-800
+                    ">
 
                         Add A{" "}
 
                         <span className="
-                                text-transparent
-                                bg-clip-text
-                                bg-gradient-to-r
-                                from-violet-600
-                                via-fuchsia-500
-                                to-pink-500
-                            ">
-                                Pet
-                            </span>
+                            text-transparent
+                            bg-clip-text
+                            bg-gradient-to-r
+                            from-violet-600
+                            via-fuchsia-500
+                            to-pink-500
+                        ">
+
+                            Pet
+
+                        </span>
 
                     </h1>
 
@@ -706,8 +752,6 @@ function AddPet() {
                     ">
 
 
-                        {/* NAME */}
-
                         <InputField
                             label="Pet Name"
                             name="name"
@@ -716,8 +760,6 @@ function AddPet() {
                             onChange={handleChange}
                         />
 
-
-                        {/* TYPE */}
 
                         <SelectField
                             label="Pet Type"
@@ -732,8 +774,6 @@ function AddPet() {
                         />
 
 
-                        {/* BREED */}
-
                         <InputField
                             label="Breed"
                             name="breed"
@@ -743,8 +783,6 @@ function AddPet() {
                         />
 
 
-                        {/* AGE */}
-
                         <InputField
                             label="Age"
                             name="age"
@@ -753,8 +791,6 @@ function AddPet() {
                             onChange={handleChange}
                         />
 
-
-                        {/* GENDER */}
 
                         <SelectField
                             label="Gender"
@@ -768,8 +804,6 @@ function AddPet() {
                             placeholder="Select gender"
                         />
 
-
-                        {/* CITY */}
 
                         <InputField
                             label="City"
@@ -984,38 +1018,76 @@ function AddPet() {
 
 
                                     {/* =================================
-                                        CHANGE FILE
+                                        FILE ACTIONS
                                     ================================== */}
 
-                                    <label className="
-                                        cursor-pointer
-                                        text-xs
-                                        font-semibold
-                                        text-violet-600
-                                        hover:text-pink-500
-                                        transition
-                                        mt-2
+                                    <div className="
+                                        flex
+                                        items-center
+                                        justify-center
+                                        gap-4
+                                        mt-3
                                     ">
 
-                                        Choose another file
+
+                                        {/* CHANGE FILE */}
+
+                                        <label className="
+                                            cursor-pointer
+                                            text-xs
+                                            font-semibold
+                                            text-violet-600
+                                            hover:text-pink-500
+                                            transition
+                                        ">
+
+                                            Choose another file
 
 
-                                        <input
-                                            type="file"
-                                            accept="
-                                                .jpg,
-                                                .jpeg,
-                                                .png,
-                                                .webp,
-                                                .pdf
-                                            "
-                                            onChange={
-                                                handleImageChange
+                                            <input
+                                                type="file"
+                                                accept="
+                                                    .jpg,
+                                                    .jpeg,
+                                                    .png,
+                                                    .webp,
+                                                    .pdf
+                                                "
+                                                onChange={
+                                                    handleImageChange
+                                                }
+                                                className="hidden"
+                                            />
+
+                                        </label>
+
+
+                                        {/* REMOVE FILE */}
+
+                                        <button
+                                            type="button"
+                                            onClick={
+                                                handleRemoveImage
                                             }
-                                            className="hidden"
-                                        />
+                                            className="
+                                                flex
+                                                items-center
+                                                gap-1.5
+                                                text-xs
+                                                font-semibold
+                                                text-red-500
+                                                hover:text-red-600
+                                                transition
+                                            "
+                                        >
 
-                                    </label>
+                                            <FaTrash />
+
+                                            Remove
+
+                                        </button>
+
+                                    </div>
 
                                 </div>
 
@@ -1077,6 +1149,7 @@ function AddPet() {
 
 
                                     <input
+                                        ref={fileInputRef}
                                         type="file"
                                         accept="
                                             .jpg,
@@ -1232,8 +1305,6 @@ function AddPet() {
                     ">
 
 
-                        {/* HEALTH STATUS */}
-
                         <SelectField
                             label="Health Status"
                             name="healthStatus"
@@ -1250,8 +1321,6 @@ function AddPet() {
                             "
                         />
 
-
-                        {/* STATUS */}
 
                         <SelectField
                             label="Pet Status"
