@@ -13,11 +13,6 @@ function Home() {
             <div className="px-4 py-2">
 
                 <Hero />
-
-                <div className="mt-4">
-                    <FilterBar />
-                </div>
-
                 <div className="mt-4">
                     <FeaturedPets />
                 </div>

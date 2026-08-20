@@ -72,39 +72,42 @@ function FeaturedPets() {
 
         <section className="w-full">
 
-            {/* =====================================
-                HEADING
-            ====================================== */}
+            {/* =================================
+                    HEADER
+                ================================== */}
 
             <div className="
-                flex
-                items-center
-                justify-between
-                mb-5
-            ">
+                    mb-8
+                    mt-16
+                    text-center
+                ">
 
-                <div>
-
-                    <div className="
+                <div className="
                         flex
                         items-center
-                        gap-2
+                        justify-center
+                        gap-3
                     ">
 
-                        <span className="text-2xl">
+                        <span className="
+                            text-3xl
+                        ">
+
                             🐾
+
                         </span>
 
-                        <h1 className="
-                            text-xl
-                            md:text-2xl
+
+                    <h1 className="
+                            text-4xl
+                            md:text-5xl
                             font-bold
                             text-slate-800
                         ">
 
-                            Featured{" "}
+                        Featured{" "}
 
-                            <span className="
+                        <span className="
                                 text-transparent
                                 bg-clip-text
                                 bg-gradient-to-r
@@ -117,25 +120,27 @@ function FeaturedPets() {
 
                             </span>
 
-                        </h1>
-
-                    </div>
-
-                    <p className="
-                        text-sm
-                        text-gray-500
-                        mt-1
-                    ">
-
-                        Meet some lovely pets waiting
-                        for their forever home.
-
-                    </p>
+                    </h1>
 
                 </div>
 
 
-                {/* VIEW ALL */}
+                <p className="
+                        mt-3
+                        text-gray-500
+                    ">
+
+                    Meet some lovely pets waiting for their forever home.
+
+                </p>
+
+            </div>
+
+
+
+            {/* VIEW ALL */}
+
+            <div className="flex justify-end mb-5">
 
                 <Link
                     to="/browse-pets"
@@ -147,9 +152,7 @@ function FeaturedPets() {
                         transition
                     "
                 >
-
                     View All Pets →
-
                 </Link>
 
             </div>
