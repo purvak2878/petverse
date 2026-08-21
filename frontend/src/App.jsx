@@ -9,7 +9,7 @@ import PetDetails from "./pages/PetDetails";
 import EditPet from "./pages/EditPet";
 import PetTips from "./pages/PetTips";
 import FAQs from "./pages/FAQs";
-import Profile from "./pages/Profile";
+import Profile from "./pages/profile";
 import Wishlist from "./pages/Wishlist";
 import MyApplication from "./pages/MyApplication";
 import Login from "./pages/Login";
