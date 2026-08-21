@@ -15,10 +15,10 @@ import {
     FaPaw,
 } from "react-icons/fa";
 
-import sidebarPet from "../assets/images/sidebarPet.png";
+import sidebarPet from "../assets/images/SidebarPet.png";
 
 
-function Sidebar({ sidebarOpen, setSidebarOpen }) {
+function Sidebar({ sidebarOpen }) {
 
     const navigate = useNavigate();
 
