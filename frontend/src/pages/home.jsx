@@ -3,14 +3,11 @@ import Hero from "../components/hero";
 import FilterBar from "../components/filterBar";
 import FeaturedPets from "../components/featuredPets";
 import AdoptionJourney from "../components/AdoptionJourney";
-import Footer from "../components//Footer";
+import Footer from "../components/Footer";
 
 function Home() {
-
     return (
-
         <div>
-
             <div className="px-4 py-2">
 
                 <Hero />
@@ -24,12 +21,12 @@ function Home() {
                 </div>
 
             </div>
+
             <AdoptionJourney />
             <Footer />
 
         </div>
     );
 }
-
 
 export default Home;

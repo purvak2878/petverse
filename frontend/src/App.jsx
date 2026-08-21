@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 
 import Home from "./pages/home";
+
 import BrowsePets from "./pages/BrowsePets";
 import AddPet from "./pages/AddPet";
 import PetDetails from "./pages/PetDetails";
