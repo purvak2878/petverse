@@ -5,39 +5,33 @@ import Navbar from "../components/Navbar.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 
 function Layout() {
-
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    // Sidebar is intentionally closed when the website first opens.
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-slate-100">
-
-            {/* Common Navbar */}
-
+        <div className="min-h-screen bg-slate-100 overflow-x-hidden">
             <Navbar
                 sidebarOpen={sidebarOpen}
                 setSidebarOpen={setSidebarOpen}
             />
-
-            {/* Common Sidebar */}
 
             <Sidebar
                 sidebarOpen={sidebarOpen}
                 setSidebarOpen={setSidebarOpen}
             />
 
-            {/* Current Page */}
-
             <main
                 className={`
                     pt-[65px]
+                    min-h-screen
+                    w-full
                     transition-all
                     duration-300
-                    ${sidebarOpen ? "ml-[285px]" : "ml-0"}
+                    ${sidebarOpen ? "md:ml-[285px] md:w-[calc(100%-285px)]" : "ml-0 w-full"}
                 `}
             >
                 <Outlet />
             </main>
-
         </div>
     );
 }

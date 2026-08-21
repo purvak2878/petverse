@@ -84,7 +84,7 @@ html.dark textarea::placeholder {
 }
 
 html.dark select option {
-    background-color: #1e293b;
+    background: #1e293b;
     color: #f1f5f9;
 }
 
@@ -114,7 +114,37 @@ html.dark .shadow-2xl {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* SMOOTH TRANSITION */
+/* =========================================================
+   GLOBAL RESPONSIVE SAFETY
+   ========================================================= */
+
+html,
+body,
+#root {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* Prevent media from creating accidental horizontal overflow. */
+img,
+svg,
+video,
+canvas {
+    max-width: 100%;
+}
+
+/* =========================================================
+   SMOOTH TRANSITIONS
+   ========================================================= */
 
 body,
 body *,
