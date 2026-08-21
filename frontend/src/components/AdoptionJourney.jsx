@@ -425,5 +425,4 @@ function AdoptionJourney() {
 
 }
 
-
 export default AdoptionJourney;

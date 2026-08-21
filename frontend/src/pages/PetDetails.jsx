@@ -27,7 +27,7 @@ function PetDetails() {
             try {
 
                 const response = await fetch(
-                    `http://localhost:9090/api/pets/${id}`
+                    `https://petverse-backend-9odi.onrender.com/api/pets/${id}`
                 );
 
                 if (!response.ok) {
@@ -74,7 +74,7 @@ function PetDetails() {
         }
 
 
-        return `http://localhost:9090/uploads/pets/${image}`;
+        return `https://petverse-backend-9odi.onrender.com/uploads/pets/${image}`;
     };
 
 
