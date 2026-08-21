@@ -11,9 +11,9 @@ import { useNavigate } from "react-router-dom";
 // HERO SLIDE IMAGES
 // =====================================================
 
-import HeroSlide1 from "../assets/images/HeroSlide1.png";
-import HeroSlide2 from "../assets/images/HeroSlide2.png";
-import HeroSlide3 from "../assets/images/HeroSlide3.png";
+import HeroSlide1 from "../assets/images/Heroslide1.png";
+import HeroSlide2 from "../assets/images/Heroslide2.png";
+import HeroSlide3 from "../assets/images/Heroslide3.png";
 import HeroSlide4 from "../assets/images/Heroslide4.png";
 
 
