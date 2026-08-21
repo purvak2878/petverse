@@ -161,7 +161,7 @@ function ApplicationForm() {
             // ==================================
 
             const response = await fetch(
-                "http://localhost:9090/api/applications",
+                "https://petverse-backend-9odi.onrender.com/api/applications",
                 {
                     method: "POST",
 
@@ -751,10 +751,11 @@ function ApplicationForm() {
                                     {pet.image ? (
 
                                         <img
+
                                             src={
                                                 pet.image.startsWith("http")
                                                     ? pet.image
-                                                    : `http://localhost:9090${pet.image}`
+                                                    : `https://petverse-backend-9odi.onrender.com${pet.image}`
                                             }
                                             alt={pet.name}
                                             className="

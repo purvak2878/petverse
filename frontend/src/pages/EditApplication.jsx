@@ -85,7 +85,7 @@ function EditApplication() {
 
 
                 const response = await fetch(
-                    `http://localhost:9090/api/applications/${id}`,
+                    `ttps://petverse-backend-9odi.onrender.com/api/applications/${id}`,
                     {
                         method: "GET",
 
@@ -312,7 +312,7 @@ function EditApplication() {
             // =================================
 
             const response = await fetch(
-                `http://localhost:9090/api/applications/${id}`,
+                `ttps://petverse-backend-9odi.onrender.com/api/applications/${id}`,
                 {
                     method: "PUT",
 

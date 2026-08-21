@@ -47,7 +47,8 @@ function EditPet() {
             try {
 
                 const response = await fetch(
-                    `http://localhost:9090/api/pets/${id}`
+                    `https://petverse-backend-9odi.onrender.com/api/pets/${id}`
+
                 );
 
 
@@ -86,7 +87,7 @@ function EditPet() {
                     } else {
 
                         setImagePreview(
-                            `http://localhost:9090/uploads/pets/${pet.image}`
+                            `https://petverse-backend-9odi.onrender.com/uploads/pets/${pet.image}`
                         );
                     }
                 }
@@ -265,7 +266,7 @@ function EditPet() {
 
 
             const response = await fetch(
-                `http://localhost:9090/api/pets/${id}`,
+                `https://petverse-backend-9odi.onrender.com/api/pets/${id}`,
                 {
                     method: "PUT",
                     body: dataToSend,

@@ -49,7 +49,7 @@ function MyApplication() {
                 // ==========================================
 
                 const response = await fetch(
-                    "http://localhost:9090/api/applications/my",
+                    "https://petverse-backend-9odi.onrender.com/api/applications/my",
                     {
                         method: "GET",
 
@@ -438,7 +438,7 @@ function MyApplication() {
                                                         "http"
                                                     )
                                                         ? application.petImage
-                                                        : `http://localhost:9090${application.petImage}`
+                                                        : `https://petverse-backend-9odi.onrender.com${application.petImage}`
                                                 }
                                                 alt={
                                                     application.petName ||

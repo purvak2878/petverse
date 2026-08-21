@@ -25,7 +25,7 @@ function FeaturedPets() {
                 setError("");
 
                 const response = await fetch(
-                    "http://localhost:9090/api/pets"
+                    "https://petverse-backend-9odi.onrender.com/api/pets"
                 );
 
                 if (!response.ok) {

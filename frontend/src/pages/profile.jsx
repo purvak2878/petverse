@@ -96,6 +96,7 @@ function Profile() {
 
     useEffect(() => {
 
+        // eslint-disable-next-line react-hooks/immutability
         loadProfile();
 
     }, []);
@@ -118,7 +119,7 @@ function Profile() {
         try {
 
             const response = await fetch(
-                "http://localhost:9090/api/profile",
+                "https://petverse-backend-9odi.onrender.com/api/profile",
                 {
                     method: "GET",
 
@@ -250,7 +251,8 @@ function Profile() {
         try {
 
             const response = await fetch(
-                "http://localhost:9090/api/profile",
+                "https://petverse-backend-9odi.onrender.com/api/profile",
+
                 {
                     method: "PUT",
 
@@ -489,7 +491,7 @@ function Profile() {
 
 
             const response = await fetch(
-                "http://localhost:9090/api/profile/image",
+                "https://petverse-backend-9odi.onrender.com/api/profile/image",
                 {
                     method: "PUT",
 
@@ -704,7 +706,7 @@ function Profile() {
         try {
 
             const response = await fetch(
-                "http://localhost:9090/api/profile/password",
+                "https://petverse-backend-9odi.onrender.com/api/profile/password",
                 {
                     method: "PUT",
 
@@ -807,7 +809,7 @@ function Profile() {
         try {
 
             const response = await fetch(
-                "http://localhost:9090/api/profile",
+                "https://petverse-backend-9odi.onrender.com/api/profile/image",
                 {
                     method: "DELETE",
 

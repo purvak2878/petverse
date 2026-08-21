@@ -53,7 +53,7 @@ function Wishlist() {
         try {
 
             const response = await fetch(
-                "http://localhost:9090/api/wishlist",
+                `https://petverse-backend-9odi.onrender.com/api/wishlist/${petId}`,
                 {
                     method: "GET",
                     headers: {
@@ -111,7 +111,7 @@ function Wishlist() {
         try {
 
             const response = await fetch(
-                `http://localhost:9090/api/wishlist/${petId}`,
+                "https://petverse-backend-9odi.onrender.com/api/wishlist",
                 {
                     method: "DELETE",
                     headers: {

@@ -111,7 +111,7 @@ function Login() {
         try {
 
             const response = await fetch(
-                "http://localhost:9090/api/users/login",
+                "https://petverse-backend-9odi.onrender.com/api/users/login",
                 {
                     method: "POST",
 
@@ -225,7 +225,7 @@ function Login() {
 
 
             const response = await fetch(
-                "http://localhost:9090/api/users/register",
+                "https://petverse-backend-9odi.onrender.com/api/users/register",
                 {
                     method: "POST",
 
