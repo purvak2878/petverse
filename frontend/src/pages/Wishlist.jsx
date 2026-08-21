@@ -26,6 +26,7 @@ function Wishlist() {
 
     useEffect(() => {
 
+        // eslint-disable-next-line react-hooks/immutability
         fetchWishlist();
 
     }, []);
@@ -159,7 +160,7 @@ function Wishlist() {
 
     const handleViewDetails = (pet) => {
 
-        navigate("/pet-details", {
+        navigate(`/pet/${pet.id}`, {
             state: {
                 pet: pet,
             },
