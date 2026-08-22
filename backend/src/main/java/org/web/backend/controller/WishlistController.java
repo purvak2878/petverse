@@ -16,13 +16,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/wishlist")
-@CrossOrigin(origins = "http://localhost:5173")
 public class WishlistController {
 
     private final WishlistRepository wishlistRepository;
     private final UserRepository userRepository;
     private final PetRepository petRepository;
-
 
     public WishlistController(
             WishlistRepository wishlistRepository,
@@ -33,7 +31,6 @@ public class WishlistController {
         this.userRepository = userRepository;
         this.petRepository = petRepository;
     }
-
 
     // =========================================
     // GET MY WISHLIST
@@ -54,7 +51,6 @@ public class WishlistController {
 
         return ResponseEntity.ok(pets);
     }
-
 
     // =========================================
     // ADD PET TO WISHLIST
@@ -78,7 +74,6 @@ public class WishlistController {
                     .build();
         }
 
-
         if (wishlistRepository
                 .existsByUserAndPet(user, pet)) {
 
@@ -86,7 +81,6 @@ public class WishlistController {
                     .badRequest()
                     .body("Pet is already in your wishlist.");
         }
-
 
         Wishlist wishlist = new Wishlist();
 
@@ -97,7 +91,6 @@ public class WishlistController {
 
         return ResponseEntity.ok(pet);
     }
-
 
     // =========================================
     // REMOVE PET FROM WISHLIST
@@ -121,7 +114,6 @@ public class WishlistController {
                     .build();
         }
 
-
         if (!wishlistRepository
                 .existsByUserAndPet(user, pet)) {
 
@@ -130,15 +122,15 @@ public class WishlistController {
                     .body("Pet is not in your wishlist.");
         }
 
-
-        wishlistRepository
-                .deleteByUserAndPet(user, pet);
+        wishlistRepository.deleteByUserAndPet(
+                user,
+                pet
+        );
 
         return ResponseEntity.ok(
                 "Pet removed from wishlist."
         );
     }
-
 
     // =========================================
     // GET LOGGED-IN USER
@@ -156,10 +148,8 @@ public class WishlistController {
             );
         }
 
-
         String email =
                 authentication.getName();
-
 
         return userRepository
                 .findByEmail(email.trim())
