@@ -17,12 +17,38 @@ function Wishlist() {
 
     const navigate = useNavigate();
 
+    // =========================================
+    // DEPLOYED BACKEND URL
+    // =========================================
+
+    const API_BASE_URL =
+        "https://petverse-backend-9odi.onrender.com";
+
+
+    // =========================================
+    // LOGIN DATA
+    // =========================================
+
+    const token =
+        localStorage.getItem("petverseToken");
+
+    const savedUser =
+        localStorage.getItem("petverseUser");
+
 
     // =========================================
     // STATE
     // =========================================
 
-    const [wishlist, setWishlist] = useState(null);
+    const [wishlist, setWishlist] = useState(() => {
+
+        if (!token || !savedUser) {
+            return [];
+        }
+
+        return null;
+
+    });
 
     const [error, setError] = useState("");
 
@@ -33,38 +59,31 @@ function Wishlist() {
 
     const fetchWishlist = async () => {
 
-        const token =
+        const currentToken =
             localStorage.getItem("petverseToken");
 
-        const savedUser =
+        const currentUser =
             localStorage.getItem("petverseUser");
 
 
-        // =====================================
-        // USER NOT LOGGED IN
-        // =====================================
-
-        if (!token || !savedUser) {
-
-            await Promise.resolve();
-
-            setWishlist([]);
-
+        // User is not logged in
+        if (!currentToken || !currentUser) {
             return;
-
         }
 
 
         try {
 
+            setError("");
+
             const response = await fetch(
-                "http://localhost:9090/api/wishlist",
+                `${API_BASE_URL}/api/wishlist`,
                 {
                     method: "GET",
 
                     headers: {
                         "Authorization":
-                            `Bearer ${token}`,
+                            `Bearer ${currentToken}`,
 
                         "Content-Type":
                             "application/json",
@@ -73,14 +92,17 @@ function Wishlist() {
             );
 
 
-            if (!response.ok) {
+            // =====================================
+            // UNAUTHORIZED / FORBIDDEN
+            // =====================================
 
-                const message =
-                    await response.text();
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
 
                 setError(
-                    message ||
-                    "Unable to load your wishlist."
+                    "Your session has expired. Please login again."
                 );
 
                 setWishlist([]);
@@ -89,15 +111,104 @@ function Wishlist() {
             }
 
 
+            // =====================================
+            // OTHER API ERRORS
+            // =====================================
+
+            if (!response.ok) {
+
+                let message =
+                    "Unable to load your wishlist.";
+
+                try {
+
+                    const responseText =
+                        await response.text();
+
+                    if (responseText) {
+                        message = responseText;
+                    }
+
+                } catch {
+                    // Keep default message
+                }
+
+                setError(message);
+
+                setWishlist([]);
+
+                return;
+            }
+
+
+            // =====================================
+            // GET RESPONSE JSON
+            // =====================================
+
             const data =
                 await response.json();
 
 
-            setWishlist(
-                Array.isArray(data)
-                    ? data
-                    : []
-            );
+            /*
+             * Supports these possible backend
+             * response formats:
+             *
+             * [
+             *   {...},
+             *   {...}
+             * ]
+             *
+             * OR
+             *
+             * {
+             *   wishlist: [...]
+             * }
+             *
+             * OR
+             *
+             * {
+             *   pets: [...]
+             * }
+             */
+
+            let pets = [];
+
+
+            if (Array.isArray(data)) {
+
+                pets = data;
+
+            } else if (
+                Array.isArray(data?.wishlist)
+            ) {
+
+                pets = data.wishlist;
+
+            } else if (
+                Array.isArray(data?.pets)
+            ) {
+
+                pets = data.pets;
+
+            }
+
+
+            // =====================================
+            // NORMALIZE PET IDs
+            // =====================================
+
+            pets = pets.map((pet) => ({
+
+                ...pet,
+
+                id:
+                    pet.id ??
+                    pet._id,
+
+            }));
+
+
+            setWishlist(pets);
 
 
         } catch (fetchError) {
@@ -108,7 +219,7 @@ function Wishlist() {
             );
 
             setError(
-                "Unable to load your wishlist."
+                "Unable to connect to the PetVerse server."
             );
 
             setWishlist([]);
@@ -124,6 +235,10 @@ function Wishlist() {
 
     useEffect(() => {
 
+        if (!token || !savedUser) {
+            return;
+        }
+
         void fetchWishlist();
 
     }, []);
@@ -135,29 +250,30 @@ function Wishlist() {
 
     const removeFromWishlist = async (petId) => {
 
-        const token =
+        const currentToken =
             localStorage.getItem("petverseToken");
 
 
-        if (!token) {
+        if (!currentToken) {
 
             navigate("/login");
 
             return;
-
         }
 
 
         try {
 
+            setError("");
+
             const response = await fetch(
-                `http://localhost:9090/api/wishlist/${petId}`,
+                `${API_BASE_URL}/api/wishlist/${petId}`,
                 {
                     method: "DELETE",
 
                     headers: {
                         "Authorization":
-                            `Bearer ${token}`,
+                            `Bearer ${currentToken}`,
 
                         "Content-Type":
                             "application/json",
@@ -166,24 +282,54 @@ function Wishlist() {
             );
 
 
-            if (!response.ok) {
+            // =====================================
+            // AUTH ERROR
+            // =====================================
 
-                const message =
-                    await response.text();
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
 
                 setError(
-                    message ||
-                    "Unable to remove this pet."
+                    "Your session has expired. Please login again."
                 );
 
                 return;
-
             }
 
 
-            // =================================
-            // REMOVE PET FROM UI
-            // =================================
+            // =====================================
+            // DELETE ERROR
+            // =====================================
+
+            if (!response.ok) {
+
+                let message =
+                    "Unable to remove this pet.";
+
+                try {
+
+                    const responseText =
+                        await response.text();
+
+                    if (responseText) {
+                        message = responseText;
+                    }
+
+                } catch {
+                    // Keep default message
+                }
+
+                setError(message);
+
+                return;
+            }
+
+
+            // =====================================
+            // REMOVE FROM UI
+            // =====================================
 
             setWishlist((currentWishlist) => {
 
@@ -193,7 +339,7 @@ function Wishlist() {
 
                 return currentWishlist.filter(
                     (pet) =>
-                        pet.id !== petId
+                        (pet.id ?? pet._id) !== petId
                 );
 
             });
@@ -207,7 +353,7 @@ function Wishlist() {
             );
 
             setError(
-                "Unable to remove this pet."
+                "Unable to connect to the PetVerse server."
             );
 
         }
@@ -221,7 +367,12 @@ function Wishlist() {
 
     const handleViewDetails = (pet) => {
 
-        navigate(`/pet/${pet.id}`, {
+        const petId =
+            pet.id ??
+            pet._id;
+
+
+        navigate(`/pet/${petId}`, {
 
             state: {
                 pet: pet,
@@ -230,17 +381,6 @@ function Wishlist() {
         });
 
     };
-
-
-    // =========================================
-    // CHECK LOGIN
-    // =========================================
-
-    const token =
-        localStorage.getItem("petverseToken");
-
-    const savedUser =
-        localStorage.getItem("petverseUser");
 
 
     // =========================================
@@ -642,7 +782,10 @@ function Wishlist() {
                         {wishlist.map((pet) => (
 
                             <div
-                                key={pet.id}
+                                key={
+                                    pet.id ??
+                                    pet._id
+                                }
                                 className="
                                     bg-white
                                     rounded-3xl
@@ -673,7 +816,10 @@ function Wishlist() {
 
                                         <img
                                             src={pet.image}
-                                            alt={pet.name}
+                                            alt={
+                                                pet.name ||
+                                                "Pet"
+                                            }
                                             className="
                                                 w-full
                                                 h-full
@@ -714,7 +860,8 @@ function Wishlist() {
                                     <button
                                         onClick={() =>
                                             removeFromWishlist(
-                                                pet.id
+                                                pet.id ??
+                                                pet._id
                                             )
                                         }
                                         className="
@@ -734,6 +881,7 @@ function Wishlist() {
                                             transition
                                         "
                                         title="Remove from wishlist"
+                                        aria-label="Remove from wishlist"
                                     >
 
                                         <FaTrash />
@@ -756,7 +904,10 @@ function Wishlist() {
                                         font-bold
                                         text-slate-800
                                     ">
-                                        {pet.name}
+                                        {
+                                            pet.name ||
+                                            "Unnamed Pet"
+                                        }
                                     </h2>
 
 
@@ -765,7 +916,10 @@ function Wishlist() {
                                         text-sm
                                         text-gray-500
                                     ">
-                                        {pet.breed}
+                                        {
+                                            pet.breed ||
+                                            "Breed not available"
+                                        }
                                     </p>
 
 
@@ -779,19 +933,23 @@ function Wishlist() {
                                         flex-wrap
                                     ">
 
-                                        <span>
-                                            {pet.age}
-                                        </span>
+                                        {pet.age && (
+                                            <span>
+                                                {pet.age}
+                                            </span>
+                                        )}
 
+                                        {pet.gender && (
+                                            <span>
+                                                {pet.gender}
+                                            </span>
+                                        )}
 
-                                        <span>
-                                            {pet.gender}
-                                        </span>
-
-
-                                        <span>
-                                            {pet.city}
-                                        </span>
+                                        {pet.city && (
+                                            <span>
+                                                {pet.city}
+                                            </span>
+                                        )}
 
                                     </div>
 
