@@ -2,7 +2,6 @@ package org.web.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.http.HttpMethod;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,12 +36,11 @@ public class SecurityConfig {
     }
 
     // =========================================
-    // BYPASS SPRING SECURITY FOR UPLOADED FILES
+    // COMPLETELY IGNORE UPLOADED FILES
     // =========================================
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-
         return web -> web
                 .ignoring()
                 .requestMatchers("/uploads/**");
@@ -58,7 +56,6 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-
                 // CORS
                 .cors(cors ->
                         cors.configurationSource(
@@ -66,7 +63,7 @@ public class SecurityConfig {
                         )
                 )
 
-                // JWT application - disable CSRF
+                // JWT application
                 .csrf(csrf ->
                         csrf.disable()
                 )
@@ -78,9 +75,9 @@ public class SecurityConfig {
                         )
                 )
 
-                // =====================================
+                // =========================================
                 // AUTHORIZATION
-                // =====================================
+                // =========================================
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -105,7 +102,7 @@ public class SecurityConfig {
                                 "/api/pets/**"
                         ).permitAll()
 
-                        // Wishlist requires login
+                        // Wishlist requires authentication
                         .requestMatchers(
                                 "/api/wishlist/**"
                         ).authenticated()
@@ -129,7 +126,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
@@ -141,7 +137,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
     ) throws Exception {
-
         return configuration.getAuthenticationManager();
     }
 
