@@ -147,7 +147,8 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(
                 List.of(
-                        "http://localhost:5173"
+                        "http://localhost:5173",
+                        "https://petverse-frontend-8ori.onrender.com"
                 )
         );
 
