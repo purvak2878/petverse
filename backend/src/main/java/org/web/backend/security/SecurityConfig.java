@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -25,6 +28,7 @@ import java.util.List;
 
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -33,7 +37,8 @@ public class SecurityConfig {
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationFilter =
+                jwtAuthenticationFilter;
     }
 
 
@@ -48,34 +53,29 @@ public class SecurityConfig {
 
         http
 
-                // =========================================
                 // CORS
-                // =========================================
                 .cors(cors ->
                         cors.configurationSource(
                                 corsConfigurationSource()
                         )
                 )
 
-                // =========================================
-                // CSRF
-                // =========================================
+                // CSRF disabled because JWT is used
                 .csrf(csrf ->
                         csrf.disable()
                 )
 
-                // =========================================
-                // JWT IS STATELESS
-                // =========================================
+                // Stateless JWT
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                // =========================================
-                // ENDPOINT PERMISSIONS
-                // =========================================
+                // =====================================
+                // AUTHORIZATION
+                // =====================================
+
                 .authorizeHttpRequests(auth -> auth
 
                         // CORS preflight
@@ -94,12 +94,12 @@ public class SecurityConfig {
                                 "/api/users/login"
                         ).permitAll()
 
-                        // Pet browsing
+                        // Public pets API
                         .requestMatchers(
                                 "/api/pets/**"
                         ).permitAll()
 
-                        // Uploaded pet images/files
+                        // Public uploaded files
                         .requestMatchers(
                                 "/uploads/**"
                         ).permitAll()
@@ -113,9 +113,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // =========================================
-                // JWT FILTER
-                // =========================================
+                // JWT filter
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
@@ -151,7 +149,7 @@ public class SecurityConfig {
 
 
     // =========================================
-    // CORS CONFIGURATION
+    // CORS
     // =========================================
 
     @Bean
