@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/wishlist")
 public class WishlistController {
@@ -21,6 +22,7 @@ public class WishlistController {
     private final WishlistRepository wishlistRepository;
     private final UserRepository userRepository;
     private final PetRepository petRepository;
+
 
     public WishlistController(
             WishlistRepository wishlistRepository,
@@ -31,6 +33,7 @@ public class WishlistController {
         this.userRepository = userRepository;
         this.petRepository = petRepository;
     }
+
 
     // =========================================
     // GET MY WISHLIST
@@ -51,6 +54,7 @@ public class WishlistController {
 
         return ResponseEntity.ok(pets);
     }
+
 
     // =========================================
     // ADD PET TO WISHLIST
@@ -74,13 +78,17 @@ public class WishlistController {
                     .build();
         }
 
+
         if (wishlistRepository
                 .existsByUserAndPet(user, pet)) {
 
             return ResponseEntity
                     .badRequest()
-                    .body("Pet is already in your wishlist.");
+                    .body(
+                            "Pet is already in your wishlist."
+                    );
         }
+
 
         Wishlist wishlist = new Wishlist();
 
@@ -91,6 +99,7 @@ public class WishlistController {
 
         return ResponseEntity.ok(pet);
     }
+
 
     // =========================================
     // REMOVE PET FROM WISHLIST
@@ -114,23 +123,29 @@ public class WishlistController {
                     .build();
         }
 
+
         if (!wishlistRepository
                 .existsByUserAndPet(user, pet)) {
 
             return ResponseEntity
                     .badRequest()
-                    .body("Pet is not in your wishlist.");
+                    .body(
+                            "Pet is not in your wishlist."
+                    );
         }
+
 
         wishlistRepository.deleteByUserAndPet(
                 user,
                 pet
         );
 
+
         return ResponseEntity.ok(
                 "Pet removed from wishlist."
         );
     }
+
 
     // =========================================
     // GET LOGGED-IN USER
@@ -148,11 +163,15 @@ public class WishlistController {
             );
         }
 
+
         String email =
                 authentication.getName();
 
+
         return userRepository
-                .findByEmail(email.trim())
+                .findByEmail(
+                        email.trim()
+                )
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Logged-in user not found."

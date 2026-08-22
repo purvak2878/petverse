@@ -3,6 +3,8 @@ package org.web.backend.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.HttpMethod;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
@@ -47,59 +49,92 @@ public class SecurityConfig {
 
         http
 
+                // =========================================
                 // CORS
+                // =========================================
                 .cors(cors ->
                         cors.configurationSource(
                                 corsConfigurationSource()
                         )
                 )
 
-                // Disable CSRF because we use JWT
+                // =========================================
+                // CSRF
+                // JWT based application
+                // =========================================
                 .csrf(csrf ->
                         csrf.disable()
                 )
 
+                // =========================================
+                // SESSION
                 // JWT is stateless
+                // =========================================
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                // ==============================
+                // =========================================
                 // ENDPOINT PERMISSIONS
-                // ==============================
-
+                // =========================================
                 .authorizeHttpRequests(auth -> auth
 
-                        // Register
+                        // =====================================
+                        // CORS PREFLIGHT
+                        // IMPORTANT FOR DELETE / POST / PUT
+                        // =====================================
+                        .requestMatchers(
+                                HttpMethod.OPTIONS,
+                                "/**"
+                        ).permitAll()
+
+                        // =====================================
+                        // REGISTER
+                        // =====================================
                         .requestMatchers(
                                 "/api/users/register"
                         ).permitAll()
 
-                        // Login
+                        // =====================================
+                        // LOGIN
+                        // =====================================
                         .requestMatchers(
                                 "/api/users/login"
                         ).permitAll()
 
-                        // Pet browsing
+                        // =====================================
+                        // PET BROWSING
+                        // =====================================
                         .requestMatchers(
                                 "/api/pets/**"
                         ).permitAll()
 
-                        // Uploaded pet images/files
+                        // =====================================
+                        // UPLOADED PET IMAGES / FILES
+                        // =====================================
                         .requestMatchers(
                                 "/uploads/**"
                         ).permitAll()
-                        // Wishlist
+
+                        // =====================================
+                        // WISHLIST
+                        // LOGIN REQUIRED
+                        // =====================================
                         .requestMatchers(
                                 "/api/wishlist/**"
                         ).authenticated()
-                        // Everything else requires login
+
+                        // =====================================
+                        // EVERYTHING ELSE
+                        // =====================================
                         .anyRequest().authenticated()
                 )
 
-                // JWT filter
+                // =========================================
+                // JWT FILTER
+                // =========================================
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
@@ -135,7 +170,7 @@ public class SecurityConfig {
 
 
     // =========================================
-    // CORS
+    // CORS CONFIGURATION
     // =========================================
 
     @Bean
@@ -145,6 +180,9 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
 
+        // =====================================
+        // FRONTEND ORIGINS
+        // =====================================
         configuration.setAllowedOrigins(
                 List.of(
                         "http://localhost:5173",
@@ -153,6 +191,9 @@ public class SecurityConfig {
         );
 
 
+        // =====================================
+        // ALLOWED HTTP METHODS
+        // =====================================
         configuration.setAllowedMethods(
                 List.of(
                         "GET",
@@ -164,14 +205,23 @@ public class SecurityConfig {
         );
 
 
+        // =====================================
+        // ALLOWED HEADERS
+        // =====================================
         configuration.setAllowedHeaders(
                 List.of("*")
         );
 
 
+        // =====================================
+        // AUTHORIZATION HEADER / CREDENTIALS
+        // =====================================
         configuration.setAllowCredentials(true);
 
 
+        // =====================================
+        // REGISTER CORS CONFIGURATION
+        // =====================================
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
