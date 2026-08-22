@@ -65,9 +65,7 @@ function PetCard({ pet }) {
             return "";
         }
 
-
         const image = pet.image.trim();
-
 
         if (
             image.startsWith("http://") ||
@@ -76,8 +74,7 @@ function PetCard({ pet }) {
             return image;
         }
 
-
-        return `http://localhost:9090/uploads/pets/${encodeURIComponent(image)}`;
+        return `https://petverse-backend-9odi.onrender.com/uploads/pets/${encodeURIComponent(image)}`;
     };
 
 
@@ -212,10 +209,9 @@ function PetCard({ pet }) {
             if (isWishlisted) {
 
                 const response = await fetch(
-                    `http://localhost:9090/api/wishlist/${pet.id}`,
+                    `https://petverse-backend-9odi.onrender.com/api/wishlist/${pet.id}`,
                     {
                         method: "DELETE",
-
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -240,10 +236,9 @@ function PetCard({ pet }) {
             else {
 
                 const response = await fetch(
-                    `http://localhost:9090/api/wishlist/${pet.id}`,
+                    `https://petverse-backend-9odi.onrender.com/api/wishlist/${pet.id}`,
                     {
                         method: "POST",
-
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
