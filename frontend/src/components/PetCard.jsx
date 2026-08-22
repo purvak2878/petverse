@@ -20,8 +20,14 @@ function PetCard({ pet }) {
     const navigate = useNavigate();
 
     const [showLoginPopup, setShowLoginPopup] =
-        useState(false);const [isWishlisted, setIsWishlisted] = useState(false);
-    const [wishlistLoading, setWishlistLoading] = useState(false);
+        useState(false);
+
+    const [isWishlisted, setIsWishlisted] =
+        useState(false);
+
+    const [wishlistLoading, setWishlistLoading] =
+        useState(false);
+
 
     // =========================================
     // GET PET TRAITS
@@ -71,7 +77,7 @@ function PetCard({ pet }) {
         }
 
 
-        return `https://petverse-backend-9odi.onrender.com/uploads/pets/${encodeURIComponent(image)}`;
+        return `http://localhost:9090/uploads/pets/${encodeURIComponent(image)}`;
     };
 
 
@@ -173,44 +179,62 @@ function PetCard({ pet }) {
             },
         });
     };
+
+
+    // =========================================
+    // WISHLIST
+    // =========================================
+
     const handleWishlist = async () => {
 
         // Check login
         const token = localStorage.getItem("petverseToken");
-        const savedUser = localStorage.getItem("petverseUser");
+
+        const savedUser =
+            localStorage.getItem("petverseUser");
+
 
         // Guest → login/register popup
         if (!token || !savedUser) {
+
             setShowLoginPopup(true);
+
             return;
         }
+
 
         try {
 
             setWishlistLoading(true);
 
+
             // If already saved → remove it
             if (isWishlisted) {
 
                 const response = await fetch(
-                    `https://petverse-backend-9odi.onrender.com/api/wishlist/${pet.id}`,
+                    `http://localhost:9090/api/wishlist/${pet.id}`,
                     {
                         method: "DELETE",
+
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
                     }
                 );
 
+
                 if (!response.ok) {
+
                     throw new Error(
                         "Failed to remove pet from wishlist."
                     );
                 }
 
+
                 setIsWishlisted(false);
 
             }
+
 
             // If not saved → add it
             else {
@@ -219,16 +243,19 @@ function PetCard({ pet }) {
                     `http://localhost:9090/api/wishlist/${pet.id}`,
                     {
                         method: "POST",
+
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
                     }
                 );
 
+
                 if (!response.ok) {
 
                     const message =
                         await response.text();
+
 
                     throw new Error(
                         message ||
@@ -236,9 +263,11 @@ function PetCard({ pet }) {
                     );
                 }
 
+
                 setIsWishlisted(true);
 
             }
+
 
         } catch (error) {
 
@@ -255,6 +284,7 @@ function PetCard({ pet }) {
 
         }
     };
+
 
     return (
 
@@ -276,6 +306,8 @@ function PetCard({ pet }) {
                 hover:-translate-y-1
                 transition-all
                 duration-300
+
+                max-md:rounded-xl
             ">
 
 
@@ -287,6 +319,9 @@ function PetCard({ pet }) {
                     relative
                     w-full
                     h-[150px]
+
+                    max-md:h-[190px]
+
                     overflow-hidden
                     bg-slate-100
                 ">
@@ -356,6 +391,7 @@ function PetCard({ pet }) {
 
                     ) : imageUrl ? (
 
+
                         /* =================================
                             PET IMAGE
                         ================================== */
@@ -389,6 +425,7 @@ function PetCard({ pet }) {
 
                     ) : (
 
+
                         /* =================================
                             NO IMAGE
                         ================================== */
@@ -414,36 +451,45 @@ function PetCard({ pet }) {
 
                     {/* =================================
                         WISHLIST HEART
-                    ================================== */}<button
-                    type="button"
-                    onClick={handleWishlist}
-                    disabled={wishlistLoading}
-                    className="
-                          absolute
-                          top-3
-                          right-3
-                          w-9
-                          h-9
-                          rounded-full
-                          bg-white
-                          flex
-                          items-center
-                          justify-center
-                          shadow-md
-                          transition-all
-                          duration-200
-                          hover:scale-110
-                     "
-                    aria-label="Add to wishlist"
-                >
-                    <FaHeart
-                        className={
-                            isWishlisted
-                                ? "text-pink-500"
-                                : "text-violet-500"
-                        }
-                    />
-                </button>
+                    ================================== */}
+
+                    <button
+                        type="button"
+                        onClick={handleWishlist}
+                        disabled={wishlistLoading}
+                        className="
+                            absolute
+                            top-3
+                            right-3
+                            w-9
+                            h-9
+                            rounded-full
+                            bg-white
+                            flex
+                            items-center
+                            justify-center
+                            shadow-md
+                            transition-all
+                            duration-200
+                            hover:scale-110
+
+                            max-md:top-2
+                            max-md:right-2
+                            max-md:w-8
+                            max-md:h-8
+                        "
+                        aria-label="Add to wishlist"
+                    >
+
+                        <FaHeart
+                            className={
+                                isWishlisted
+                                    ? "text-pink-500"
+                                    : "text-violet-500"
+                            }
+                        />
+
+                    </button>
 
 
                 </div>
@@ -457,6 +503,10 @@ function PetCard({ pet }) {
                     px-5
                     pt-4
                     pb-5
+
+                    max-md:px-3
+                    max-md:pt-3
+                    max-md:pb-3
                 ">
 
 
@@ -479,6 +529,8 @@ function PetCard({ pet }) {
                                 font-bold
                                 text-slate-800
                                 truncate
+
+                                max-md:text-sm
                             ">
                                 {pet.name}
                             </h3>
@@ -489,6 +541,8 @@ function PetCard({ pet }) {
                                 text-slate-500
                                 mt-0.5
                                 truncate
+
+                                max-md:text-[10px]
                             ">
                                 {pet.breed}
                             </p>
@@ -507,6 +561,10 @@ function PetCard({ pet }) {
                             bg-violet-50
                             text-violet-600
                             font-semibold
+
+                            max-md:text-[8px]
+                            max-md:px-2
+                            max-md:py-0.5
                         ">
                             {pet.type}
                         </span>
@@ -525,6 +583,11 @@ function PetCard({ pet }) {
                         mt-3
                         text-[11px]
                         text-slate-500
+
+                        max-md:flex-col
+                        max-md:items-start
+                        max-md:gap-1.5
+                        max-md:text-[10px]
                     ">
 
 
@@ -597,6 +660,9 @@ function PetCard({ pet }) {
                         gap-1.5
                         mt-3
                         min-h-[25px]
+
+                        max-md:gap-1
+                        max-md:mt-2
                     ">
 
                         {traits
@@ -611,6 +677,11 @@ function PetCard({ pet }) {
                                         py-1
                                         rounded-full
                                         font-medium
+
+                                        max-md:text-[8px]
+                                        max-md:px-2
+                                        max-md:py-0.5
+
                                         ${
                                         index === 0
                                             ? "bg-violet-50 text-violet-600"
@@ -636,6 +707,10 @@ function PetCard({ pet }) {
                         flex
                         gap-2
                         mt-4
+
+                        max-md:flex-col
+                        max-md:gap-1.5
+                        max-md:mt-3
                     ">
 
 
@@ -661,6 +736,9 @@ function PetCard({ pet }) {
                                 hover:bg-violet-50
                                 hover:border-violet-400
                                 transition-all
+
+                                max-md:py-2
+                                max-md:text-[9px]
                             "
                         >
 
@@ -696,6 +774,9 @@ function PetCard({ pet }) {
                                 hover:-translate-y-0.5
                                 hover:shadow-md
                                 transition-all
+
+                                max-md:py-2
+                                max-md:text-[9px]
                             "
                         >
 
@@ -706,6 +787,7 @@ function PetCard({ pet }) {
                         </button>
 
                     </div>
+
 
                 </div>
 
@@ -885,6 +967,7 @@ function PetCard({ pet }) {
                         ">
                             Find your perfect companion with PetVerse 🐾
                         </p>
+
 
                     </div>
 

@@ -34,10 +34,6 @@ function Login() {
         confirm: "",
     });
 
-    // =========================================
-    // NOTIFICATION STATE
-    // =========================================
-
     const [notification, setNotification] = useState({
         show: false,
         type: "",
@@ -50,7 +46,11 @@ function Login() {
     // SHOW NOTIFICATION
     // =========================================
 
-    const showNotification = (type, title, message) => {
+    const showNotification = (
+        type,
+        title,
+        message
+    ) => {
 
         setNotification({
             show: true,
@@ -82,7 +82,6 @@ function Login() {
             ...loginData,
             [e.target.name]: e.target.value,
         });
-
     };
 
 
@@ -96,7 +95,6 @@ function Login() {
             ...registerData,
             [e.target.name]: e.target.value,
         });
-
     };
 
 
@@ -155,11 +153,9 @@ function Login() {
                         ? data
                         : "Invalid email or password"
                 );
-
             }
 
 
-            // Save JWT + user
             loginUser(data);
 
 
@@ -169,7 +165,6 @@ function Login() {
             );
 
 
-            // Show success notification
             showNotification(
                 "success",
                 "Welcome back! 🐾",
@@ -177,9 +172,10 @@ function Login() {
             );
 
 
-            // Small delay so user can see notification
             setTimeout(() => {
+
                 navigate("/");
+
             }, 1000);
 
 
@@ -211,7 +207,6 @@ function Login() {
 
         try {
 
-            // Password confirmation
             if (
                 registerData.password !==
                 registerData.confirm
@@ -220,7 +215,6 @@ function Login() {
                 throw new Error(
                     "Passwords do not match."
                 );
-
             }
 
 
@@ -252,7 +246,6 @@ function Login() {
                     data ||
                     "Registration failed."
                 );
-
             }
 
 
@@ -261,7 +254,6 @@ function Login() {
             );
 
 
-            // Clear registration form
             setRegisterData({
                 name: "",
                 email: "",
@@ -270,11 +262,9 @@ function Login() {
             });
 
 
-            // Switch to login
             setIsSignUp(false);
 
 
-            // Show success notification
             showNotification(
                 "success",
                 "Account created! 🐾",
@@ -310,11 +300,19 @@ function Login() {
             bg-slate-50
             flex
             items-center
+
+            max-md:min-h-screen
+            max-md:h-auto
+            max-md:overflow-y-auto
+            max-md:overflow-x-hidden
+            max-md:flex-col
+            max-md:items-stretch
+            max-md:py-6
         ">
 
 
             {/* =====================================
-                PAW PRINT BACKGROUND
+                PAW BACKGROUND
             ====================================== */}
 
             <PawBackground />
@@ -345,6 +343,11 @@ function Login() {
                     hover:-translate-x-1
                     transition-all
                     duration-200
+
+                    max-md:top-4
+                    max-md:left-4
+                    max-md:w-9
+                    max-md:h-9
                 "
                 aria-label="Back to Home"
             >
@@ -391,7 +394,9 @@ function Login() {
 
 
             {/* =====================================
-                LEFT INTRO / DOG SECTION
+                LEFT DOG + TEXT SECTION
+                DESKTOP UNCHANGED
+                MOBILE POSITION KEPT
             ====================================== */}
 
             <section className="
@@ -404,7 +409,17 @@ function Login() {
                 flex
                 items-center
                 justify-center
+
+                max-md:relative
+                max-md:left-auto
+                max-md:top-auto
+                max-md:w-full
+                max-md:h-auto
+                max-md:min-h-0
+                max-md:z-10
+                max-md:order-1
             ">
+
 
                 <div className="
                     relative
@@ -416,10 +431,19 @@ function Login() {
                     flex-col
                     items-center
                     justify-center
+
+                    max-md:max-w-full
+                    max-md:h-auto
+                    max-md:px-5
+                    max-md:pt-4
+                    max-md:pb-2
+                    max-md:justify-start
                 ">
 
 
-                    {/* LOGO */}
+                    {/* =================================
+                        LOGO
+                    ================================== */}
 
                     <div className="
                         flex
@@ -439,13 +463,19 @@ function Login() {
                                 object-contain
                                 translate-y-2
                                 -translate-x-2
+
+                                max-md:h-20
+                                max-md:translate-y-0
+                                max-md:translate-x-0
                             "
                         />
 
                     </div>
 
 
-                    {/* DOG */}
+                    {/* =================================
+                        DOG
+                    ================================== */}
 
                     <div className="
                         relative
@@ -454,10 +484,14 @@ function Login() {
                         flex
                         items-end
                         justify-center
+
+                        max-md:w-[280px]
+                        max-md:h-[245px]
+                        max-md:mt-1
                     ">
 
 
-                        {/* Ground shadow */}
+                        {/* SHADOW */}
 
                         <div
                             className="
@@ -468,6 +502,10 @@ function Login() {
                                 rounded-[50%]
                                 bg-slate-400/35
                                 blur-md
+
+                                max-md:bottom-2
+                                max-md:w-[165px]
+                                max-md:h-[20px]
                             "
                             style={{
                                 animation:
@@ -476,7 +514,7 @@ function Login() {
                         />
 
 
-                        {/* Dog */}
+                        {/* DOG */}
 
                         <img
                             src={dogImage}
@@ -488,6 +526,9 @@ function Login() {
                                 h-[440px]
                                 object-contain
                                 drop-shadow-xl
+
+                                max-md:w-[320px]
+                                max-md:h-[280px]
                             "
                             style={{
                                 animation:
@@ -498,7 +539,9 @@ function Login() {
                     </div>
 
 
-                    {/* TAGLINE */}
+                    {/* =================================
+                        TAGLINE
+                    ================================== */}
 
                     <div className="text-center">
 
@@ -508,6 +551,10 @@ function Login() {
                             font-extrabold
                             text-slate-800
                             -translate-y-10
+
+                            max-md:text-[27px]
+                            max-md:leading-[1.05]
+                            max-md:translate-y-1
                         ">
 
                             Because every
@@ -528,6 +575,10 @@ function Login() {
                             font-medium
                             text-slate-500
                             -translate-y-4
+
+                            max-md:text-sm
+                            max-md:translate-y-1
+                            max-md:mb-3
                         ">
 
                             Adopt. Love. Repeat.
@@ -550,7 +601,7 @@ function Login() {
 
 
             {/* =====================================
-                RIGHT SIDE
+                RIGHT SIDE / LOGIN CARD
             ====================================== */}
 
             <div className="
@@ -563,11 +614,22 @@ function Login() {
                 justify-end
                 pr-[6%]
                 pl-[38%]
+
+                max-md:min-h-0
+                max-md:w-full
+                max-md:px-3
+                max-md:py-4
+                max-md:items-center
+                max-md:justify-center
+                max-md:order-2
             ">
 
 
                 {/* =================================
-                    LOGIN / REGISTER CARD
+                    REVERSIBLE CARD
+
+                    IMPORTANT:
+                    MOBILE ALSO KEEPS TWO HALVES
                 ================================== */}
 
                 <div className="
@@ -579,11 +641,17 @@ function Login() {
                     shadow-2xl
                     overflow-hidden
                     bg-white
+
+                    max-md:w-[calc(100vw-24px)]
+                    max-md:max-w-[390px]
+                    max-md:h-[500px]
+                    max-md:rounded-2xl
+                    max-md:shadow-xl
                 ">
 
 
                     {/* =================================
-                        REGISTER FORM
+                        REGISTER FORM PANEL
                     ================================== */}
 
                     <div
@@ -601,6 +669,8 @@ function Login() {
                             transition-all
                             duration-700
                             ease-in-out
+
+                            max-md:px-3
 
                             ${
                             isSignUp
@@ -624,17 +694,22 @@ function Login() {
                                 font-bold
                                 text-gray-800
                                 mb-1
+
+                                max-md:text-base
                             ">
                                 Register
                             </h2>
 
 
-                            {/* SOCIAL ICONS */}
+                            {/* SOCIAL */}
 
                             <div className="
                                 flex
                                 gap-3
                                 my-4
+
+                                max-md:gap-2
+                                max-md:my-3
                             ">
 
                                 <SocialIcon>
@@ -656,6 +731,10 @@ function Login() {
                                 text-xs
                                 text-gray-400
                                 mb-5
+                                text-center
+
+                                max-md:text-[8px]
+                                max-md:mb-3
                             ">
                                 or use your email for registration
                             </p>
@@ -689,6 +768,12 @@ function Login() {
                                         outline-none
                                         focus:ring-2
                                         focus:ring-violet-400
+
+                                        max-md:px-2.5
+                                        max-md:py-2
+                                        max-md:text-[9px]
+                                        max-md:mb-2
+                                        max-md:rounded-lg
                                     "
                                 />
 
@@ -711,6 +796,12 @@ function Login() {
                                         outline-none
                                         focus:ring-2
                                         focus:ring-violet-400
+
+                                        max-md:px-2.5
+                                        max-md:py-2
+                                        max-md:text-[9px]
+                                        max-md:mb-2
+                                        max-md:rounded-lg
                                     "
                                 />
 
@@ -733,6 +824,12 @@ function Login() {
                                         outline-none
                                         focus:ring-2
                                         focus:ring-violet-400
+
+                                        max-md:px-2.5
+                                        max-md:py-2
+                                        max-md:text-[9px]
+                                        max-md:mb-2
+                                        max-md:rounded-lg
                                     "
                                 />
 
@@ -755,6 +852,12 @@ function Login() {
                                         outline-none
                                         focus:ring-2
                                         focus:ring-violet-400
+
+                                        max-md:px-2.5
+                                        max-md:py-2
+                                        max-md:text-[9px]
+                                        max-md:mb-3
+                                        max-md:rounded-lg
                                     "
                                 />
 
@@ -777,6 +880,9 @@ function Login() {
                                         hover:-translate-y-0.5
                                         active:translate-y-0
                                         transition
+
+                                        max-md:py-2
+                                        max-md:text-[9px]
                                     "
                                 >
                                     REGISTER
@@ -789,6 +895,10 @@ function Login() {
                                 text-xs
                                 text-gray-400
                                 mt-5
+                                text-center
+
+                                max-md:text-[8px]
+                                max-md:mt-3
                             ">
 
                                 Already have an account?
@@ -797,7 +907,9 @@ function Login() {
 
                                 <button
                                     type="button"
-                                    onClick={() => setIsSignUp(false)}
+                                    onClick={() =>
+                                        setIsSignUp(false)
+                                    }
                                     className="
                                         font-semibold
                                         text-violet-600
@@ -815,7 +927,7 @@ function Login() {
 
 
                     {/* =================================
-                        LOGIN FORM
+                        LOGIN FORM PANEL
                     ================================== */}
 
                     <div
@@ -833,6 +945,8 @@ function Login() {
                             transition-all
                             duration-700
                             ease-in-out
+
+                            max-md:px-3
 
                             ${
                             isSignUp
@@ -856,17 +970,22 @@ function Login() {
                                 font-bold
                                 text-gray-800
                                 mb-1
+
+                                max-md:text-base
                             ">
                                 Login
                             </h2>
 
 
-                            {/* SOCIAL ICONS */}
+                            {/* SOCIAL */}
 
                             <div className="
                                 flex
                                 gap-3
                                 my-4
+
+                                max-md:gap-2
+                                max-md:my-3
                             ">
 
                                 <SocialIcon>
@@ -888,6 +1007,10 @@ function Login() {
                                 text-xs
                                 text-gray-400
                                 mb-5
+                                text-center
+
+                                max-md:text-[8px]
+                                max-md:mb-3
                             ">
                                 or use your account
                             </p>
@@ -921,6 +1044,12 @@ function Login() {
                                         outline-none
                                         focus:ring-2
                                         focus:ring-violet-400
+
+                                        max-md:px-2.5
+                                        max-md:py-2
+                                        max-md:text-[9px]
+                                        max-md:mb-2
+                                        max-md:rounded-lg
                                     "
                                 />
 
@@ -943,6 +1072,12 @@ function Login() {
                                         outline-none
                                         focus:ring-2
                                         focus:ring-violet-400
+
+                                        max-md:px-2.5
+                                        max-md:py-2
+                                        max-md:text-[9px]
+                                        max-md:mb-1
+                                        max-md:rounded-lg
                                     "
                                 />
 
@@ -955,6 +1090,9 @@ function Login() {
                                         text-gray-400
                                         hover:text-violet-600
                                         mb-5
+
+                                        max-md:text-[7px]
+                                        max-md:mb-3
                                     "
                                 >
                                     Forgot your password?
@@ -979,6 +1117,9 @@ function Login() {
                                         hover:-translate-y-0.5
                                         active:translate-y-0
                                         transition
+
+                                        max-md:py-2
+                                        max-md:text-[9px]
                                     "
                                 >
                                     LOGIN
@@ -991,6 +1132,10 @@ function Login() {
                                 text-xs
                                 text-gray-400
                                 mt-5
+                                text-center
+
+                                max-md:text-[8px]
+                                max-md:mt-3
                             ">
 
                                 Don't have an account?
@@ -999,7 +1144,9 @@ function Login() {
 
                                 <button
                                     type="button"
-                                    onClick={() => setIsSignUp(true)}
+                                    onClick={() =>
+                                        setIsSignUp(true)
+                                    }
                                     className="
                                         font-semibold
                                         text-violet-600
@@ -1017,7 +1164,7 @@ function Login() {
 
 
                     {/* =================================
-                        SLIDING PURPLE PANEL
+                        PURPLE REVERSIBLE PANEL
                     ================================== */}
 
                     <div
@@ -1042,6 +1189,8 @@ function Login() {
                             ease-in-out
                             z-30
 
+                            max-md:px-3
+
                             ${
                             isSignUp
                                 ? "left-0"
@@ -1053,34 +1202,48 @@ function Login() {
                         {isSignUp ? (
 
                             <>
-
                                 <FaPaw className="
                                     text-3xl
                                     mb-3
                                     opacity-80
+
+                                    max-md:text-xl
+                                    max-md:mb-2
                                 " />
+
 
                                 <h1 className="
                                     text-2xl
                                     font-bold
                                     mb-3
+
+                                    max-md:text-base
+                                    max-md:mb-2
                                 ">
                                     Welcome Back!
                                 </h1>
+
 
                                 <p className="
                                     text-sm
                                     text-white/85
                                     leading-relaxed
                                     mb-6
+
+                                    max-md:text-[8px]
+                                    max-md:leading-4
+                                    max-md:mb-3
                                 ">
                                     To keep connected with PetVerse,
                                     please sign in with your personal info.
                                 </p>
 
+
                                 <button
                                     type="button"
-                                    onClick={() => setIsSignUp(false)}
+                                    onClick={() =>
+                                        setIsSignUp(false)
+                                    }
                                     className="
                                         px-10
                                         py-2.5
@@ -1092,44 +1255,62 @@ function Login() {
                                         tracking-wide
                                         hover:bg-white/10
                                         transition
+
+                                        max-md:px-5
+                                        max-md:py-1.5
+                                        max-md:text-[8px]
+                                        max-md:border
                                     "
                                 >
                                     LOGIN
                                 </button>
-
                             </>
 
                         ) : (
 
                             <>
-
                                 <FaPaw className="
                                     text-3xl
                                     mb-3
                                     opacity-80
+
+                                    max-md:text-xl
+                                    max-md:mb-2
                                 " />
+
 
                                 <h1 className="
                                     text-2xl
                                     font-bold
                                     mb-3
+
+                                    max-md:text-base
+                                    max-md:mb-2
                                 ">
                                     Hello, Friend!
                                 </h1>
+
 
                                 <p className="
                                     text-sm
                                     text-white/85
                                     leading-relaxed
                                     mb-6
+
+                                    max-md:text-[8px]
+                                    max-md:leading-4
+                                    max-md:mb-3
                                 ">
                                     Enter your details and start your
                                     adoption journey with us today.
                                 </p>
 
+
                                 <button
                                     type="button"
-                                    onClick={() => setIsSignUp(true)}
+                                    onClick={() =>
+                                        setIsSignUp(true)
+                                    }
                                     className="
                                         px-10
                                         py-2.5
@@ -1141,11 +1322,15 @@ function Login() {
                                         tracking-wide
                                         hover:bg-white/10
                                         transition
+
+                                        max-md:px-5
+                                        max-md:py-1.5
+                                        max-md:text-[8px]
+                                        max-md:border
                                     "
                                 >
                                     REGISTER
                                 </button>
-
                             </>
 
                         )}
@@ -1156,8 +1341,7 @@ function Login() {
 
 
                 {/* =====================================
-                    PETVERSE NOTIFICATION
-                    APPEARS BELOW LOGIN CARD
+                    NOTIFICATION
                 ====================================== */}
 
                 <div
@@ -1173,6 +1357,14 @@ function Login() {
                         pointer-events-none
                         transition-all
                         duration-500
+
+                        max-md:fixed
+                        max-md:left-4
+                        max-md:right-4
+                        max-md:top-4
+                        max-md:w-auto
+                        max-md:max-w-none
+
                         ${
                         notification.show
                             ? "opacity-100 translate-y-0"
@@ -1197,6 +1389,10 @@ function Login() {
                                 items-center
                                 gap-4
 
+                                max-md:max-w-full
+                                max-md:px-4
+                                max-md:py-3
+
                                 ${
                                 notification.type === "success"
                                     ? "bg-white/95 border-emerald-200"
@@ -1204,8 +1400,6 @@ function Login() {
                             }
                             `}
                         >
-
-                            {/* Notification Icon */}
 
                             <div
                                 className={`
@@ -1219,6 +1413,10 @@ function Login() {
                                     text-white
                                     font-bold
                                     text-lg
+
+                                    max-md:w-8
+                                    max-md:h-8
+                                    max-md:text-sm
 
                                     ${
                                     notification.type === "success"
@@ -1235,8 +1433,6 @@ function Login() {
                             </div>
 
 
-                            {/* Notification Text */}
-
                             <div className="text-left">
 
                                 <h3 className="
@@ -1246,6 +1442,7 @@ function Login() {
                                 ">
                                     {notification.title}
                                 </h3>
+
 
                                 <p className="
                                     text-xs
@@ -1271,7 +1468,7 @@ function Login() {
 
 
 /* =========================================
-   SOCIAL ICON COMPONENT
+   SOCIAL ICON
 ========================================= */
 
 function SocialIcon({ children }) {
@@ -1293,6 +1490,10 @@ function SocialIcon({ children }) {
             transition
             text-sm
             cursor-pointer
+
+            max-md:w-7
+            max-md:h-7
+            max-md:text-[9px]
         ">
             {children}
         </span>

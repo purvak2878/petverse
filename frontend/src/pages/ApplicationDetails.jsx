@@ -55,7 +55,7 @@ function ApplicationDetails() {
                 // ==============================
 
                 const response = await fetch(
-                    `https://petverse-backend-9odi.onrender.com/api/applications/${id}`,
+                    `http://localhost:9090/api/applications/${id}`,
                     {
                         method: "GET",
 

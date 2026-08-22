@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+
 import PetCard from "../components/PetCard";
+
 import { Link } from "react-router-dom";
+
 
 function FeaturedPets() {
 
@@ -22,27 +25,35 @@ function FeaturedPets() {
             try {
 
                 setLoading(true);
+
                 setError("");
 
+
                 const response = await fetch(
-                    "https://petverse-backend-9odi.onrender.com/api/pets"
+                    "http://localhost:9090/api/pets"
                 );
 
+
                 if (!response.ok) {
+
                     throw new Error(
                         "Failed to load pets."
                     );
                 }
 
+
                 const data = await response.json();
+
 
                 console.log(
                     "Featured pets received:",
                     data
                 );
 
+
                 // Show first 8 pets on Home
                 setPets(data.slice(0, 8));
+
 
             } catch (error) {
 
@@ -51,9 +62,11 @@ function FeaturedPets() {
                     error
                 );
 
+
                 setError(
                     "Unable to load pets right now."
                 );
+
 
             } finally {
 
@@ -63,6 +76,7 @@ function FeaturedPets() {
 
         };
 
+
         fetchPets();
 
     }, []);
@@ -71,6 +85,7 @@ function FeaturedPets() {
     return (
 
         <section className="w-full">
+
 
             {/* =================================
                     HEADER
@@ -82,6 +97,7 @@ function FeaturedPets() {
                     text-center
                 ">
 
+
                 <div className="
                         flex
                         items-center
@@ -89,13 +105,14 @@ function FeaturedPets() {
                         gap-3
                     ">
 
-                        <span className="
+
+                    <span className="
                             text-3xl
                         ">
 
-                            🐾
+                        🐾
 
-                        </span>
+                    </span>
 
 
                     <h1 className="
@@ -107,6 +124,7 @@ function FeaturedPets() {
 
                         Featured{" "}
 
+
                         <span className="
                                 text-transparent
                                 bg-clip-text
@@ -116,11 +134,12 @@ function FeaturedPets() {
                                 to-pink-500
                             ">
 
-                                Pets
+                            Pets
 
-                            </span>
+                        </span>
 
                     </h1>
+
 
                 </div>
 
@@ -134,13 +153,17 @@ function FeaturedPets() {
 
                 </p>
 
-            </div>
 
+            </div>
 
 
             {/* VIEW ALL */}
 
-            <div className="flex justify-end mb-5">
+            <div className="
+                flex
+                justify-end
+                mb-5
+            ">
 
                 <Link
                     to="/browse-pets"
@@ -152,7 +175,9 @@ function FeaturedPets() {
                         transition
                     "
                 >
+
                     View All Pets →
+
                 </Link>
 
             </div>
@@ -166,9 +191,13 @@ function FeaturedPets() {
 
                 <div className="
                     grid
-                    grid-cols-4
+
+                    grid-cols-2
+                    lg:grid-cols-4
+
                     gap-5
                 ">
+
 
                     {[1, 2, 3, 4, 5, 6, 7, 8].map(
                         (item) => (
@@ -188,6 +217,7 @@ function FeaturedPets() {
 
                         )
                     )}
+
 
                 </div>
 
@@ -209,19 +239,26 @@ function FeaturedPets() {
                     text-center
                 ">
 
+
                     <div className="
                         text-4xl
                         mb-3
                     ">
+
                         🐾
+
                     </div>
+
 
                     <p className="
                         text-gray-500
                         text-sm
                     ">
+
                         {error}
+
                     </p>
+
 
                 </div>
 
@@ -238,9 +275,13 @@ function FeaturedPets() {
 
                     <div className="
                         grid
-                        grid-cols-4
+
+                        grid-cols-2
+                        lg:grid-cols-4
+
                         gap-5
                     ">
+
 
                         {pets.map((pet) => (
 
@@ -250,6 +291,7 @@ function FeaturedPets() {
                             />
 
                         ))}
+
 
                     </div>
 
@@ -273,27 +315,36 @@ function FeaturedPets() {
                         text-center
                     ">
 
+
                         <div className="
                             text-4xl
                             mb-3
                         ">
+
                             🐾
+
                         </div>
+
 
                         <p className="
                             text-gray-500
                             text-sm
                         ">
+
                             No pets are currently available.
+
                         </p>
+
 
                     </div>
 
                 )}
 
+
         </section>
 
     );
 }
+
 
 export default FeaturedPets;

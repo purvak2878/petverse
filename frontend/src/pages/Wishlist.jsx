@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+
 import {
     FaHeart,
     FaTrash,
     FaArrowRight,
     FaPaw,
 } from "react-icons/fa";
+
 import { useNavigate } from "react-router-dom";
 
 import PawBackground from "../components/PawBackground.jsx";
@@ -15,22 +17,19 @@ function Wishlist() {
 
     const navigate = useNavigate();
 
-    const [wishlist, setWishlist] = useState([]);
-    const [loading, setLoading] = useState(true);
+
+    // =========================================
+    // STATE
+    // =========================================
+
+    const [wishlist, setWishlist] = useState(null);
+
     const [error, setError] = useState("");
 
 
     // =========================================
     // FETCH WISHLIST
     // =========================================
-
-    useEffect(() => {
-
-        // eslint-disable-next-line react-hooks/immutability
-        fetchWishlist();
-
-    }, []);
-
 
     const fetchWishlist = async () => {
 
@@ -41,10 +40,16 @@ function Wishlist() {
             localStorage.getItem("petverseUser");
 
 
-        // Guest user
+        // =====================================
+        // USER NOT LOGGED IN
+        // =====================================
+
         if (!token || !savedUser) {
 
-            setLoading(false);
+            await Promise.resolve();
+
+            setWishlist([]);
+
             return;
 
         }
@@ -53,11 +58,16 @@ function Wishlist() {
         try {
 
             const response = await fetch(
-                `https://petverse-backend-9odi.onrender.com/api/wishlist/${petId}`,
+                "http://localhost:9090/api/wishlist",
                 {
                     method: "GET",
+
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        "Authorization":
+                            `Bearer ${token}`,
+
+                        "Content-Type":
+                            "application/json",
                     },
                 }
             );
@@ -65,33 +75,43 @@ function Wishlist() {
 
             if (!response.ok) {
 
-                throw new Error(
-                    "Failed to load wishlist."
+                const message =
+                    await response.text();
+
+                setError(
+                    message ||
+                    "Unable to load your wishlist."
                 );
 
+                setWishlist([]);
+
+                return;
             }
 
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
-            setWishlist(data);
+
+            setWishlist(
+                Array.isArray(data)
+                    ? data
+                    : []
+            );
 
 
-        } catch (error) {
+        } catch (fetchError) {
 
             console.error(
                 "Wishlist error:",
-                error
+                fetchError
             );
 
             setError(
                 "Unable to load your wishlist."
             );
 
-
-        } finally {
-
-            setLoading(false);
+            setWishlist([]);
 
         }
 
@@ -99,7 +119,18 @@ function Wishlist() {
 
 
     // =========================================
-    // REMOVE PET
+    // LOAD WISHLIST WHEN PAGE OPENS
+    // =========================================
+
+    useEffect(() => {
+
+        void fetchWishlist();
+
+    }, []);
+
+
+    // =========================================
+    // REMOVE PET FROM WISHLIST
     // =========================================
 
     const removeFromWishlist = async (petId) => {
@@ -108,14 +139,28 @@ function Wishlist() {
             localStorage.getItem("petverseToken");
 
 
+        if (!token) {
+
+            navigate("/login");
+
+            return;
+
+        }
+
+
         try {
 
             const response = await fetch(
-                "https://petverse-backend-9odi.onrender.com/api/wishlist",
+                `http://localhost:9090/api/wishlist/${petId}`,
                 {
                     method: "DELETE",
+
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        "Authorization":
+                            `Bearer ${token}`,
+
+                        "Content-Type":
+                            "application/json",
                     },
                 }
             );
@@ -123,26 +168,42 @@ function Wishlist() {
 
             if (!response.ok) {
 
-                throw new Error(
-                    "Failed to remove pet."
+                const message =
+                    await response.text();
+
+                setError(
+                    message ||
+                    "Unable to remove this pet."
                 );
+
+                return;
 
             }
 
 
-            // Remove immediately from UI
-            setWishlist((current) =>
-                current.filter(
-                    (pet) => pet.id !== petId
-                )
-            );
+            // =================================
+            // REMOVE PET FROM UI
+            // =================================
+
+            setWishlist((currentWishlist) => {
+
+                if (!Array.isArray(currentWishlist)) {
+                    return [];
+                }
+
+                return currentWishlist.filter(
+                    (pet) =>
+                        pet.id !== petId
+                );
+
+            });
 
 
-        } catch (error) {
+        } catch (removeError) {
 
             console.error(
                 "Remove wishlist error:",
-                error
+                removeError
             );
 
             setError(
@@ -155,25 +216,38 @@ function Wishlist() {
 
 
     // =========================================
-    // VIEW DETAILS
+    // VIEW PET DETAILS
     // =========================================
 
     const handleViewDetails = (pet) => {
 
         navigate(`/pet/${pet.id}`, {
+
             state: {
                 pet: pet,
             },
+
         });
 
     };
 
 
     // =========================================
+    // CHECK LOGIN
+    // =========================================
+
+    const token =
+        localStorage.getItem("petverseToken");
+
+    const savedUser =
+        localStorage.getItem("petverseUser");
+
+
+    // =========================================
     // LOADING
     // =========================================
 
-    if (loading) {
+    if (wishlist === null) {
 
         return (
 
@@ -190,13 +264,15 @@ function Wishlist() {
                     text-gray-500
                 ">
 
-                    <FaPaw className="
-                        mx-auto
-                        mb-4
-                        text-4xl
-                        text-violet-500
-                        animate-bounce
-                    " />
+                    <FaPaw
+                        className="
+                            mx-auto
+                            mb-4
+                            text-4xl
+                            text-violet-500
+                            animate-bounce
+                        "
+                    />
 
                     <p>
                         Loading your wishlist...
@@ -212,15 +288,8 @@ function Wishlist() {
 
 
     // =========================================
-    // GUEST USER
+    // GUEST PAGE
     // =========================================
-
-    const token =
-        localStorage.getItem("petverseToken");
-
-    const savedUser =
-        localStorage.getItem("petverseUser");
-
 
     if (!token || !savedUser) {
 
@@ -246,6 +315,7 @@ function Wishlist() {
                     px-6
                 ">
 
+
                     <div className="
                         bg-white
                         rounded-3xl
@@ -257,6 +327,7 @@ function Wishlist() {
                         w-full
                         text-center
                     ">
+
 
                         <div className="
                             w-16
@@ -270,10 +341,12 @@ function Wishlist() {
                             mb-5
                         ">
 
-                            <FaHeart className="
-                                text-pink-500
-                                text-2xl
-                            " />
+                            <FaHeart
+                                className="
+                                    text-pink-500
+                                    text-2xl
+                                "
+                            />
 
                         </div>
 
@@ -283,9 +356,7 @@ function Wishlist() {
                             font-bold
                             text-slate-800
                         ">
-
                             Your Wishlist
-
                         </h1>
 
 
@@ -294,11 +365,9 @@ function Wishlist() {
                             text-gray-500
                             leading-6
                         ">
-
                             Login to save your favourite
                             pets and keep them close
                             to your heart.
-
                         </p>
 
 
@@ -322,10 +391,9 @@ function Wishlist() {
                                 transition
                             "
                         >
-
                             Login / Register
-
                         </button>
+
 
                     </div>
 
@@ -354,6 +422,9 @@ function Wishlist() {
             overflow-hidden
         ">
 
+
+            {/* PAW BACKGROUND */}
+
             <PawBackground />
 
 
@@ -377,6 +448,7 @@ function Wishlist() {
                     mb-12
                 ">
 
+
                     <div className="
                         flex
                         items-center
@@ -384,10 +456,13 @@ function Wishlist() {
                         gap-3
                     ">
 
-                        <FaHeart className="
-                            text-pink-500
-                            text-2xl
-                        " />
+
+                        <FaHeart
+                            className="
+                                text-pink-500
+                                text-2xl
+                            "
+                        />
 
 
                         <h1 className="
@@ -407,12 +482,11 @@ function Wishlist() {
                                 via-fuchsia-500
                                 to-pink-500
                             ">
-
                                 Wishlist
-
                             </span>
 
                         </h1>
+
 
                     </div>
 
@@ -421,16 +495,15 @@ function Wishlist() {
                         mt-3
                         text-gray-500
                     ">
-
                         Pets you've saved for later.
-
                     </p>
+
 
                 </div>
 
 
                 {/* =================================
-                    ERROR
+                    ERROR MESSAGE
                 ================================== */}
 
                 {error && (
@@ -473,6 +546,7 @@ function Wishlist() {
                         mx-auto
                     ">
 
+
                         <div className="
                             w-20
                             h-20
@@ -485,10 +559,12 @@ function Wishlist() {
                             mb-5
                         ">
 
-                            <FaHeart className="
-                                text-pink-400
-                                text-3xl
-                            " />
+                            <FaHeart
+                                className="
+                                    text-pink-400
+                                    text-3xl
+                                "
+                            />
 
                         </div>
 
@@ -498,9 +574,7 @@ function Wishlist() {
                             font-bold
                             text-slate-800
                         ">
-
                             Your wishlist is empty
-
                         </h2>
 
 
@@ -508,17 +582,17 @@ function Wishlist() {
                             mt-2
                             text-gray-500
                         ">
-
                             Found a pet you love?
                             Save it here so you can
                             find it again later.
-
                         </p>
 
 
                         <button
                             onClick={() =>
-                                navigate("/browse-pets")
+                                navigate(
+                                    "/browse-pets"
+                                )
                             }
                             className="
                                 mt-7
@@ -546,9 +620,11 @@ function Wishlist() {
 
                         </button>
 
+
                     </div>
 
                 ) : (
+
 
                     /* =================================
                        WISHLIST PET GRID
@@ -561,6 +637,7 @@ function Wishlist() {
                         lg:grid-cols-3
                         gap-7
                     ">
+
 
                         {wishlist.map((pet) => (
 
@@ -580,13 +657,17 @@ function Wishlist() {
                                 "
                             >
 
-                                {/* IMAGE */}
+
+                                {/* =================================
+                                    PET IMAGE
+                                ================================== */}
 
                                 <div className="
                                     relative
                                     h-60
                                     overflow-hidden
                                 ">
+
 
                                     {pet.image ? (
 
@@ -614,17 +695,21 @@ function Wishlist() {
                                             justify-center
                                         ">
 
-                                            <FaPaw className="
-                                                text-5xl
-                                                text-violet-300
-                                            " />
+                                            <FaPaw
+                                                className="
+                                                    text-5xl
+                                                    text-violet-300
+                                                "
+                                            />
 
                                         </div>
 
                                     )}
 
 
-                                    {/* REMOVE BUTTON */}
+                                    {/* =================================
+                                        REMOVE BUTTON
+                                    ================================== */}
 
                                     <button
                                         onClick={() =>
@@ -655,21 +740,23 @@ function Wishlist() {
 
                                     </button>
 
+
                                 </div>
 
 
-                                {/* PET INFO */}
+                                {/* =================================
+                                    PET INFORMATION
+                                ================================== */}
 
                                 <div className="p-6">
+
 
                                     <h2 className="
                                         text-xl
                                         font-bold
                                         text-slate-800
                                     ">
-
                                         {pet.name}
-
                                     </h2>
 
 
@@ -678,9 +765,7 @@ function Wishlist() {
                                         text-sm
                                         text-gray-500
                                     ">
-
                                         {pet.breed}
-
                                     </p>
 
 
@@ -691,15 +776,18 @@ function Wishlist() {
                                         mt-3
                                         text-xs
                                         text-gray-500
+                                        flex-wrap
                                     ">
 
                                         <span>
                                             {pet.age}
                                         </span>
 
+
                                         <span>
                                             {pet.gender}
                                         </span>
+
 
                                         <span>
                                             {pet.city}
@@ -708,7 +796,9 @@ function Wishlist() {
                                     </div>
 
 
-                                    {/* VIEW DETAILS */}
+                                    {/* =================================
+                                        VIEW DETAILS
+                                    ================================== */}
 
                                     <button
                                         onClick={() =>
@@ -744,20 +834,25 @@ function Wishlist() {
 
                                     </button>
 
+
                                 </div>
+
 
                             </div>
 
                         ))}
 
+
                     </div>
 
                 )}
+
 
             </main>
 
 
             <Footer />
+
 
         </div>
 

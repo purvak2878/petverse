@@ -3,7 +3,6 @@ import {
     FaInstagram,
     FaTwitter,
     FaYoutube,
-    FaPaw,
 } from "react-icons/fa";
 
 import logo from "../assets/images/petverse_logo_1.png";
@@ -36,6 +35,9 @@ function Footer({ sidebarOpen }) {
                 w-full
                 h-[70px]
                 overflow-hidden
+
+                max-md:-top-[35px]
+                max-md:h-[45px]
             ">
 
 
@@ -47,6 +49,8 @@ function Footer({ sidebarOpen }) {
                         bottom-0
                         w-full
                         h-[65px]
+
+                        max-md:h-[40px]
                     "
                     viewBox="0 0 1440 120"
                     preserveAspectRatio="none"
@@ -76,6 +80,8 @@ function Footer({ sidebarOpen }) {
                         bottom-[-5px]
                         w-full
                         h-[55px]
+
+                        max-md:h-[35px]
                     "
                     viewBox="0 0 1440 120"
                     preserveAspectRatio="none"
@@ -105,6 +111,8 @@ function Footer({ sidebarOpen }) {
                         bottom-[-12px]
                         w-full
                         h-[45px]
+
+                        max-md:h-[30px]
                     "
                     viewBox="0 0 1440 120"
                     preserveAspectRatio="none"
@@ -141,6 +149,10 @@ function Footer({ sidebarOpen }) {
                     transition-all
                     duration-300
 
+                    max-md:pt-8
+                    max-md:pb-3
+                    max-md:px-6
+
                     ${
                     sidebarOpen
                         ? "ml-[285px]"
@@ -150,12 +162,20 @@ function Footer({ sidebarOpen }) {
             >
 
 
+                {/* =====================================
+                    FOOTER GRID
+                ====================================== */}
+
                 <div className="
                     grid
                     grid-cols-1
                     sm:grid-cols-2
                     lg:grid-cols-4
                     gap-8
+
+                    max-md:grid-cols-2
+                    max-md:gap-x-6
+                    max-md:gap-y-4
                 ">
 
 
@@ -163,7 +183,10 @@ function Footer({ sidebarOpen }) {
                         BRAND
                     ================================== */}
 
-                    <div>
+                    <div className="
+                        max-md:col-span-2
+                        max-md:text-center
+                    ">
 
                         <img
                             src={logo}
@@ -173,6 +196,12 @@ function Footer({ sidebarOpen }) {
                                 object-contain
                                 -translate-y-8
                                 -translate-x-6
+
+                                max-md:h-16
+                                max-md:translate-x-0
+                                max-md:translate-y-0
+                                max-md:mx-auto
+                                max-md:mb-0
                             "
                         />
 
@@ -183,6 +212,12 @@ function Footer({ sidebarOpen }) {
                             -translate-y-14
                             mt-0
                             max-w-xs
+
+                            max-md:text-[11px]
+                            max-md:translate-y-1
+                            max-md:max-w-full
+                            max-md:mt-0
+                            max-md:mb-1
                         ">
 
                             Connecting paws with hearts,
@@ -203,6 +238,9 @@ function Footer({ sidebarOpen }) {
                             font-bold
                             text-gray-800
                             mb-3
+
+                            max-md:text-sm
+                            max-md:mb-2
                         ">
 
                             Quick Links
@@ -216,6 +254,9 @@ function Footer({ sidebarOpen }) {
                             gap-2
                             text-sm
                             text-gray-600
+
+                            max-md:gap-1
+                            max-md:text-[11px]
                         ">
 
                             <Link
@@ -225,9 +266,7 @@ function Footer({ sidebarOpen }) {
                                     transition
                                 "
                             >
-
                                 Home
-
                             </Link>
 
 
@@ -238,9 +277,7 @@ function Footer({ sidebarOpen }) {
                                     transition
                                 "
                             >
-
                                 Browse Pets
-
                             </Link>
 
 
@@ -251,9 +288,7 @@ function Footer({ sidebarOpen }) {
                                     transition
                                 "
                             >
-
                                 Pet Tips
-
                             </Link>
 
 
@@ -264,9 +299,7 @@ function Footer({ sidebarOpen }) {
                                     transition
                                 "
                             >
-
                                 FAQs
-
                             </Link>
 
                         </div>
@@ -284,6 +317,9 @@ function Footer({ sidebarOpen }) {
                             font-bold
                             text-gray-800
                             mb-3
+
+                            max-md:text-sm
+                            max-md:mb-2
                         ">
 
                             For Help
@@ -297,6 +333,9 @@ function Footer({ sidebarOpen }) {
                             gap-2
                             text-sm
                             text-gray-600
+
+                            max-md:gap-1
+                            max-md:text-[11px]
                         ">
 
 
@@ -307,13 +346,9 @@ function Footer({ sidebarOpen }) {
                                     transition
                                 "
                             >
-
                                 Help Center
-
                             </Link>
 
-
-                            {/* ADOPTION PROCESS */}
 
                             <Link
                                 to="/adoption-process"
@@ -327,7 +362,6 @@ function Footer({ sidebarOpen }) {
                                 "
                             >
                                 Adoption Process
-
                             </Link>
 
 
@@ -338,9 +372,7 @@ function Footer({ sidebarOpen }) {
                                     transition
                                 "
                             >
-
                                 Pet Care Guide
-
                             </Link>
 
 
@@ -349,9 +381,7 @@ function Footer({ sidebarOpen }) {
                                 hover:text-violet-600
                                 transition
                             ">
-
                                 Contact Us
-
                             </span>
 
                         </div>
@@ -363,12 +393,21 @@ function Footer({ sidebarOpen }) {
                         SOCIAL
                     ================================== */}
 
-                    <div>
+                    <div className="
+                        max-md:col-span-2
+                        max-md:flex
+                        max-md:flex-col
+                        max-md:items-center
+                        max-md:mt-1
+                    ">
 
                         <h3 className="
                             font-bold
                             text-gray-800
                             mb-3
+
+                            max-md:text-sm
+                            max-md:mb-2
                         ">
 
                             Follow Us
@@ -379,8 +418,12 @@ function Footer({ sidebarOpen }) {
                         <div className="
                             flex
                             gap-3
+
+                            max-md:gap-2
                         ">
 
+
+                            {/* FACEBOOK */}
 
                             <button
                                 type="button"
@@ -395,6 +438,10 @@ function Footer({ sidebarOpen }) {
                                     shadow-sm
                                     hover:scale-110
                                     transition
+
+                                    max-md:w-8
+                                    max-md:h-8
+                                    max-md:text-sm
                                 "
                             >
 
@@ -403,6 +450,8 @@ function Footer({ sidebarOpen }) {
                             </button>
 
 
+                            {/* INSTAGRAM */}
+
                             <button
                                 type="button"
                                 className="
@@ -416,6 +465,10 @@ function Footer({ sidebarOpen }) {
                                     shadow-sm
                                     hover:scale-110
                                     transition
+
+                                    max-md:w-8
+                                    max-md:h-8
+                                    max-md:text-sm
                                 "
                             >
 
@@ -424,6 +477,8 @@ function Footer({ sidebarOpen }) {
                             </button>
 
 
+                            {/* TWITTER */}
+
                             <button
                                 type="button"
                                 className="
@@ -437,6 +492,10 @@ function Footer({ sidebarOpen }) {
                                     shadow-sm
                                     hover:scale-110
                                     transition
+
+                                    max-md:w-8
+                                    max-md:h-8
+                                    max-md:text-sm
                                 "
                             >
 
@@ -445,6 +504,8 @@ function Footer({ sidebarOpen }) {
                             </button>
 
 
+                            {/* YOUTUBE */}
+
                             <button
                                 type="button"
                                 className="
@@ -458,6 +519,10 @@ function Footer({ sidebarOpen }) {
                                     shadow-sm
                                     hover:scale-110
                                     transition
+
+                                    max-md:w-8
+                                    max-md:h-8
+                                    max-md:text-sm
                                 "
                             >
 
@@ -484,6 +549,10 @@ function Footer({ sidebarOpen }) {
                     text-center
                     text-sm
                     text-gray-500
+
+                    max-md:mt-4
+                    max-md:pt-2
+                    max-md:text-[10px]
                 ">
 
                     © 2026 PetVerse. All rights reserved. 🐾
@@ -495,7 +564,6 @@ function Footer({ sidebarOpen }) {
         </footer>
 
     );
-
 }
 
 
