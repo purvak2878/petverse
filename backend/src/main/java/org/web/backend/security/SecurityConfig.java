@@ -7,12 +7,10 @@ import org.springframework.http.HttpMethod;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,21 +24,29 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
-        this.jwtAuthenticationFilter =
-                jwtAuthenticationFilter;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    // =========================================
+    // BYPASS SPRING SECURITY FOR UPLOADED FILES
+    // =========================================
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+
+        return web -> web
+                .ignoring()
+                .requestMatchers("/uploads/**");
+    }
 
     // =========================================
     // SECURITY FILTER CHAIN
@@ -60,12 +66,12 @@ public class SecurityConfig {
                         )
                 )
 
-                // CSRF disabled because JWT is used
+                // JWT application - disable CSRF
                 .csrf(csrf ->
                         csrf.disable()
                 )
 
-                // Stateless JWT
+                // Stateless session
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
@@ -94,17 +100,12 @@ public class SecurityConfig {
                                 "/api/users/login"
                         ).permitAll()
 
-                        // Public pets API
+                        // Public pet APIs
                         .requestMatchers(
                                 "/api/pets/**"
                         ).permitAll()
 
-                        // Public uploaded files
-                        .requestMatchers(
-                                "/uploads/**"
-                        ).permitAll()
-
-                        // Wishlist
+                        // Wishlist requires login
                         .requestMatchers(
                                 "/api/wishlist/**"
                         ).authenticated()
@@ -119,10 +120,8 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 );
 
-
         return http.build();
     }
-
 
     // =========================================
     // PASSWORD ENCODER
@@ -133,7 +132,6 @@ public class SecurityConfig {
 
         return new BCryptPasswordEncoder();
     }
-
 
     // =========================================
     // AUTHENTICATION MANAGER
@@ -147,7 +145,6 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-
     // =========================================
     // CORS
     // =========================================
@@ -158,14 +155,12 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
-
         configuration.setAllowedOrigins(
                 List.of(
                         "http://localhost:5173",
                         "https://petverse-frontend-8ori.onrender.com"
                 )
         );
-
 
         configuration.setAllowedMethods(
                 List.of(
@@ -177,24 +172,19 @@ public class SecurityConfig {
                 )
         );
 
-
         configuration.setAllowedHeaders(
                 List.of("*")
         );
 
-
         configuration.setAllowCredentials(true);
-
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
-
 
         source.registerCorsConfiguration(
                 "/**",
                 configuration
         );
-
 
         return source;
     }
