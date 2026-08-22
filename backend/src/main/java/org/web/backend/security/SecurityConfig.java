@@ -33,8 +33,7 @@ public class SecurityConfig {
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
-        this.jwtAuthenticationFilter =
-                jwtAuthenticationFilter;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
 
@@ -60,15 +59,13 @@ public class SecurityConfig {
 
                 // =========================================
                 // CSRF
-                // JWT based application
                 // =========================================
                 .csrf(csrf ->
                         csrf.disable()
                 )
 
                 // =========================================
-                // SESSION
-                // JWT is stateless
+                // JWT IS STATELESS
                 // =========================================
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
@@ -81,54 +78,38 @@ public class SecurityConfig {
                 // =========================================
                 .authorizeHttpRequests(auth -> auth
 
-                        // =====================================
-                        // CORS PREFLIGHT
-                        // IMPORTANT FOR DELETE / POST / PUT
-                        // =====================================
+                        // CORS preflight
                         .requestMatchers(
                                 HttpMethod.OPTIONS,
                                 "/**"
                         ).permitAll()
 
-                        // =====================================
-                        // REGISTER
-                        // =====================================
+                        // Register
                         .requestMatchers(
                                 "/api/users/register"
                         ).permitAll()
 
-                        // =====================================
-                        // LOGIN
-                        // =====================================
+                        // Login
                         .requestMatchers(
                                 "/api/users/login"
                         ).permitAll()
 
-                        // =====================================
-                        // PET BROWSING
-                        // =====================================
+                        // Pet browsing
                         .requestMatchers(
                                 "/api/pets/**"
                         ).permitAll()
 
-                        // =====================================
-                        // UPLOADED PET IMAGES / FILES
-                        // =====================================
+                        // Uploaded pet images/files
                         .requestMatchers(
                                 "/uploads/**"
                         ).permitAll()
 
-                        // =====================================
-                        // WISHLIST
-                        // LOGIN REQUIRED
-                        // =====================================
+                        // Wishlist
                         .requestMatchers(
                                 "/api/wishlist/**"
                         ).authenticated()
 
-                        // =====================================
-                        // EVERYTHING ELSE
-                        // =====================================
+                        // Everything else
                         .anyRequest().authenticated()
                 )
 
@@ -180,9 +161,6 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
 
-        // =====================================
-        // FRONTEND ORIGINS
-        // =====================================
         configuration.setAllowedOrigins(
                 List.of(
                         "http://localhost:5173",
@@ -191,9 +169,6 @@ public class SecurityConfig {
         );
 
 
-        // =====================================
-        // ALLOWED HTTP METHODS
-        // =====================================
         configuration.setAllowedMethods(
                 List.of(
                         "GET",
@@ -205,23 +180,14 @@ public class SecurityConfig {
         );
 
 
-        // =====================================
-        // ALLOWED HEADERS
-        // =====================================
         configuration.setAllowedHeaders(
                 List.of("*")
         );
 
 
-        // =====================================
-        // AUTHORIZATION HEADER / CREDENTIALS
-        // =====================================
         configuration.setAllowCredentials(true);
 
 
-        // =====================================
-        // REGISTER CORS CONFIGURATION
-        // =====================================
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
